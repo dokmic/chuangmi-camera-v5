@@ -1,0 +1,7 @@
+services:
+  miicam:
+    build:
+      context: .
+    image: miicam:latest
+    volumes:
+      - .:/app

@@ -6,25 +6,25 @@ PROCS        := $(shell nproc --all )
 
 DOWNLOADCMD := curl -qs --http1.1 -L --retry 10 --output
 
+TOPDIR         := $(CURDIR)
+SOURCEDIR      := $(TOPDIR)/src
+PREFIXDIR      := $(TOPDIR)/prefix
+BUILDDIR       := $(TOPDIR)/build
+TOOLSDIR       := $(TOPDIR)/tools
+
 BUILDENV :=			\
 	AR=$(TARGET)-ar		\
 	AS=$(TARGET)-as		\
 	CC=$(TARGET)-gcc	\
 	CXX=$(TARGET)-g++	\
 	LD=${TARGET}-ld		\
+	LDSHARED="$(TARGET)-gcc -shared"		\
 	NM=$(TARGET)-nm		\
 	RANLIB=$(TARGET)-ranlib	\
 	STRIP=$(TARGET)-strip	\
 	CFLAGS="-fPIC"		\
 	CPPFLAGS="-I$(PREFIXDIR)/include -L$(PREFIXDIR)/lib" \
 	LDFLAGS=" -I$(PREFIXDIR)/include -L$(PREFIXDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags"
-
-
-TOPDIR         := $(CURDIR)
-SOURCEDIR      := $(TOPDIR)/src
-PREFIXDIR      := $(TOPDIR)/prefix
-BUILDDIR       := $(TOPDIR)/build
-TOOLSDIR       := $(TOPDIR)/tools
 
 PATCHESDIR     := $(TOOLSDIR)/patches
 GMLIBDIR       := $(TOOLSDIR)/gm_lib

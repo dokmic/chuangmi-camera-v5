@@ -26,7 +26,7 @@ $(BUILDDIR)/fromdos: $(PREFIXDIR)/bin $(SOURCEDIR)/$(FROMDOSARCHIVE)
 	@unzip -q $(SOURCEDIR)/$(FROMDOSARCHIVE) -d $@-$(FROMDOSVERSION)
 	@cd $@-$(FROMDOSVERSION)/src								\
 	&& fromdos Makefile											\
-	&& patch --binary -p2 < /env/tools/patches/tofrodos.patch	\
+	&& patch --binary -p2 < $(TOOLSDIR)/patches/tofrodos.patch	\
 	&& $(BUILDENV)												\
 		make -j$(PROCS) all										\
 	&& cp fromdos todos $(PREFIXDIR)/bin/
