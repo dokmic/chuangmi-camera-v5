@@ -1,8 +1,8 @@
 {
     "zlib": {
-        "version": "1.2.11",
-        "archive": "zlib-1.2.11.tar.gz",
-        "uri": "https://www.zlib.net/zlib-1.2.11.tar.gz",
+        "version": "1.2.12",
+        "archive": "zlib-1.2.12.tar.gz",
+        "uri": "https://www.zlib.net/zlib-1.2.12.tar.gz",
         "website": "http://zlib.net/"
     },
     "libxml": {
@@ -32,7 +32,7 @@
     "pcre": {
         "version": "8.44",
         "archive": "pcre-8.44.zip",
-        "uri": "https://ftp.pcre.org/pub/pcre/pcre-8.44.zip",
+        "uri": "https://netix.dl.sourceforge.net/project/pcre/pcre/8.44/pcre-8.44.zip",
         "website": "https://ftp.pcre.org/pub/pcre/"
     },
     "libpopt": {
@@ -126,9 +126,9 @@
         "website": "https://download.samba.org/pub/rsync/src"
     },
     "x264": {
-        "version": "master",
-        "archive": "x264-master.tar.gz",
-        "uri": "https://code.videolan.org/videolan/x264/-/archive/master/x264-master.tar.gz",
+        "version": "15e447f9b7b9c78fa89f373e3acb2438752a6b39",
+        "archive": "x264-15e447f9b7b9c78fa89f373e3acb2438752a6b39.tar.gz",
+        "uri": "https://code.videolan.org/videolan/x264/-/archive/15e447f9b7b9c78fa89f373e3acb2438752a6b39/x264-15e447f9b7b9c78fa89f373e3acb2438752a6b39.tar.gz",
         "website": "https://code.videolan.org/videolan/x264/"
     },
     "ffmpeg": {

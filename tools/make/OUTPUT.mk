@@ -80,7 +80,7 @@ THIRD_PARTY_LIBS :=			\
 	libssl.a			\
 	libswresample.so.3.1.100	\
 	libswscale.so.5.1.100		\
-	libx264.so.160			\
+	libx264.so.161			\
 	libxml2.so.$(LIBXML2VERSION)	\
 	libz.a				\
 	libz.so.$(ZLIBVERSION)		\
