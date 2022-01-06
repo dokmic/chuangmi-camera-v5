@@ -136,24 +136,6 @@ TIMEZONE="${TIMEZONE:-"UTC"}"
 ## Prefered NTP server
 NTP_SERVER="${NTP_SERVER:-"pool.ntp.org"}"
 
-
-############################################################
-## Web service                                            ##
-############################################################
-
-## See: https://miicam.github.io/configuration/Configuring-the-HTTP-service
-
-## Start web server at system boot (0/1)
-ENABLE_HTTPD="${ENABLE_HTTPD:-1}"
-
-## HTTP Only user: To avoid using the root password of the camera in your ha setup
-## We'll create another username and password combo for making api calls
-HTTP_API_USER="${HTTP_API_USER:-"admin"}"
-HTTP_API_PASS="${HTTP_API_PASS:-"drgsrethsfdghs"}"
-
-## To enable SSL on the camera, use the instructions in the wiki: https://miicam.github.io/configuration/Creating-an-SSL-certificate-for-use-on-this-camera
-
-
 ############################################################
 ## MQTT Settings                                          ##
 ############################################################

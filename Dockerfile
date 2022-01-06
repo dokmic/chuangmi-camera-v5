@@ -20,7 +20,6 @@ RUN apt-get -qq update \
     ca-certificates \
     bison \
     build-essential \
-    composer \
     cpio \
     curl \
     file \

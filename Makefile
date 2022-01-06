@@ -34,9 +34,6 @@ UTILSDIR       := $(TOOLSDIR)/utils
 BINARIESDIR    := $(TOPDIR)/sdcard/firmware/bin
 LIBRARIESDIR   := $(TOPDIR)/sdcard/firmware/lib
 
-WEBSOURCEDIR   := $(TOPDIR)/web
-WEBDESTDIR     := $(TOPDIR)/sdcard/firmware/www
-
 SOURCES        := $(TOPDIR)/sources.json
 
 #################################################################
@@ -78,10 +75,6 @@ GMUTILS :=				\
 
 THIRD_PARTY_SOFTWARE :=			\
 	$(BUILDDIR)/zlib		\
-	$(BUILDDIR)/libxml2		\
-	$(BUILDDIR)/libjpeg-turbo	\
-	$(BUILDDIR)/libpng		\
-	$(BUILDDIR)/libgd		\
 	$(BUILDDIR)/pcre		\
 	$(BUILDDIR)/popt		\
 	$(BUILDDIR)/x264		\
@@ -99,9 +92,7 @@ THIRD_PARTY_SOFTWARE :=			\
 	$(BUILDDIR)/logrotate		\
 	$(BUILDDIR)/sftp		\
 	$(BUILDDIR)/dropbear		\
-	$(BUILDDIR)/lighttpd		\
 	$(BUILDDIR)/nano		\
-	$(BUILDDIR)/php			\
 	$(BUILDDIR)/rsync		\
 	$(BUILDDIR)/lsof		\
 	$(BUILDDIR)/strace		\
@@ -110,8 +101,6 @@ THIRD_PARTY_SOFTWARE :=			\
 libs: $(LIBS)
 
 third-party: $(THIRD_PARTY_SOFTWARE)
-
-website: $(BUILDDIR)/website
 
 utils: $(UTILS)
 
@@ -124,7 +113,6 @@ all:					\
 	libs				\
 	utils				\
 	gmutils				\
-	website				\
 	sdcard/config.cfg		\
 	sdcard/manufacture.bin		\
 	sdcard/firmware/etc/os-release	\
@@ -281,10 +269,6 @@ sdcard/firmware/etc/os-release:
 #################################################################
 
 include tools/make/zlib.mk
-include tools/make/libxml.mk
-include tools/make/libjpeg.mk
-include tools/make/libpng.mk
-include tools/make/libgd.mk
 include tools/make/pcre.mk
 include tools/make/wget.mk
 include tools/make/libpopt.mk
@@ -298,8 +282,6 @@ include tools/make/openssl.mk
 include tools/make/socat.mk
 include tools/make/logrotate.mk
 include tools/make/dropbear.mk
-include tools/make/lighttpd.mk
-include tools/make/php.mk
 include tools/make/nano.mk
 include tools/make/rsync.mk
 include tools/make/strace.mk
@@ -308,33 +290,6 @@ include tools/make/fromdos.mk
 include tools/make/jq.mk
 include tools/make/ffmpeg.mk
 include tools/make/OUTPUT.mk
-
-
-#################################################################
-## WEB INTERFACE                                               ##
-#################################################################
-
-$(BUILDDIR)/website:
-	$(call box,"Building webui from $(WEBSOURCEDIR) to $(WEBDESTDIR)")
-	@mkdir -p $(WEBDESTDIR)
-	@cd $(WEBSOURCEDIR) \
-	\
-	&& echo '*** Running composer install in $(WEBSOURCEDIR)' \
-	&& composer install --no-dev --ignore-platform-reqs --no-interaction --prefer-dist \
-	\
-	&& echo "***Removing all unneeded crap from the vendor dir" \
-	&& php $(HOME)/.composer/vendor/mediamonks/composer-vendor-cleaner/bin/clean --dir vendor/ >/dev/null \
-	\
-	&& echo "*** Recreating class mappings" \
-	&& composer dump-autoload --classmap-authoritative \
-	\
-	&& echo '*** Removing symlinks from $(WEBSOURCEDIR)/vendor to prevent fat32 symlink issues' \
-	&& find $(WEBSOURCEDIR)/vendor -type l -delete \
-	\
-	&& echo '*** Copying files to $(WEBDESTDIR)' \
-	&& cp -r app libs public vendor $(WEBDESTDIR)/. \
-	\
-	&& touch $@
 
 
 #################################################################
@@ -394,7 +349,7 @@ clean:
 	@cd $(TOPDIR) \
 	\
 	&& echo "*** Removing directories with build artifacts" \
-	&& rm -rf $(BINARIESDIR) $(LIBRARIESDIR) $(WEBDESTDIR) $(PREFIXDIR) $(BUILDDIR) \
+	&& rm -rf $(BINARIESDIR) $(LIBRARIESDIR) $(PREFIXDIR) $(BUILDDIR) \
 	\
 	&& echo "*** Removing all own-brewed binaries" \
 	&& find $(TOOLSDIR)/bin -maxdepth 1 -type f -delete \

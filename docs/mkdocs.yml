@@ -16,7 +16,6 @@ nav:
   - Flashing the firmware: Flashing-the-U-boot-firmware-to-an-older-version-when-the-hack-is-not-working.md
   - Troubleshooting Guide: Troubleshooting.md
   - Security Considerations: Security-Considerations.md
-  - Screenshots: Screenshots.md
   - Configuration:
     - configuration/Accessing-the-camera.md
     - configuration/Configuration-file-options.md
@@ -25,8 +24,6 @@ nav:
     - configuration/Setting-up-motion-detection.md
     - configuration/Using-Auto-Night-Mode.md
     - configuration/Configuring-MQTT.md
-    - configuration/Configuring-the-HTTP-service.md
-    - configuration/Creating-an-SSL-certificate-for-use-on-this-camera.md
     - configuration/Time-settings.md
     - configuration/Configuring-the-shell-environment.md
     - configuration/Configuring-your-terminal-profile.md

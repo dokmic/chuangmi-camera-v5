@@ -5,30 +5,6 @@
         "uri": "https://www.zlib.net/zlib-1.2.12.tar.gz",
         "website": "http://zlib.net/"
     },
-    "libxml": {
-        "version": "2.9.10",
-        "archive": "libxml2-2.9.10.tar.gz",
-        "uri": "http://xmlsoft.org/sources/libxml2-2.9.10.tar.gz",
-        "website": "https://gitlab.gnome.org/GNOME/libxml2/-/tags"
-    },
-    "libjpeg": {
-        "version": "2.0.4",
-        "archive": "libjpeg-turbo-2.0.4.tar.gz",
-        "uri": "https://github.com/libjpeg-turbo/libjpeg-turbo/archive/2.0.4.tar.gz",
-        "website": "https://github.com/libjpeg-turbo/libjpeg-turbo/releases"
-    },
-    "libpng": {
-        "version": "1.6.37",
-        "archive": "libpng-1.6.37.tar.gz",
-        "uri": "https://github.com/glennrp/libpng/archive/v1.6.37.tar.gz",
-        "website": "https://github.com/glennrp/libpng/releases"
-    },
-    "libgd": {
-        "version": "2.3.0",
-        "archive": "libgd-2.3.0.tar.gz",
-        "uri": "https://github.com/libgd/libgd/releases/download/gd-2.3.0/libgd-2.3.0.tar.gz",
-        "website": "https://github.com/libgd/libgd/releases"
-    },
     "pcre": {
         "version": "8.44",
         "archive": "pcre-8.44.zip",
@@ -88,18 +64,6 @@
         "archive": "dropbear-2019.78.tar.bz2",
         "uri": "https://matt.ucc.asn.au/dropbear/releases/dropbear-2019.78.tar.bz2",
         "website": "https://matt.ucc.asn.au/dropbear/releases"
-    },
-    "lighttpd": {
-        "version": "1.4.55",
-        "archive": "lighttpd-1.4.55.tar.gz",
-        "uri": "https://download.lighttpd.net/lighttpd/releases-1.4.x/lighttpd-1.4.55.tar.gz",
-        "website": "https://download.lighttpd.net/lighttpd/releases-1.4.x"
-    },
-    "php": {
-        "version": "7.3.17",
-        "archive": "php-7.3.17.tar.bz2",
-        "uri": "http://php.net/get/php-7.3.17.tar.bz2/from/this/mirror",
-        "website": "https://www.php.net/downloads.php"
     },
     "nano": {
         "version": "4.9",

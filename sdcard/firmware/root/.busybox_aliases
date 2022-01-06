@@ -1,5 +1,3 @@
-
-alias php='/tmp/sd/firmware/bin/arm-php'
 alias ssh='/tmp/sd/firmware/bin/dbclient'
 alias curl='curl --cacert /tmp/sd/firmware/share/ssl/cacert.pem'
 alias reboot='reboot && exit'

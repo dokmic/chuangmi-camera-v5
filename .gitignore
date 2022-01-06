@@ -39,11 +39,6 @@ tmp/
 docs/docs-repo
 docs/deploy_key
 
-## Web
-web/vendor
-web/build
-web/composer.lock
-
 *.py[cod]
 *$py.class
 
