@@ -5,12 +5,6 @@
         "uri": "https://www.zlib.net/zlib-1.2.12.tar.gz",
         "website": "http://zlib.net/"
     },
-    "pcre": {
-        "version": "8.44",
-        "archive": "pcre-8.44.zip",
-        "uri": "https://netix.dl.sourceforge.net/project/pcre/pcre/8.44/pcre-8.44.zip",
-        "website": "https://ftp.pcre.org/pub/pcre/"
-    },
     "libpopt": {
         "version": "1.16",
         "archive": "popt-1.16.tar.gz",
@@ -70,12 +64,6 @@
         "archive": "nano-4.9.tar.gz",
         "uri": "https://www.nano-editor.org/dist/v4/nano-4.9.tar.gz",
         "website": "https://www.nano-editor.org/dist"
-    },
-    "wget": {
-        "version": "1.20.3",
-        "archive": "wget-1.20.3.tar.gz",
-        "uri": "https://ftp.gnu.org/gnu/wget/wget-1.20.3.tar.gz",
-        "website": "https://ftp.gnu.org/gnu/wget"
     },
     "dosfstools": {
         "version": "4.1",

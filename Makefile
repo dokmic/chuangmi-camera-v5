@@ -75,13 +75,11 @@ GMUTILS :=				\
 
 THIRD_PARTY_SOFTWARE :=			\
 	$(BUILDDIR)/zlib		\
-	$(BUILDDIR)/pcre		\
 	$(BUILDDIR)/popt		\
 	$(BUILDDIR)/x264		\
 	$(BUILDDIR)/ncurses		\
 	$(BUILDDIR)/readline		\
 	$(BUILDDIR)/busybox		\
-	$(BUILDDIR)/wget		\
 	$(BUILDDIR)/dosfstools		\
 	$(BUILDDIR)/libpcap		\
 	$(BUILDDIR)/tcpdump		\
@@ -269,8 +267,6 @@ sdcard/firmware/etc/os-release:
 #################################################################
 
 include tools/make/zlib.mk
-include tools/make/pcre.mk
-include tools/make/wget.mk
 include tools/make/libpopt.mk
 include tools/make/h264.mk
 include tools/make/ncurses.mk

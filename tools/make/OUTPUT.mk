@@ -23,8 +23,6 @@ THIRD_PARTY_BINS :=	\
 	lsof		\
 	nano		\
 	openssl		\
-	pcregrep	\
-	pcretest	\
 	procan		\
 	rsync		\
 	scp		\
@@ -36,8 +34,7 @@ THIRD_PARTY_BINS :=	\
 	todos		\
 	toe		\
 	tput		\
-	tset		\
-	wget
+	tset
 
 ## Extra tools and symlinks that should not be stripped but copied too
 THIRD_PARTY_BIN_EXTRAS := 	\
@@ -61,9 +58,6 @@ THIRD_PARTY_LIBS :=			\
 	libpanel.a			\
 	libpcap.a			\
 	libpcap.so.$(LIBPCAPVERSION)	\
-	libpcre.so.1.2.12		\
-	libpcrecpp.so.0.0.2		\
-	libpcreposix.so.0.0.7		\
 	libpopt.so.0.0.0		\
 	libpostproc.so.55.1.100		\
 	libreadline.so.7.0		\
@@ -99,12 +93,6 @@ THIRD_PARTY_LIB_EXTRAS :=		\
 	libhistory.so.7			\
 	libpcap.so			\
 	libpcap.so.1			\
-	libpcre.so			\
-	libpcre.so.1			\
-	libpcrecpp.so			\
-	libpcrecpp.so.0			\
-	libpcreposix.so			\
-	libpcreposix.so.0		\
 	libpopt.so			\
 	libpopt.so.0			\
 	libpostproc.so			\
