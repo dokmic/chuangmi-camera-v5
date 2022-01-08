@@ -81,8 +81,6 @@ THIRD_PARTY_SOFTWARE :=			\
 	$(BUILDDIR)/readline		\
 	$(BUILDDIR)/busybox		\
 	$(BUILDDIR)/dosfstools		\
-	$(BUILDDIR)/libpcap		\
-	$(BUILDDIR)/tcpdump		\
 	$(BUILDDIR)/openssl		\
 	$(BUILDDIR)/socat		\
 	$(BUILDDIR)/fromdos		\
@@ -273,7 +271,6 @@ include tools/make/ncurses.mk
 include tools/make/readline.mk
 include tools/make/busybox.mk
 include tools/make/dosfstools.mk
-include tools/make/tcpdump.mk
 include tools/make/openssl.mk
 include tools/make/socat.mk
 include tools/make/logrotate.mk

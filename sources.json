@@ -29,18 +29,6 @@
         "uri": "https://www.openssl.org/source/openssl-1.0.2u.tar.gz",
         "website": "https://www.openssl.org/source/old/"
     },
-    "libpcap": {
-        "version": "1.9.1",
-        "archive": "libpcap-1.9.1.tar.gz",
-        "uri": "http://www.tcpdump.org/release/libpcap-1.9.1.tar.gz",
-        "website": "http://www.tcpdump.org/release"
-    },
-    "tcpdump": {
-        "version": "4.9.3",
-        "archive": "tcpdump-4.9.3.tar.gz",
-        "uri": "http://www.tcpdump.org/release/tcpdump-4.9.3.tar.gz",
-        "website": "http://www.tcpdump.org/release"
-    },
     "socat": {
         "version": "1.7.3.4",
         "archive": "socat-1.7.3.4.tar.gz",

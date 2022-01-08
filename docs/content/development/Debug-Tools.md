@@ -10,7 +10,6 @@ Some useful tools are:
 
 - strace
 - lsof
-- tcpdump
 - ffmpeg
 - ffprobe
 - jq

@@ -5,8 +5,7 @@ THIRD_PARTY_SBINS :=	\
 	fsck.fat	\
 	mkfs.fat	\
 	dropbear	\
-	logrotate	\
-	tcpdump
+	logrotate
 
 ## The third party binaries in prefix/bin that should be stripped and copied to firmware/bin
 THIRD_PARTY_BINS :=	\
@@ -56,8 +55,6 @@ THIRD_PARTY_LIBS :=			\
 	libncurses++.a			\
 	libncurses.a			\
 	libpanel.a			\
-	libpcap.a			\
-	libpcap.so.$(LIBPCAPVERSION)	\
 	libpopt.so.0.0.0		\
 	libpostproc.so.55.1.100		\
 	libreadline.so.7.0		\
@@ -91,8 +88,6 @@ THIRD_PARTY_LIB_EXTRAS :=		\
 	libavutil.so.56			\
 	libhistory.so			\
 	libhistory.so.7			\
-	libpcap.so			\
-	libpcap.so.1			\
 	libpopt.so			\
 	libpopt.so.0			\
 	libpostproc.so			\
