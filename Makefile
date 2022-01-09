@@ -77,22 +77,14 @@ THIRD_PARTY_SOFTWARE :=			\
 	$(BUILDDIR)/zlib		\
 	$(BUILDDIR)/popt		\
 	$(BUILDDIR)/x264		\
-	$(BUILDDIR)/ncurses		\
 	$(BUILDDIR)/readline		\
 	$(BUILDDIR)/busybox		\
-	$(BUILDDIR)/dosfstools		\
 	$(BUILDDIR)/openssl		\
 	$(BUILDDIR)/socat		\
-	$(BUILDDIR)/fromdos		\
-	$(BUILDDIR)/jq			\
 	$(BUILDDIR)/logrotate		\
 	$(BUILDDIR)/sftp		\
 	$(BUILDDIR)/dropbear		\
-	$(BUILDDIR)/nano		\
-	$(BUILDDIR)/rsync		\
-	$(BUILDDIR)/lsof		\
-	$(BUILDDIR)/strace		\
-	$(BUILDDIR)/ffmpeg
+	$(BUILDDIR)/rsync
 
 libs: $(LIBS)
 
@@ -267,21 +259,13 @@ sdcard/firmware/etc/os-release:
 include tools/make/zlib.mk
 include tools/make/libpopt.mk
 include tools/make/h264.mk
-include tools/make/ncurses.mk
 include tools/make/readline.mk
 include tools/make/busybox.mk
-include tools/make/dosfstools.mk
 include tools/make/openssl.mk
 include tools/make/socat.mk
 include tools/make/logrotate.mk
 include tools/make/dropbear.mk
-include tools/make/nano.mk
 include tools/make/rsync.mk
-include tools/make/strace.mk
-include tools/make/lsof.mk
-include tools/make/fromdos.mk
-include tools/make/jq.mk
-include tools/make/ffmpeg.mk
 include tools/make/OUTPUT.mk
 
 
@@ -302,7 +286,6 @@ install: all
 	&& echo "*** Copying third party binaries and extras to $(BINARIESDIR)" \
 	&& cd $(PREFIXDIR)/sbin && $(TARGET)-strip $(THIRD_PARTY_SBINS) && cp $(THIRD_PARTY_SBINS) $(BINARIESDIR)/. \
 	&& cd $(PREFIXDIR)/bin  && $(TARGET)-strip $(THIRD_PARTY_BINS)  && cp $(THIRD_PARTY_BINS)  $(BINARIESDIR)/. \
-	&& cd $(PREFIXDIR)/bin  && cp $(THIRD_PARTY_BIN_EXTRAS) $(BINARIESDIR)/. \
 	\
 	&& echo "*** Copying third party libraries and extras to $(LIBRARIESDIR)" \
 	&& cd $(PREFIXDIR)/lib  && $(TARGET)-strip $(THIRD_PARTY_LIBS) && cp $(THIRD_PARTY_LIBS) $(LIBRARIESDIR)/. \

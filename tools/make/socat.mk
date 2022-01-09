@@ -20,7 +20,7 @@ $(SOURCEDIR)/$(SOCATARCHIVE): $(SOURCEDIR)
 ##                                                             ##
 #################################################################
 
-$(BUILDDIR)/socat: $(SOURCEDIR)/$(SOCATARCHIVE) $(BUILDDIR)/ncurses $(BUILDDIR)/readline $(BUILDDIR)/openssl
+$(BUILDDIR)/socat: $(SOURCEDIR)/$(SOCATARCHIVE) $(BUILDDIR)/readline $(BUILDDIR)/openssl
 	$(call box,"Building socat")
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(SOCATVERSION)
 	@tar -xzf $(SOURCEDIR)/$(SOCATARCHIVE) -C $(BUILDDIR)

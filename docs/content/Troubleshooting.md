@@ -34,26 +34,6 @@ Allowed chars in the web interface config editor are:
 a-z A-Z 0-9 (){}.@|+:[]><\/^%&_- .=
 ```
 
-### Editing your config.cfg
-
-Use an editor that does not change the character encoding of the `config.cfg` to make your edits. If you see errors in your log files similar to:
-
-```
-Jan  1 00:00:21 wifi: Line 6: failed to parse psk '"^M"'.
-
-/tmp/sd/config.cfg: line 6: ^M: not found
-```
-
-This happens if you have edited your `config.cfg` on windows computer with a non-text-based editor.
-
-Use `notepad++` or similar to work around this issue.
-
-You can try to fix this using the `fromdos` utility:
-
-```
-/tmp/sd/firmware/bin/fromdos /tmp/sd/config.cfg
-```
-
 ### WIFI connection issues
 
 Sometimes configuring the WIFI through the `config.cfg` results in a non-responsive or offline camera.

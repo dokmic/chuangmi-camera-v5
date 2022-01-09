@@ -36,7 +36,6 @@ RUN apt-get -qq update \
     libyaml-dev \
     locales \
     make \
-    ncurses-dev \
     openssl \
     pkg-config \
     python3 \
@@ -45,7 +44,6 @@ RUN apt-get -qq update \
     rsync \
     texi2html \
     texinfo \
-    tofrodos \
     unzip \
     zip \
   && apt-get clean \
