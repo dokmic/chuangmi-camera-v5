@@ -18,6 +18,6 @@ to downgrade to a firmware that does support this boot mode.
 Normally the software created by Xiaomi is started when the camera is powered on, but instead of the regular boot script, 
 we use our own scripts to ensure the Xiaomi cloud suite is not able to start.
 
-After this is done, we start our boot sequence starting the rtspd and the dropbear SSH server.
+After this is done, we start our boot sequence starting the rtspd.
 After our own boot scripts, the rest of the boot sequence is continued as usual to ensure all required services 
 and configuration is done at boot time.

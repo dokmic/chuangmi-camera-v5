@@ -72,7 +72,7 @@ fi
 ## Telnetd                                                                      ##
 ##################################################################################
 
-if [ "${ENABLE_TELNETD}" -eq 1 ] || [ "${ENABLE_SSHD}"  -eq 0 ]
+if [ "${ENABLE_TELNETD}" -eq 1 ]
 then
     sh ${SD_MOUNTDIR}/firmware/init/S99telnet start
 
@@ -82,20 +82,6 @@ then
     fi
 else
     sh ${SD_MOUNTDIR}/firmware/init/S99telnet stop
-fi
-
-##################################################################################
-## Dropbear SSH                                                                 ##
-##################################################################################
-
-if [ "${ENABLE_SSHD}" -eq 1 ] || [ "${ENABLE_TELNETD}" -eq 0 ]
-then
-    sh ${SD_MOUNTDIR}/firmware/init/S99dropbear start
-
-    if ! grep -q '^dropbear' /tmp/etc/restartd.conf
-    then
-        echo "dropbear \"${SD_MOUNTDIR}/firmware/bin/dropbear\" \"${SD_MOUNTDIR}/firmware/init/S99dropbear restart\" \"/bin/echo '*** Dropbear SSH was restarted from restartd... '\"" >> /tmp/etc/restartd.conf
-    fi
 fi
 
 ##################################################################################

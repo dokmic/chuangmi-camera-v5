@@ -232,12 +232,6 @@ MOTION_TOPIC="${MOTION_TOPIC:-"$MQTT_TOPIC/motion"}"
 
 ## See: https://miicam.github.io/configuration/Accessing-the-camera
 
-## Start SSH server at system boot (0/1)
-ENABLE_SSHD="${ENABLE_SSHD:-1}"
-
-## Additional commandline arguments for the dropbear SSH daemon
-DROPBEAR_EXTRA_ARGS="${DROPBEAR_EXTRA_ARGS:-""}"
-
 ## Start telnet server at system boot (0/1)
 ENABLE_TELNETD="${ENABLE_TELNETD:-0}"
 

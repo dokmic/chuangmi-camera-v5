@@ -82,8 +82,6 @@ THIRD_PARTY_SOFTWARE :=			\
 	$(BUILDDIR)/openssl		\
 	$(BUILDDIR)/socat		\
 	$(BUILDDIR)/logrotate		\
-	$(BUILDDIR)/sftp		\
-	$(BUILDDIR)/dropbear		\
 	$(BUILDDIR)/rsync
 
 libs: $(LIBS)
@@ -264,7 +262,6 @@ include tools/make/busybox.mk
 include tools/make/openssl.mk
 include tools/make/socat.mk
 include tools/make/logrotate.mk
-include tools/make/dropbear.mk
 include tools/make/rsync.mk
 include tools/make/OUTPUT.mk
 

@@ -4,7 +4,7 @@ Restartd is a daemon for checking running and not running processes.
 It reads the /proc directory every n seconds and does a POSIX regexp on the process names.
 You can execute a script or a program if the process is or is not running.
 
-By default, if enabled the ntpd and the dropbear SSH daemon are both guarded using restartd.
+By default if enabled, the ntpd is guarded using restartd.
 You can enable the restartd service by settings `ENABLE_RESTARTD` to `1`.
 
 You can add your own services to restartd to automatically restart the services when they are killed due to out-of-memory issues or when something flaky is going on.
@@ -39,6 +39,5 @@ Use the following format:
 
 For example:
 ```bash
-dropbear "/tmp/sd/firmware/bin/dropbear" "/tmp/sd/firmware/etc/init/S99dropbear restart" "/bin/echo '*** Dropbear SSH was restarted from restartd... '"
 ntpd "/usr/sbin/ntpd" "/tmp/sd/firmware/etc/init/S51ntpd restart" "/bin/echo '*** NTPd was restarted from restartd... '"
 ```

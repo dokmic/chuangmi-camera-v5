@@ -1,29 +1,18 @@
 
 ## The third party binaries in prefix/sbin that should be stripped and copied to firmware/bin
 THIRD_PARTY_SBINS :=	\
-	dropbear	\
 	logrotate
 
 ## The third party binaries in prefix/bin that should be stripped and copied to firmware/bin
 THIRD_PARTY_BINS :=	\
 	busybox	   	\
-	dbclient   	\
-	dropbearkey	\
 	ffmpeg	   	\
 	ffprobe	   	\
 	filan		\
 	openssl		\
 	procan		\
 	rsync		\
-	scp		\
-	sftp-server	\
 	socat
-
-## Extra tools and symlinks that should not be stripped but copied too
-THIRD_PARTY_BIN_EXTRAS := 	\
-	captoinfo		\
-	infotocap		\
-	reset
 
 ## Third party library files that should be stripped and copied to firmware/lib
 THIRD_PARTY_LIBS :=			\

@@ -1,3 +1,2 @@
-alias ssh='/tmp/sd/firmware/bin/dbclient'
 alias curl='curl --cacert /tmp/sd/firmware/share/ssl/cacert.pem'
 alias crontab='crontab -c /var/run/cron'

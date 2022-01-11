@@ -6,7 +6,6 @@ chuangmi.jpg
 tools/bin/*
 tools/lib/*.so
 tools/lib/*.o
-sdcard/firmware/root/.ssh
 sdcard/firmware/bin/*
 sdcard/firmware/www
 sdcard/firmware/share/ssl/rootCA.key
