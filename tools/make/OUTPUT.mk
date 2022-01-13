@@ -8,11 +8,8 @@ THIRD_PARTY_BINS :=	\
 	busybox	   	\
 	ffmpeg	   	\
 	ffprobe	   	\
-	filan		\
 	openssl		\
-	procan		\
-	rsync		\
-	socat
+	rsync
 
 ## Third party library files that should be stripped and copied to firmware/lib
 THIRD_PARTY_LIBS :=			\
@@ -22,10 +19,8 @@ THIRD_PARTY_LIBS :=			\
 	libavformat.so.58.12.100	\
 	libavutil.so.56.14.100		\
 	libcrypto.a			\
-	libhistory.so.7.0		\
 	libpopt.so.0.0.0		\
 	libpostproc.so.55.1.100		\
-	libreadline.so.7.0		\
 	libssl.a			\
 	libswresample.so.3.1.100	\
 	libswscale.so.5.1.100		\
@@ -46,14 +41,10 @@ THIRD_PARTY_LIB_EXTRAS :=		\
 	libavformat.so.58		\
 	libavutil.so			\
 	libavutil.so.56			\
-	libhistory.so			\
-	libhistory.so.7			\
 	libpopt.so			\
 	libpopt.so.0			\
 	libpostproc.so			\
 	libpostproc.so.55		\
-	libreadline.so			\
-	libreadline.so.7		\
 	libswresample.so		\
 	libswresample.so.3		\
 	libswscale.so			\

@@ -11,23 +11,11 @@
         "uri": "http://ftp.rpm.org/mirror/popt/popt-1.16.tar.gz",
         "website": "http://ftp.rpm.org/mirror/popt/"
     },
-    "readline": {
-        "version": "7.0",
-        "archive": "readline-7.0.tar.gz",
-        "uri": "https://ftp.gnu.org/gnu/readline/readline-7.0.tar.gz",
-        "website": "https://ftp.gnu.org/gnu/readline/"
-    },
     "openssl": {
         "version": "1.0.2u",
         "archive": "openssl-1.0.2u.tar.gz",
         "uri": "https://www.openssl.org/source/openssl-1.0.2u.tar.gz",
         "website": "https://www.openssl.org/source/old/"
-    },
-    "socat": {
-        "version": "1.7.3.4",
-        "archive": "socat-1.7.3.4.tar.gz",
-        "uri": "http://www.dest-unreach.org/socat/download/socat-1.7.3.4.tar.gz",
-        "website": "http://www.dest-unreach.org/socat/download/"
     },
     "rsync": {
         "version": "3.1.3",

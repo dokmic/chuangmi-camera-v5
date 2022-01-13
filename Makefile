@@ -77,10 +77,8 @@ THIRD_PARTY_SOFTWARE :=			\
 	$(BUILDDIR)/zlib		\
 	$(BUILDDIR)/popt		\
 	$(BUILDDIR)/x264		\
-	$(BUILDDIR)/readline		\
 	$(BUILDDIR)/busybox		\
 	$(BUILDDIR)/openssl		\
-	$(BUILDDIR)/socat		\
 	$(BUILDDIR)/logrotate		\
 	$(BUILDDIR)/rsync
 
@@ -257,10 +255,8 @@ sdcard/firmware/etc/os-release:
 include tools/make/zlib.mk
 include tools/make/libpopt.mk
 include tools/make/h264.mk
-include tools/make/readline.mk
 include tools/make/busybox.mk
 include tools/make/openssl.mk
-include tools/make/socat.mk
 include tools/make/logrotate.mk
 include tools/make/rsync.mk
 include tools/make/OUTPUT.mk
