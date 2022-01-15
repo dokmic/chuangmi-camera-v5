@@ -8,8 +8,7 @@ THIRD_PARTY_BINS :=	\
 	busybox	   	\
 	ffmpeg	   	\
 	ffprobe	   	\
-	openssl		\
-	rsync
+	openssl
 
 ## Third party library files that should be stripped and copied to firmware/lib
 THIRD_PARTY_LIBS :=			\
