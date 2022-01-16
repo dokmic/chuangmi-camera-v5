@@ -7,8 +7,7 @@ THIRD_PARTY_SBINS :=	\
 THIRD_PARTY_BINS :=	\
 	busybox	   	\
 	ffmpeg	   	\
-	ffprobe	   	\
-	openssl
+	ffprobe
 
 ## Third party library files that should be stripped and copied to firmware/lib
 THIRD_PARTY_LIBS :=			\
@@ -17,10 +16,8 @@ THIRD_PARTY_LIBS :=			\
 	libavfilter.so.7.16.100		\
 	libavformat.so.58.12.100	\
 	libavutil.so.56.14.100		\
-	libcrypto.a			\
 	libpopt.so.0.0.0		\
 	libpostproc.so.55.1.100		\
-	libssl.a			\
 	libswresample.so.3.1.100	\
 	libswscale.so.5.1.100		\
 	libx264.so.161			\

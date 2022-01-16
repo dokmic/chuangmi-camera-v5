@@ -10,15 +10,6 @@ sdcard/firmware/etc/os-release
 sdcard/config.cfg
 sdcard/manufacture.bin
 sdcard/log
-sdcard/firmware/share/ssl/rootCA.key
-sdcard/firmware/share/ssl/rootCA.pem
-sdcard/firmware/share/ssl/rootCA.srl
-sdcard/firmware/share/ssl/server.crt
-sdcard/firmware/share/ssl/server.csr
-sdcard/firmware/share/ssl/server.key
-sdcard/firmware/share/ssl/dh2048.pem
-sdcard/firmware/share/ssl/server.pem
-sdcard/firmware/share/ssl/v3.ext
 sdcard/firmware/www
 
 sdk/

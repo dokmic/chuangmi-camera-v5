@@ -16,9 +16,6 @@ use a private and secure wifi network, put it behind a firewall,
 don't show your junk in front of the camera and make sure you don't place it in private spaces 
 that you don't want others on your wifi network to see.
 
-Generate an SSL certificate and implement it on the web server. 
-You can find out how to do this in the [ssl instructions](/configuration/Creating-an-SSL-certificate-for-use-on-this-camera).
-
 As the RTSP daemon is semi-secured with authentication, non-computer-skilled people in your network 
 might not be able to view the camera, but the guy in the hoodie leeching on your wifi and who knows 
 how to use a packet sniffer certainly can.

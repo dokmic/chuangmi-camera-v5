@@ -78,7 +78,6 @@ THIRD_PARTY_SOFTWARE :=			\
 	$(BUILDDIR)/popt		\
 	$(BUILDDIR)/x264		\
 	$(BUILDDIR)/busybox		\
-	$(BUILDDIR)/openssl		\
 	$(BUILDDIR)/logrotate
 
 libs: $(LIBS)
@@ -255,7 +254,6 @@ include tools/make/zlib.mk
 include tools/make/libpopt.mk
 include tools/make/h264.mk
 include tools/make/busybox.mk
-include tools/make/openssl.mk
 include tools/make/logrotate.mk
 include tools/make/OUTPUT.mk
 

@@ -11,12 +11,6 @@
         "uri": "http://ftp.rpm.org/mirror/popt/popt-1.16.tar.gz",
         "website": "http://ftp.rpm.org/mirror/popt/"
     },
-    "openssl": {
-        "version": "1.0.2u",
-        "archive": "openssl-1.0.2u.tar.gz",
-        "uri": "https://www.openssl.org/source/openssl-1.0.2u.tar.gz",
-        "website": "https://www.openssl.org/source/old/"
-    },
     "x264": {
         "version": "15e447f9b7b9c78fa89f373e3acb2438752a6b39",
         "archive": "x264-15e447f9b7b9c78fa89f373e3acb2438752a6b39.tar.gz",
