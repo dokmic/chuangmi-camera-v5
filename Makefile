@@ -76,7 +76,6 @@ GMUTILS :=				\
 THIRD_PARTY_SOFTWARE :=			\
 	$(BUILDDIR)/zlib		\
 	$(BUILDDIR)/popt		\
-	$(BUILDDIR)/x264		\
 	$(BUILDDIR)/busybox		\
 	$(BUILDDIR)/logrotate
 
@@ -252,7 +251,6 @@ sdcard/firmware/etc/os-release:
 
 include tools/make/zlib.mk
 include tools/make/libpopt.mk
-include tools/make/h264.mk
 include tools/make/busybox.mk
 include tools/make/logrotate.mk
 include tools/make/OUTPUT.mk

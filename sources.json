@@ -11,12 +11,6 @@
         "uri": "http://ftp.rpm.org/mirror/popt/popt-1.16.tar.gz",
         "website": "http://ftp.rpm.org/mirror/popt/"
     },
-    "x264": {
-        "version": "15e447f9b7b9c78fa89f373e3acb2438752a6b39",
-        "archive": "x264-15e447f9b7b9c78fa89f373e3acb2438752a6b39.tar.gz",
-        "uri": "https://code.videolan.org/videolan/x264/-/archive/15e447f9b7b9c78fa89f373e3acb2438752a6b39/x264-15e447f9b7b9c78fa89f373e3acb2438752a6b39.tar.gz",
-        "website": "https://code.videolan.org/videolan/x264/"
-    },
     "logrotate": {
         "version": "3.16.0",
         "archive": "logrotate-3.16.0.tar.gz",
