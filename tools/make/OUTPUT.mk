@@ -1,8 +1,3 @@
-
-## The third party binaries in prefix/sbin that should be stripped and copied to firmware/bin
-THIRD_PARTY_SBINS :=	\
-	logrotate
-
 ## The third party binaries in prefix/bin that should be stripped and copied to firmware/bin
 THIRD_PARTY_BINS :=	\
 	busybox

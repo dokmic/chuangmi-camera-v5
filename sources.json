@@ -11,12 +11,6 @@
         "uri": "http://ftp.rpm.org/mirror/popt/popt-1.16.tar.gz",
         "website": "http://ftp.rpm.org/mirror/popt/"
     },
-    "logrotate": {
-        "version": "3.16.0",
-        "archive": "logrotate-3.16.0.tar.gz",
-        "uri": "https://github.com/logrotate/logrotate/releases/download/3.16.0/logrotate-3.16.0.tar.gz",
-        "website": "https://github.com/logrotate/logrotate/releases"
-    },
     "busybox": {
         "version": "1.31.1",
         "archive": "busybox-1.31.1.tar.bz2",

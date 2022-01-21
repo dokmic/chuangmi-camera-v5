@@ -76,8 +76,7 @@ GMUTILS :=				\
 THIRD_PARTY_SOFTWARE :=			\
 	$(BUILDDIR)/zlib		\
 	$(BUILDDIR)/popt		\
-	$(BUILDDIR)/busybox		\
-	$(BUILDDIR)/logrotate
+	$(BUILDDIR)/busybox
 
 libs: $(LIBS)
 
@@ -252,7 +251,6 @@ sdcard/firmware/etc/os-release:
 include tools/make/zlib.mk
 include tools/make/libpopt.mk
 include tools/make/busybox.mk
-include tools/make/logrotate.mk
 include tools/make/OUTPUT.mk
 
 
@@ -271,7 +269,6 @@ install: all
 	@mkdir -p $(BINARIESDIR) $(LIBRARIESDIR) \
 	\
 	&& echo "*** Copying third party binaries and extras to $(BINARIESDIR)" \
-	&& cd $(PREFIXDIR)/sbin && $(TARGET)-strip $(THIRD_PARTY_SBINS) && cp $(THIRD_PARTY_SBINS) $(BINARIESDIR)/. \
 	&& cd $(PREFIXDIR)/bin  && $(TARGET)-strip $(THIRD_PARTY_BINS)  && cp $(THIRD_PARTY_BINS)  $(BINARIESDIR)/. \
 	\
 	&& echo "*** Copying third party libraries and extras to $(LIBRARIESDIR)" \

@@ -17,15 +17,6 @@ When debugging boot issues or startup errors, it is recommended to set `PURGE_LO
 
 This prevents the camera from deleting the log files every time the camera starts, wiping out your history.
 
-## Log rotation
-
-If the cron daemon is enabled, a cronjob triggering logrotate is ran every evening.
-To add logfiles or change the settings, edit `/etc/logrotate.conf`.
-
-The `logrotate` utility ensures log files doe not grow too large to handle for the camera 
-by creating a compressed archive of the logfile and truncating the current logfile 
-so it can be refilled during the day.
-
 ## Remote syslog
 
 You can use remote syslogging to a syslog server by setting the `ENABLE_REMOTE_SYSLOG` to `1` 
