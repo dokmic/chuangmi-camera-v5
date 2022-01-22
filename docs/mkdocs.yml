@@ -29,7 +29,6 @@ nav:
     - configuration/Configuring-your-terminal-profile.md
     - configuration/System-Logging-and-Logfiles.md
     - configuration/Configuring-Restartd.md
-    - configuration/Configuring-FTP.md
     - configuration/Using-cronjobs.md
     - configuration/Integrating-the-cam-in-your-home-automation.md
     - configuration/Using-this-camera-with-obs.md

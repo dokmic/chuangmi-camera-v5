@@ -234,23 +234,6 @@ MOTION_TOPIC="${MOTION_TOPIC:-"$MQTT_TOPIC/motion"}"
 ## Start telnet server at system boot (0/1)
 ENABLE_TELNETD="${ENABLE_TELNETD:-0}"
 
-
-############################################################
-## FTP Configuration                                      ##
-############################################################
-
-## See: https://miicam.github.io/configuration/Configuring-FTP
-
-## Start FTP server at system boot (0/1)
-ENABLE_FTPD="${ENABLE_FTPD:-0}"
-
-## The FTP Root directory
-FTP_ROOT="${FTP_ROOT:-"/tmp/sd/RECORDED_IMAGES"}"
-
-## Additional commandline arguments for the ftp daemon (-w allows (write) uploads)
-FTP_EXTRA_ARGS="${FTP_EXTRA_ARGS:-""}"
-
-
 ############################################################
 ## Configure Restart daemon                               ##
 ############################################################
