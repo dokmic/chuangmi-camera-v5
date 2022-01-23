@@ -4,7 +4,6 @@ There are 2 shells on board that you can use for configuration and exploring the
 
 ## Using bash
 
-To use bash, you can use the `admin` user to login. This user has the `bash` shell configured to be run at login.
 If you logged in as `root`, you can use the bash shell by calling it's executable.
 
 (It's full path is `/tmp/sd/firmware/bin/bash` instead of of the common used `/bin/bash`).
@@ -39,6 +38,3 @@ you should add your settings in the source root files in `/tmp/sd/firmware/root`
 It is not recommended to use the bash shell as the default shell for `root`. If something goes wrong during boot and the SD card is not available, it becomes very hard to debug the issue as the shell configured in `/etc/passwd` is not available.
 
 The bash shell is on the SD card so the root user uses the default `/bin/sh` shell to guarantee a working shell when the sd card is not able to mount.
-
-The admin user has exactly the same `uid` and `gid` as the root user, but uses the bash shell as login. Use this user if you want to use bash, or change the shell after logging in.
-

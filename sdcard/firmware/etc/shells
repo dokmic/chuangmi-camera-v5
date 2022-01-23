@@ -1,4 +1,3 @@
-# /etc/shells: valid login shells
 /bin/sh
 /bin/ash
 /bin/busybox
