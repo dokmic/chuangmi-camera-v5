@@ -36,8 +36,6 @@ nav:
     - development/development.md
     - development/How-to-build-the-binaries-for-the-webcam-hack.md
     - development/Test-Framework.md
-    - development/helpers.md
-    - development/Adding-software-to-the-build.md
     - development/Convert-recorded-video.md
 
 

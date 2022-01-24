@@ -106,9 +106,6 @@ Now you can try whatever you want inside the container. If you messed up, exit t
 
 I prefer to edit the `Makefile` and `SOURCES.mk` in the repository itself and copy it inside the container build directory to keep track and prevent my changes to be gone after accidentally exiting the container.
 
-Have a look in `tools/dev/helpers.sh` for some utils for building and testing new binaries.
-
-
 To update the changed files by hand, copy the files from `/result/` to `/env`:
 
 ```bash
@@ -118,10 +115,3 @@ rebuild_rtsp
 ```
 
 After that you can test the binary on your camera by scp-ing or rsync-ing the binary to the camera and execute it.
-
-## Helper utils
-
-I've created some helper utils in `tools/dev/helpers.sh` that are useful when devving in the container.
-It makes recompiling an uploading binaries to the camera a bit easier until I've build an update mechanism.
-
-To use the dev helpers, open the file and change the `CAMERA_HOSTNAME` variable to the hostname or ip of your camera.

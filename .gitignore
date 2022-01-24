@@ -4,7 +4,6 @@ src
 tools/bin/*
 tools/lib/*.so
 tools/lib/*.o
-tools/dev/host.cfg
 sdcard/firmware/bin/*
 sdcard/firmware/etc/os-release
 sdcard/config.cfg
