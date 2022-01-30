@@ -11,7 +11,7 @@ BUSYBOXURI     := $(shell cat $(SOURCES) | jq -r '.busybox.uri' )
 ##                                                             ##
 #################################################################
 
-$(SOURCEDIR)/$(BUSYBOXARCHIVE): $(SOURCEDIR)
+$(BUILDDIR)/$(BUSYBOXARCHIVE): $(BUILDDIR)
 	$(call box,"Downloading busybox source code")
 	test -f $@ || $(DOWNLOADCMD) $@ $(BUSYBOXURI) || rm -f $@
 
@@ -20,16 +20,16 @@ $(SOURCEDIR)/$(BUSYBOXARCHIVE): $(SOURCEDIR)
 ##                                                             ##
 #################################################################
 
-$(BUILDDIR)/busybox: $(SOURCEDIR)/$(BUSYBOXARCHIVE)
+$(BUILDDIR)/busybox: $(BUILDDIR)/$(BUSYBOXARCHIVE)
 	$(call box,"Building busybox")
-	@mkdir -p $(BUILDDIR) $(PREFIXDIR)/bin $(PREFIXDIR)/sbin && rm -rf $@-$(BUSYBOXVERSION)
-	@tar -xjf $(SOURCEDIR)/$(BUSYBOXARCHIVE) -C $(BUILDDIR)
+	@mkdir -p $(BUILDDIR) $(BUILDDIR)/bin $(BUILDDIR)/sbin && rm -rf $@-$(BUSYBOXVERSION)
+	@tar -xjf $(BUILDDIR)/$(BUSYBOXARCHIVE) -C $(BUILDDIR)
 	@cd $@-$(BUSYBOXVERSION) && \
 	cp $(TOOLSDIR)/patches/busybox.config $@-$(BUSYBOXVERSION)/.config 	\
 	&& $(BUILDENV)				    									\
 		make ARCH=arm CROSS_COMPILE=$(TARGET)- -j$(PROCS)         		\
 		&& make ARCH=arm CROSS_COMPILE=$(TARGET)- -j$(PROCS) install 	\
-		&& mv $@-$(BUSYBOXVERSION)/_install/bin/busybox $(PREFIXDIR)/bin
+		&& mv $@-$(BUSYBOXVERSION)/_install/bin/busybox $(BUILDDIR)/bin
 	@touch $@
 	@rm -rf $@-$(BUSYBOXVERSION)
 

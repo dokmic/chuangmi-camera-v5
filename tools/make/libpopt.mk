@@ -11,7 +11,7 @@ LIBPOPTURI     := $(shell cat $(SOURCES) | jq -r '.libpopt.uri' )
 ##                                                             ##
 #################################################################
 
-$(SOURCEDIR)/$(LIBPOPTARCHIVE): $(SOURCEDIR)
+$(BUILDDIR)/$(LIBPOPTARCHIVE): $(BUILDDIR)
 	$(call box,"Downloading libpopt source code")
 	test -f $@ || $(DOWNLOADCMD) $@ $(LIBPOPTURI) || rm -f $@
 
@@ -20,15 +20,15 @@ $(SOURCEDIR)/$(LIBPOPTARCHIVE): $(SOURCEDIR)
 ##                                                             ##
 #################################################################
 
-$(BUILDDIR)/popt: $(SOURCEDIR)/$(LIBPOPTARCHIVE) $(BUILDDIR)/zlib
+$(BUILDDIR)/popt: $(BUILDDIR)/$(LIBPOPTARCHIVE) $(BUILDDIR)/zlib
 	$(call box,"Building libpopt")
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(LIBPOPTVERSION)
-	@tar -xzf $(SOURCEDIR)/$(LIBPOPTARCHIVE) -C $(BUILDDIR)
+	@tar -xzf $(BUILDDIR)/$(LIBPOPTARCHIVE) -C $(BUILDDIR)
 	@cd $@-$(LIBPOPTVERSION)		\
 	&& $(BUILDENV)					\
 		./configure					\
 			--host=$(TARGET)		\
-			--prefix=$(PREFIXDIR)	\
+			--prefix=$(BUILDDIR)	\
 			--enable-shared			\
 			--disable-static		\
 		&& make -j$(PROCS)			\

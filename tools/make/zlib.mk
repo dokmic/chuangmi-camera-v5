@@ -11,7 +11,7 @@ ZLIBURI     := $(shell cat $(SOURCES) | jq -r '.zlib.uri' )
 ##                                                             ##
 #################################################################
 
-$(SOURCEDIR)/$(ZLIBARCHIVE): $(SOURCEDIR)
+$(BUILDDIR)/$(ZLIBARCHIVE): $(BUILDDIR)
 	$(call box,"Downloading zlib source code")
 	test -f $@ || $(DOWNLOADCMD) $@ $(ZLIBURI) || rm -f $@
 
@@ -20,14 +20,14 @@ $(SOURCEDIR)/$(ZLIBARCHIVE): $(SOURCEDIR)
 ##                                                             ##
 #################################################################
 
-$(BUILDDIR)/zlib: $(SOURCEDIR)/$(ZLIBARCHIVE)
+$(BUILDDIR)/zlib: $(BUILDDIR)/$(ZLIBARCHIVE)
 	$(call box,"Building zlib")
 	@mkdir -p $(BUILDDIR) && rm -rf $@-$(ZLIBVERSION)
-	@tar -xzf $(SOURCEDIR)/$(ZLIBARCHIVE) -C $(BUILDDIR)
+	@tar -xzf $(BUILDDIR)/$(ZLIBARCHIVE) -C $(BUILDDIR)
 	@cd $@-$(ZLIBVERSION)			\
 	&& $(BUILDENV)					\
 		./configure					\
-			--prefix=$(PREFIXDIR)	\
+			--prefix=$(BUILDDIR)	\
 			--enable-shared			\
 		&& make -j$(PROCS)			\
 		&& make -j$(PROCS) install

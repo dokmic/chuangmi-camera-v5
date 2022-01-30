@@ -7,8 +7,6 @@ PROCS        := $(shell nproc --all )
 DOWNLOADCMD := curl -qs --http1.1 -L --retry 10 --output
 
 TOPDIR         := $(CURDIR)
-SOURCEDIR      := $(TOPDIR)/src
-PREFIXDIR      := $(TOPDIR)/prefix
 BUILDDIR       := $(TOPDIR)/build
 TOOLSDIR       := $(TOPDIR)/tools
 
@@ -23,16 +21,12 @@ BUILDENV :=			\
 	RANLIB=$(TARGET)-ranlib	\
 	STRIP=$(TARGET)-strip	\
 	CFLAGS="-fPIC"		\
-	CPPFLAGS="-I$(PREFIXDIR)/include -L$(PREFIXDIR)/lib" \
-	LDFLAGS=" -I$(PREFIXDIR)/include -L$(PREFIXDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags"
+	CPPFLAGS="-I$(BUILDDIR)/include -L$(BUILDDIR)/lib" \
+	LDFLAGS=" -I$(BUILDDIR)/include -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags"
 
-PATCHESDIR     := $(TOOLSDIR)/patches
 GMLIBDIR       := $(TOOLSDIR)/gm_lib
 RTSPDDIR       := $(TOOLSDIR)/rtsp_server
 UTILSDIR       := $(TOOLSDIR)/utils
-
-BINARIESDIR    := $(TOPDIR)/sdcard/firmware/bin
-LIBRARIESDIR   := $(TOPDIR)/sdcard/firmware/lib
 
 SOURCES        := $(TOPDIR)/sources.json
 
@@ -88,39 +82,35 @@ libs: $(LIBS)
 
 gmutils: $(GMUTILS)
 
-all:					\
-	sources				\
+default:					\
 	libs				\
 	utils				\
 	gmutils				\
-	sdcard/config.cfg		\
-	sdcard/manufacture.bin		\
-	sdcard/firmware/etc/os-release	\
+	config.cfg		\
+	manufacture.bin		\
 	$(BUILDDIR)/rtspd		\
 	third-party
+	find $(BUILDDIR)/lib -maxdepth 1 -type f -name '*.so*' -or -name '*.a*' -exec $(TARGET)-strip {} \; \
+	&& find $(BUILDDIR)/bin -maxdepth 1 -type f -exec $(TARGET)-strip {} \;
 
 #################################################################
 ## DIRS                                                        ##
 #################################################################
 
-$(SOURCEDIR):
-	@mkdir -p $(SOURCEDIR)
+$(BUILDDIR)/bin:
+	@mkdir -p $(BUILDDIR)/bin
 
-$(PREFIXDIR)/bin:
-	@mkdir -p $(PREFIXDIR)/bin
+$(BUILDDIR)/sbin:
+	@mkdir -p $(BUILDDIR)/sbin
 
-$(PREFIXDIR)/sbin:
-	@mkdir -p $(PREFIXDIR)/sbin
-
-$(PREFIXDIR)/lib:
-	@mkdir -p $(PREFIXDIR)/lib
+$(BUILDDIR)/lib:
+	@mkdir -p $(BUILDDIR)/lib
 
 #################################################################
 ## RTSPD                                                       ##
 #################################################################
 
-$(BUILDDIR)/rtspd: $(PREFIXDIR)/bin
-	@mkdir -p $(BUILDDIR) $(TOOLSDIR)/bin
+$(BUILDDIR)/rtspd: $(BUILDDIR)/bin
 	cd $(RTSPDDIR)			\
 	&& $(TARGET)-gcc		\
 		-DLOG_USE_COLOR		\
@@ -130,8 +120,8 @@ $(BUILDDIR)/rtspd: $(PREFIXDIR)/bin
 		$(RTSPDDIR)/log/log.c	\
 		$(RTSPDDIR)/librtsp.a	\
 		-L$(GMLIBDIR)/lib	\
-		-lpthread -lm -lrt -lgm -o $(TOOLSDIR)/bin/rtspd && \
-		$(TARGET)-strip $(TOOLSDIR)/bin/rtspd
+		-lpthread -lm -lrt -lgm -o $(BUILDDIR)/bin/rtspd && \
+		$(TARGET)-strip $(BUILDDIR)/bin/rtspd
 	@touch $@
 
 
@@ -139,44 +129,39 @@ $(BUILDDIR)/rtspd: $(PREFIXDIR)/bin
 ## LIBS                                                        ##
 #################################################################
 
-$(BUILDDIR)/chuangmi_utils:
+$(BUILDDIR)/chuangmi_utils: $(BUILDDIR)/lib
 	$(call box,"Compiling miicam library $(@F)")
-	@mkdir -p $(BUILDDIR)
-	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib" \
-	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
-	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/libchuangmi_utils.so -fPIC $(TOOLSDIR)/lib/chuangmi_utils.c
+	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib" \
+	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
+	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_utils.so -fPIC $(TOOLSDIR)/lib/chuangmi_utils.c
 	@touch $@
 
-$(BUILDDIR)/chuangmi_ircut: $(BUILDDIR)/chuangmi_utils
+$(BUILDDIR)/chuangmi_ircut: $(BUILDDIR)/lib $(BUILDDIR)/chuangmi_utils
 	$(call box,"Compiling miicam library $(@F)")
-	@mkdir -p $(BUILDDIR)
-	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib" \
-	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
-	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/libchuangmi_ircut.so -fPIC $(TOOLSDIR)/lib/chuangmi_ircut.c
+	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib" \
+	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
+	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_ircut.so -fPIC $(TOOLSDIR)/lib/chuangmi_ircut.c
 	@touch $@
 
-$(BUILDDIR)/chuangmi_isp328: $(BUILDDIR)/chuangmi_utils
+$(BUILDDIR)/chuangmi_isp328: $(BUILDDIR)/lib $(BUILDDIR)/chuangmi_utils
 	$(call box,"Compiling miicam library $(@F)")
-	@mkdir -p $(BUILDDIR)
-	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib" \
-	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
-	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/libchuangmi_isp328.so -fPIC $(TOOLSDIR)/lib/chuangmi_isp328.c
+	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib" \
+	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
+	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_isp328.so -fPIC $(TOOLSDIR)/lib/chuangmi_isp328.c
 	@touch $@
 
-$(BUILDDIR)/chuangmi_pwm: $(BUILDDIR)/chuangmi_utils
+$(BUILDDIR)/chuangmi_pwm: $(BUILDDIR)/lib $(BUILDDIR)/chuangmi_utils
 	$(call box,"Compiling miicam library $(@F)")
-	@mkdir -p $(BUILDDIR)
-	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib" \
-	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
-	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/libchuangmi_pwm.so -fPIC $(TOOLSDIR)/lib/chuangmi_pwm.c
+	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib" \
+	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
+	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_pwm.so -fPIC $(TOOLSDIR)/lib/chuangmi_pwm.c
 	@touch $@
 
-$(BUILDDIR)/chuangmi_led: $(BUILDDIR)/chuangmi_utils
+$(BUILDDIR)/chuangmi_led: $(BUILDDIR)/lib $(BUILDDIR)/chuangmi_utils
 	$(call box,"Compiling miicam library $(@F)")
-	@mkdir -p $(BUILDDIR)
-	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib" \
-	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
-	$(TARGET)-gcc -shared -o $(TOOLSDIR)/lib/libchuangmi_led.so -fPIC $(TOOLSDIR)/lib/chuangmi_led.c
+	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib" \
+	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
+	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_led.so -fPIC $(TOOLSDIR)/lib/chuangmi_led.c
 	@touch $@
 
 
@@ -184,16 +169,15 @@ $(BUILDDIR)/chuangmi_led: $(BUILDDIR)/chuangmi_utils
 ## UTILS                                                       ##
 #################################################################
 
-$(UTILS): $(PREFIXDIR)/bin $(LIBS) $(BUILDDIR)/popt
+$(UTILS): $(BUILDDIR)/bin $(LIBS) $(BUILDDIR)/popt
 	$(call box,"Compiling miicam utility $(@F)")
-	@mkdir -p $(BUILDDIR) $(TOOLSDIR)/bin
-	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib" \
-	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(TOOLSDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
+	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib" \
+	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
 	$(TARGET)-gcc \
 		-Wall \
-		-o $(TOOLSDIR)/bin/$(@F) $(UTILSDIR)/$(@F).c \
-		-I $(TOOLSDIR)/lib -L$(TOOLSDIR)/lib \
-		-I $(PREFIXDIR)/include -L$(PREFIXDIR)/lib \
+		-o $(BUILDDIR)/bin/$(@F) $(UTILSDIR)/$(@F).c \
+		-I $(TOOLSDIR)/lib \
+		-I $(BUILDDIR)/include -L$(BUILDDIR)/lib \
 		-l popt            \
 		-l chuangmi_ircut  \
 		-l chuangmi_utils  \
@@ -209,24 +193,22 @@ $(UTILS): $(PREFIXDIR)/bin $(LIBS) $(BUILDDIR)/popt
 
 $(GMUTILS): $(BUILDDIR)/popt
 	$(call box,"Compiling miicam libraries")
-	@mkdir -p $(BUILDDIR) $(TOOLSDIR)/bin
 	cd $(GMLIBDIR)			\
 	&& $(TARGET)-gcc		\
 		-Wall			\
 		-I $(GMLIBDIR)/inc	\
 		-I $(TOOLSDIR)/lib	\
-		-I $(PREFIXDIR)/include	\
-		-L $(TOOLSDIR)/lib	\
+		-I $(BUILDDIR)/include	\
 		-L $(GMLIBDIR)/lib	\
-		-L $(PREFIXDIR)/lib	\
-		-o $(TOOLSDIR)/bin/$(@F)\
+		-L $(BUILDDIR)/lib	\
+		-o $(BUILDDIR)/bin/$(@F)\
 		$(GMLIBDIR)/$(@F).c	\
 		-l gm 			\
 		-l m			\
 		-l popt			\
 		-l rt			\
 		-l pthread		\
-	&& $(TARGET)-strip $(TOOLSDIR)/bin/$(@F)
+	&& $(TARGET)-strip $(BUILDDIR)/bin/$(@F)
 	@touch $@
 
 
@@ -234,15 +216,11 @@ $(GMUTILS): $(BUILDDIR)/popt
 ## Firmware configuration files                                ##
 #################################################################
 
-sdcard/config.cfg:
-	$(TOPDIR)/sdcard/firmware/scripts/configupdate $(TOPDIR)/sdcard/config.cfg
+config.cfg:
+	$(TOPDIR)/sdcard/firmware/scripts/configupdate $(BUILDDIR)/config.cfg
 
-sdcard/manufacture.bin:
-	tar -cf $(TOPDIR)/sdcard/manufacture.bin manufacture/test_drv
-
-sdcard/firmware/etc/os-release:
-	$(TOPDIR)/bin/print-version | tee $@
-
+manufacture.bin:
+	tar -cf $(BUILDDIR)/manufacture.bin manufacture/test_drv
 
 #################################################################
 ## Third party tools                                           ##
@@ -251,69 +229,25 @@ sdcard/firmware/etc/os-release:
 include tools/make/zlib.mk
 include tools/make/libpopt.mk
 include tools/make/busybox.mk
-include tools/make/OUTPUT.mk
-
 
 #################################################################
 ##                                                             ##
 #################################################################
 
-.PHONY: sources install images clean
+.PHONY: default install dist clean
 
-sources:
-	$(call box,"Downloading current third-party sources")
-	$(TOPDIR)/bin/download-sources.py --file $(SOURCES)
+install: default
+	rm -rf $(BUILDDIR)/dist \
+	&& mkdir -p $(BUILDDIR)/dist \
+	&& cp -r --preserve=links $(TOPDIR)/sdcard  $(BUILDDIR)/dist \
+	&& cp $(BUILDDIR)/manufacture.bin $(BUILDDIR)/config.cfg $(BUILDDIR)/dist/sdcard \
+	&& mkdir -p $(BUILDDIR)/dist/sdcard/firmware/bin $(BUILDDIR)/dist/sdcard/firmware/lib \
+	&& find $(BUILDDIR)/lib -maxdepth 1 \( -type f -or -type l \) \( -name '*.so*' -or -name '*.a*' \) -exec cp --no-dereference {} $(BUILDDIR)/dist/sdcard/firmware/lib/. \; \
+	&& find $(BUILDDIR)/bin -maxdepth 1 -type f -exec cp {} $(BUILDDIR)/dist/sdcard/firmware/bin \;
 
-install: all
-	$(call box,"Running make install")
-	@mkdir -p $(BINARIESDIR) $(LIBRARIESDIR) \
-	\
-	&& echo "*** Copying third party binaries and extras to $(BINARIESDIR)" \
-	&& cd $(PREFIXDIR)/bin  && $(TARGET)-strip $(THIRD_PARTY_BINS)  && cp $(THIRD_PARTY_BINS)  $(BINARIESDIR)/. \
-	\
-	&& echo "*** Copying third party libraries and extras to $(LIBRARIESDIR)" \
-	&& cd $(PREFIXDIR)/lib  && $(TARGET)-strip $(THIRD_PARTY_LIBS) && cp $(THIRD_PARTY_LIBS) $(LIBRARIESDIR)/. \
-	&& cd $(PREFIXDIR)/lib  && cp $(THIRD_PARTY_LIB_EXTRAS) $(LIBRARIESDIR)/. \
-	\
-	&& echo "*** Copying our own binaries to $(BINARIESDIR)" \
-	&& cd $(TOOLSDIR)/bin   && find . -maxdepth 1 -type f -exec $(TARGET)-strip {} \; -exec cp {} $(BINARIESDIR)/. \; \
-	\
-	&& echo "*** Copying our own libraries to $(BINARIESDIR)" \
-	&& cd $(TOOLSDIR)/lib   && find . -maxdepth 1 -type f -name '*.so' -exec $(TARGET)-strip {} \; -exec cp {} $(LIBRARIESDIR) \;
-
-
-images: all install
-	$(call box,"Running make images")
-	@cd $(TOPDIR) \
-	\
-	&& echo "*** Removing older version of MiiCam.tgz and MiiCam.zip" \
-	&& find $(TOPDIR) -maxdepth 1 -type f -name 'MiiCam.zip' -or -name 'MiiCam.tgz' -delete \
-	\
-	&& echo "*** Creating file listing before packing" \
-	&& find $(TOPDIR)/sdcard -type f -exec md5sum {} \; > sdcard/firmware/etc/files.db \
-	\
-	&& echo "*** Creating zip archive of sdcard/ to MiiCam.zip" \
-	&& zip -r --quiet MiiCam.zip README.md sdcard \
-	\
-	&& echo "*** Creating tar archive of sdcard/ to MiiCam.tgz" \
-	&& tar czf MiiCam.tgz -C $(TOPDIR) README.md sdcard \
-	\
-	&& md5sum MiiCam.tgz > MiiCam.tgz.md5sum \
-	&& md5sum MiiCam.zip > MiiCam.zip.md5sum \
-	\
-	&& echo "*** MiiCam.zip and MiiCam.tgz created"
-
+dist: install
+	tar czf $(BUILDDIR)/MiiCam.tar.gz -C $(BUILDDIR)/dist sdcard \
+	&& md5sum $(BUILDDIR)/MiiCam.tar.gz > $(BUILDDIR)/MiiCam.tar.gz.md5
 
 clean:
-	$(call box,"Running make clean")
-	@cd $(TOPDIR) \
-	\
-	&& echo "*** Removing directories with build artifacts" \
-	&& rm -rf $(BINARIESDIR) $(LIBRARIESDIR) $(PREFIXDIR) $(BUILDDIR) \
-	\
-	&& echo "*** Removing all own-brewed binaries" \
-	&& find $(TOOLSDIR)/bin -maxdepth 1 -type f -delete \
-	\
-	&& echo "*** Removing all self-brewed libraries" \
-	&& find $(TOOLSDIR)/lib -maxdepth 1 -type f -name '*.so' -delete
-
+	rm -rf $(BUILDDIR)

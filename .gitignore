@@ -1,21 +1,4 @@
 build
-prefix
-src
-tools/bin/*
-tools/lib/*.so
-tools/lib/*.o
-sdcard/firmware/bin/*
-sdcard/firmware/etc/os-release
-sdcard/config.cfg
-sdcard/manufacture.bin
-sdcard/log
-sdcard/firmware/www
-
-sdk/
-MiiCam.zip
-MiiCam.zip.md5sum
-MiiCam.tgz
-MiiCam.tgz.md5sum
 
 .idea/
 .vscode
