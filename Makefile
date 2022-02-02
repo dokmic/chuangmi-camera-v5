@@ -6,9 +6,9 @@ PROCS        := $(shell nproc --all )
 
 DOWNLOADCMD := curl -qs --http1.1 -L --retry 10 --output
 
-TOPDIR         := $(CURDIR)
-BUILDDIR       := $(TOPDIR)/build
-TOOLSDIR       := $(TOPDIR)/tools
+BUILDDIR       := $(CURDIR)/build
+SRCDIR         := $(CURDIR)/src
+SOURCES        := $(CURDIR)/sources.json
 
 BUILDENV :=			\
 	AR=$(TARGET)-ar		\
@@ -24,17 +24,15 @@ BUILDENV :=			\
 	CPPFLAGS="-I$(BUILDDIR)/include -L$(BUILDDIR)/lib" \
 	LDFLAGS=" -I$(BUILDDIR)/include -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags"
 
-GMLIBDIR       := $(TOOLSDIR)/gm_lib
-RTSPDDIR       := $(TOOLSDIR)/rtsp_server
-UTILSDIR       := $(TOOLSDIR)/utils
-
-SOURCES        := $(TOPDIR)/sources.json
+GMLIBDIR       := $(SRCDIR)/gm_lib
+RTSPDDIR       := $(SRCDIR)/rtsp_server
+UTILSDIR       := $(SRCDIR)/utils
 
 #################################################################
 ## Functions                                                   ##
 #################################################################
 
-include tools/make/functions.mk
+include $(SRCDIR)/make/functions.mk
 
 
 #################################################################
@@ -131,37 +129,37 @@ $(BUILDDIR)/rtspd: $(BUILDDIR)/bin
 
 $(BUILDDIR)/chuangmi_utils: $(BUILDDIR)/lib
 	$(call box,"Compiling miicam library $(@F)")
-	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib" \
-	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
-	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_utils.so -fPIC $(TOOLSDIR)/lib/chuangmi_utils.c
+	CPPFLAGS="-I$(SRCDIR)/lib -L$(BUILDDIR)/lib" \
+	LDFLAGS=" -I$(SRCDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
+	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_utils.so -fPIC $(SRCDIR)/lib/chuangmi_utils.c
 	@touch $@
 
 $(BUILDDIR)/chuangmi_ircut: $(BUILDDIR)/lib $(BUILDDIR)/chuangmi_utils
 	$(call box,"Compiling miicam library $(@F)")
-	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib" \
-	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
-	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_ircut.so -fPIC $(TOOLSDIR)/lib/chuangmi_ircut.c
+	CPPFLAGS="-I$(SRCDIR)/lib -L$(BUILDDIR)/lib" \
+	LDFLAGS=" -I$(SRCDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
+	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_ircut.so -fPIC $(SRCDIR)/lib/chuangmi_ircut.c
 	@touch $@
 
 $(BUILDDIR)/chuangmi_isp328: $(BUILDDIR)/lib $(BUILDDIR)/chuangmi_utils
 	$(call box,"Compiling miicam library $(@F)")
-	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib" \
-	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
-	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_isp328.so -fPIC $(TOOLSDIR)/lib/chuangmi_isp328.c
+	CPPFLAGS="-I$(SRCDIR)/lib -L$(BUILDDIR)/lib" \
+	LDFLAGS=" -I$(SRCDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
+	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_isp328.so -fPIC $(SRCDIR)/lib/chuangmi_isp328.c
 	@touch $@
 
 $(BUILDDIR)/chuangmi_pwm: $(BUILDDIR)/lib $(BUILDDIR)/chuangmi_utils
 	$(call box,"Compiling miicam library $(@F)")
-	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib" \
-	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
-	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_pwm.so -fPIC $(TOOLSDIR)/lib/chuangmi_pwm.c
+	CPPFLAGS="-I$(SRCDIR)/lib -L$(BUILDDIR)/lib" \
+	LDFLAGS=" -I$(SRCDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
+	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_pwm.so -fPIC $(SRCDIR)/lib/chuangmi_pwm.c
 	@touch $@
 
 $(BUILDDIR)/chuangmi_led: $(BUILDDIR)/lib $(BUILDDIR)/chuangmi_utils
 	$(call box,"Compiling miicam library $(@F)")
-	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib" \
-	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
-	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_led.so -fPIC $(TOOLSDIR)/lib/chuangmi_led.c
+	CPPFLAGS="-I$(SRCDIR)/lib -L$(BUILDDIR)/lib" \
+	LDFLAGS=" -I$(SRCDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
+	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_led.so -fPIC $(SRCDIR)/lib/chuangmi_led.c
 	@touch $@
 
 
@@ -171,12 +169,12 @@ $(BUILDDIR)/chuangmi_led: $(BUILDDIR)/lib $(BUILDDIR)/chuangmi_utils
 
 $(UTILS): $(BUILDDIR)/bin $(LIBS) $(BUILDDIR)/popt
 	$(call box,"Compiling miicam utility $(@F)")
-	CPPFLAGS="-I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib" \
-	LDFLAGS=" -I$(TOOLSDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
+	CPPFLAGS="-I$(SRCDIR)/lib -L$(BUILDDIR)/lib" \
+	LDFLAGS=" -I$(SRCDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
 	$(TARGET)-gcc \
 		-Wall \
 		-o $(BUILDDIR)/bin/$(@F) $(UTILSDIR)/$(@F).c \
-		-I $(TOOLSDIR)/lib \
+		-I $(SRCDIR)/lib \
 		-I $(BUILDDIR)/include -L$(BUILDDIR)/lib \
 		-l popt            \
 		-l chuangmi_ircut  \
@@ -197,7 +195,7 @@ $(GMUTILS): $(BUILDDIR)/popt
 	&& $(TARGET)-gcc		\
 		-Wall			\
 		-I $(GMLIBDIR)/inc	\
-		-I $(TOOLSDIR)/lib	\
+		-I $(SRCDIR)/lib	\
 		-I $(BUILDDIR)/include	\
 		-L $(GMLIBDIR)/lib	\
 		-L $(BUILDDIR)/lib	\
@@ -217,18 +215,18 @@ $(GMUTILS): $(BUILDDIR)/popt
 #################################################################
 
 config.cfg:
-	$(TOPDIR)/sdcard/firmware/scripts/configupdate $(BUILDDIR)/config.cfg
+	$(SRCDIR)/sdcard/firmware/scripts/configupdate $(BUILDDIR)/config.cfg
 
 manufacture.bin:
-	tar -cf $(BUILDDIR)/manufacture.bin manufacture/test_drv
+	tar -cf $(BUILDDIR)/manufacture.bin -C $(SRCDIR) manufacture/test_drv
 
 #################################################################
 ## Third party tools                                           ##
 #################################################################
 
-include tools/make/zlib.mk
-include tools/make/libpopt.mk
-include tools/make/busybox.mk
+include $(SRCDIR)/make/zlib.mk
+include $(SRCDIR)/make/libpopt.mk
+include $(SRCDIR)/make/busybox.mk
 
 #################################################################
 ##                                                             ##
@@ -239,7 +237,7 @@ include tools/make/busybox.mk
 install: default
 	rm -rf $(BUILDDIR)/dist \
 	&& mkdir -p $(BUILDDIR)/dist \
-	&& cp -r --preserve=links $(TOPDIR)/sdcard  $(BUILDDIR)/dist \
+	&& cp -r --preserve=links $(SRCDIR)/sdcard  $(BUILDDIR)/dist \
 	&& cp $(BUILDDIR)/manufacture.bin $(BUILDDIR)/config.cfg $(BUILDDIR)/dist/sdcard \
 	&& mkdir -p $(BUILDDIR)/dist/sdcard/firmware/bin $(BUILDDIR)/dist/sdcard/firmware/lib \
 	&& find $(BUILDDIR)/lib -maxdepth 1 \( -type f -or -type l \) \( -name '*.so*' -or -name '*.a*' \) -exec cp --no-dereference {} $(BUILDDIR)/dist/sdcard/firmware/lib/. \; \

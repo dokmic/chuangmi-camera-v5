@@ -25,7 +25,7 @@ $(BUILDDIR)/busybox: $(BUILDDIR)/$(BUSYBOXARCHIVE)
 	@mkdir -p $(BUILDDIR) $(BUILDDIR)/bin $(BUILDDIR)/sbin && rm -rf $@-$(BUSYBOXVERSION)
 	@tar -xjf $(BUILDDIR)/$(BUSYBOXARCHIVE) -C $(BUILDDIR)
 	@cd $@-$(BUSYBOXVERSION) && \
-	cp $(TOOLSDIR)/patches/busybox.config $@-$(BUSYBOXVERSION)/.config 	\
+	cp $(SRCDIR)/patches/busybox.config $@-$(BUSYBOXVERSION)/.config 	\
 	&& $(BUILDENV)				    									\
 		make ARCH=arm CROSS_COMPILE=$(TARGET)- -j$(PROCS)         		\
 		&& make ARCH=arm CROSS_COMPILE=$(TARGET)- -j$(PROCS) install 	\
