@@ -241,7 +241,8 @@ install: default
 	&& cp $(BUILDDIR)/manufacture.bin $(BUILDDIR)/config.cfg $(BUILDDIR)/dist/sdcard \
 	&& mkdir -p $(BUILDDIR)/dist/sdcard/firmware/bin $(BUILDDIR)/dist/sdcard/firmware/lib \
 	&& find $(BUILDDIR)/lib -maxdepth 1 \( -type f -or -type l \) \( -name '*.so*' -or -name '*.a*' \) -exec cp --no-dereference {} $(BUILDDIR)/dist/sdcard/firmware/lib/. \; \
-	&& find $(BUILDDIR)/bin -maxdepth 1 -type f -exec cp {} $(BUILDDIR)/dist/sdcard/firmware/bin \;
+	&& find $(BUILDDIR)/bin -maxdepth 1 -type f -exec cp {} $(BUILDDIR)/dist/sdcard/firmware/bin \; \
+	&& sync
 
 dist: install
 	tar czf $(BUILDDIR)/MiiCam.tar.gz -C $(BUILDDIR)/dist sdcard \
