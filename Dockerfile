@@ -28,7 +28,6 @@ RUN apt-get -qq update \
     gettext \
     git \
     groff \
-    jq \
     libtool \
     lib32z1-dev \
     libcurl4-openssl-dev \

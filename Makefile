@@ -29,13 +29,6 @@ RTSPDDIR       := $(SRCDIR)/rtsp_server
 UTILSDIR       := $(SRCDIR)/utils
 
 #################################################################
-## Functions                                                   ##
-#################################################################
-
-include $(SRCDIR)/make/functions.mk
-
-
-#################################################################
 ## Results                                                     ##
 #################################################################
 
@@ -128,35 +121,30 @@ $(BUILDDIR)/rtspd: $(BUILDDIR)/bin
 #################################################################
 
 $(BUILDDIR)/chuangmi_utils: $(BUILDDIR)/lib
-	$(call box,"Compiling miicam library $(@F)")
 	CPPFLAGS="-I$(SRCDIR)/lib -L$(BUILDDIR)/lib" \
 	LDFLAGS=" -I$(SRCDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
 	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_utils.so -fPIC $(SRCDIR)/lib/chuangmi_utils.c
 	@touch $@
 
 $(BUILDDIR)/chuangmi_ircut: $(BUILDDIR)/lib $(BUILDDIR)/chuangmi_utils
-	$(call box,"Compiling miicam library $(@F)")
 	CPPFLAGS="-I$(SRCDIR)/lib -L$(BUILDDIR)/lib" \
 	LDFLAGS=" -I$(SRCDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
 	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_ircut.so -fPIC $(SRCDIR)/lib/chuangmi_ircut.c
 	@touch $@
 
 $(BUILDDIR)/chuangmi_isp328: $(BUILDDIR)/lib $(BUILDDIR)/chuangmi_utils
-	$(call box,"Compiling miicam library $(@F)")
 	CPPFLAGS="-I$(SRCDIR)/lib -L$(BUILDDIR)/lib" \
 	LDFLAGS=" -I$(SRCDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
 	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_isp328.so -fPIC $(SRCDIR)/lib/chuangmi_isp328.c
 	@touch $@
 
 $(BUILDDIR)/chuangmi_pwm: $(BUILDDIR)/lib $(BUILDDIR)/chuangmi_utils
-	$(call box,"Compiling miicam library $(@F)")
 	CPPFLAGS="-I$(SRCDIR)/lib -L$(BUILDDIR)/lib" \
 	LDFLAGS=" -I$(SRCDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
 	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_pwm.so -fPIC $(SRCDIR)/lib/chuangmi_pwm.c
 	@touch $@
 
 $(BUILDDIR)/chuangmi_led: $(BUILDDIR)/lib $(BUILDDIR)/chuangmi_utils
-	$(call box,"Compiling miicam library $(@F)")
 	CPPFLAGS="-I$(SRCDIR)/lib -L$(BUILDDIR)/lib" \
 	LDFLAGS=" -I$(SRCDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
 	$(TARGET)-gcc -shared -o $(BUILDDIR)/lib/libchuangmi_led.so -fPIC $(SRCDIR)/lib/chuangmi_led.c
@@ -168,7 +156,6 @@ $(BUILDDIR)/chuangmi_led: $(BUILDDIR)/lib $(BUILDDIR)/chuangmi_utils
 #################################################################
 
 $(UTILS): $(BUILDDIR)/bin $(LIBS) $(BUILDDIR)/popt
-	$(call box,"Compiling miicam utility $(@F)")
 	CPPFLAGS="-I$(SRCDIR)/lib -L$(BUILDDIR)/lib" \
 	LDFLAGS=" -I$(SRCDIR)/lib -L$(BUILDDIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags" \
 	$(TARGET)-gcc \
@@ -190,7 +177,6 @@ $(UTILS): $(BUILDDIR)/bin $(LIBS) $(BUILDDIR)/popt
 #################################################################
 
 $(GMUTILS): $(BUILDDIR)/popt
-	$(call box,"Compiling miicam libraries")
 	cd $(GMLIBDIR)			\
 	&& $(TARGET)-gcc		\
 		-Wall			\
@@ -224,9 +210,67 @@ manufacture.bin:
 ## Third party tools                                           ##
 #################################################################
 
-include $(SRCDIR)/make/zlib.mk
-include $(SRCDIR)/make/libpopt.mk
-include $(SRCDIR)/make/busybox.mk
+BUSYBOX_URL := https://busybox.net/downloads/busybox-1.31.1.tar.bz2
+BUSYBOX_ARCHIVE := $(BUILDDIR)/$(notdir $(BUSYBOX_URL))
+BUSYBOX_DIR := $(basename $(basename $(BUSYBOX_ARCHIVE)))
+
+$(BUILDDIR)/busybox:
+	@test -f $(BUSYBOX_ARCHIVE) \
+		|| $(DOWNLOADCMD) $(BUSYBOX_ARCHIVE) $(BUSYBOX_URL) \
+		|| rm -f $(BUSYBOX_ARCHIVE)
+	@mkdir -p $(BUILDDIR)/bin $(BUILDDIR)/sbin && rm -rf $(BUSYBOX_DIR)
+	@tar -xjf $(BUSYBOX_ARCHIVE) -C $(BUILDDIR)
+	@cd $(BUSYBOX_DIR) && \
+	cp $(SRCDIR)/patches/busybox.config $(BUSYBOX_DIR)/.config 	\
+	&& $(BUILDENV)				    									\
+		make ARCH=arm CROSS_COMPILE=$(TARGET)- -j$(PROCS)         		\
+		&& make ARCH=arm CROSS_COMPILE=$(TARGET)- -j$(PROCS) install 	\
+		&& mv $(BUSYBOX_DIR)/_install/bin/busybox $(BUILDDIR)/bin
+	@touch $@
+	@rm -rf $(BUSYBOX_DIR)
+
+LIBPOPT_URL := http://ftp.rpm.org/mirror/popt/popt-1.16.tar.gz
+LIBPOPT_ARCHIVE := $(BUILDDIR)/$(notdir $(LIBPOPT_URL))
+LIBPOPT_DIR := $(basename $(basename $(LIBPOPT_ARCHIVE)))
+
+$(BUILDDIR)/popt: $(BUILDDIR)/zlib
+	@test -f $(LIBPOPT_ARCHIVE) \
+		|| $(DOWNLOADCMD) $(LIBPOPT_ARCHIVE) $(LIBPOPT_URL) \
+		|| rm -f $(LIBPOPT_ARCHIVE)
+	@mkdir -p $(BUILDDIR) && rm -rf $(LIBPOPT_DIR)
+	@tar -xzf $(LIBPOPT_ARCHIVE) -C $(BUILDDIR)
+	@cd $(LIBPOPT_DIR)		\
+	&& $(BUILDENV)					\
+		./configure					\
+			--host=$(TARGET)		\
+			--prefix=$(BUILDDIR)	\
+			--enable-shared			\
+			--disable-static		\
+		&& make -j$(PROCS)			\
+		&& make -j$(PROCS) install
+	@rm -rf $(LIBPOPT_DIR)
+	@touch $@
+
+ZLIB_URL := https://www.zlib.net/zlib-1.2.12.tar.gz
+ZLIB_ARCHIVE := $(BUILDDIR)/$(notdir $(ZLIB_URL))
+ZLIB_DIR := $(basename $(basename $(ZLIB_ARCHIVE)))
+
+$(BUILDDIR)/zlib:
+	@echo $(ZLIB_DIR)
+	@test -f $(ZLIB_ARCHIVE) \
+		|| $(DOWNLOADCMD) $(ZLIB_ARCHIVE) $(ZLIB_URL) \
+		|| rm -f $(ZLIB_ARCHIVE)
+	@mkdir -p $(BUILDDIR) && rm -rf $(ZLIB_DIR)
+	@tar -xzf $(ZLIB_ARCHIVE) -C $(BUILDDIR)
+	@cd $(ZLIB_DIR)			\
+	&& $(BUILDENV)					\
+		./configure					\
+			--prefix=$(BUILDDIR)	\
+			--enable-shared			\
+		&& make -j$(PROCS)			\
+		&& make -j$(PROCS) install
+	@rm -rf $(ZLIB_DIR)
+	@touch $@
 
 #################################################################
 ##                                                             ##
