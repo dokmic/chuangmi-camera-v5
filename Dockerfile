@@ -1,51 +1,32 @@
-FROM ubuntu:20.04
+FROM debian:stable-slim
 
 ENV PATH="/usr/src/arm-linux-3.3/toolchain_gnueabi-4.4.0_ARMv5TE/usr/bin:$PATH"
 ENV TARGET=arm-unknown-linux-uclibcgnueabi
 ENV AR=$TARGET-ar
 ENV AS=$TARGET-as
-ENV CC=$TARGET-gc
+ENV CC=$TARGET-gcc
 ENV CXX=$TARGET-g++
 ENV LD=$TARGET-ld
+ENV LDSHARED="$TARGET-gcc -shared"
 ENV NM=$TARGET-nm
 ENV RANLIB=$TARGET-ranlib
 ENV STRIP=$TARGET-strip
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get -qq update \
-  && apt-get -qq install -y \
-    autoconf \
-    cmake \
-    ca-certificates \
-    bison \
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends \
     build-essential \
-    cpio \
+    libc6-i386 \
+    lib32z1 \
+    bzip2 \
+    ca-certificates \
     curl \
-    file \
-    flex \
-    gawk \
-    gettext \
-    git \
-    groff \
-    libtool \
-    lib32z1-dev \
-    libcurl4-openssl-dev \
-    libssl-dev \
-    libyaml-dev \
-    locales \
-    make \
     openssl \
-    pkg-config \
-    python3 \
-    python3-pip \
-    python3-dev \
-    texi2html \
-    texinfo \
-    unzip \
-    zip \
+  && apt-get autoremove \
   && apt-get clean \
-  && locale-gen en_US.UTF-8
+  && rm -rf /var/lib/apt/lists/* \
+  && rm -f /etc/dpkg/dpkg.cfg.d/02apt-speedup
 
 COPY toolchain_gnueabi-4.4.0_ARMv5TE.tgz /tmp
 RUN mkdir -p /usr/src/arm-linux-3.3 \
