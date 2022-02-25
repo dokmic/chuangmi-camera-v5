@@ -264,7 +264,4 @@ AUTO_NIGHT_MODE_ARGS="${AUTO_NIGHT_MODE_ARGS:-"--ev-on 30 --ir-on 90 --ev-off 10
 ## Ceiling camera mode when the image is flipped and mirrored (0/1)
 CEILING_MODE="${CEILING_MODE:-0}"
 
-## Restore the state of the image corrections, leds and camera modes after reboot
-RESTORE_STATE="${RESTORE_STATE:-1}"
-
 EOF

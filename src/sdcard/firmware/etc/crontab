@@ -2,6 +2,3 @@ SHELL=/bin/sh
 PATH=/tmp/sd/firmware/bin:/tmp/sd/firmware/scripts:/sbin:/bin:/usr/sbin:/usr/bin
 
 # min hour day_of_month month day_of_week command
-
-## Save the state file every hour
-00    *    *            *     *           flock -n -x /tmp/.save_state.lock -c /tmp/sd/firmware/init/S99restore_state save

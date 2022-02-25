@@ -55,18 +55,9 @@ blue_led --enable
 ## IR Cut on
 ir_cut     --enable
 
-## Disable the others (will be changed using restore state if required)
+## Disable the others
 yellow_led --disable
 ir_led     --disable
-
-##################################################################################
-## Restore settings                                                             ##
-##################################################################################
-
-if [ "${RESTORE_STATE}" -eq 1 ]
-then
-    sh ${SD_MOUNTDIR}/firmware/init/S99restore_state start
-fi
 
 ##################################################################################
 ## Telnetd                                                                      ##
