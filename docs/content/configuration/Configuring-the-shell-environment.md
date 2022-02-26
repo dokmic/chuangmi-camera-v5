@@ -24,10 +24,10 @@ You can create aliases and functions and many features that most shell's offer.
 
 ## Creating aliases and adding settings to the shell environment
 
-You can add aliases and settings to the shell environment by editing the `.profile` and the `.busybox_aliases` file.
+You can add aliases and settings to the shell environment by editing the `.profile` file.
 
 As the `/root` partition is created at boot-time by mounting a `tmpfs` and copying all files from the sd card,
-all changes in `/root/.profile` and `/root/.busybox_aliases` will be gone after a reboot.
+all changes in `/root/.profile` will be gone after a reboot.
 
 This can be useful for testing purposes, but to make settings permanent,
 you should add your settings in the source root files in `/tmp/sd/firmware/root`

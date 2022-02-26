@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Start the ntpd and crontab
+# Start the ntpd
 #
 
 SD_MOUNTDIR="/tmp/sd"

@@ -113,17 +113,6 @@ WIFI_SSID="${WIFI_SSID:-""}"
 ## Set WIFI STA password
 WIFI_PASS="${WIFI_PASS:-""}"
 
-
-############################################################
-## Cron Settings                                          ##
-############################################################
-
-## See: https://miicam.github.io/configuration/Using-cronjobs
-
-## Enable cron by setting 0 to 1
-ENABLE_CRON="${ENABLE_CRON:-1}"
-
-
 ############################################################
 ## Time Settings                                          ##
 ############################################################

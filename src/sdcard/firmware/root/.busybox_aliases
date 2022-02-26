@@ -1,1 +1,0 @@
-alias crontab='crontab -c /var/run/cron'

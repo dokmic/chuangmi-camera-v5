@@ -34,7 +34,6 @@ if [ $BIN_BUSYBOX_MD5 == $TMP_BUSYBOX_MD5 ] &&
 
     /tmp/busybox killall -9 udhcpc
     /tmp/busybox killall -9 dbus-daemon
-    /tmp/busybox killall -9 crond
     /tmp/busybox killall -9 telnetd
     /tmp/busybox killall -9 miio_client_helper_nomqtt.sh
     #/mnt/data/imi/imi_init/S01logging stop
