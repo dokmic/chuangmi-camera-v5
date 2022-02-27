@@ -163,7 +163,7 @@ enable_binary()
     # update restartd.conf
     if [ -n "${RESTART}" ] && [ -f /tmp/etc/restartd.conf ] && ! grep -q ^"${RESTART} " /tmp/etc/restartd.conf
     then
-        grep ^"${RESTART} " /tmp/etc/restartd.conf.org >> /tmp/etc/restartd.conf
+        grep ^"${RESTART} " /tmp/etc/restartd.conf.bak >> /tmp/etc/restartd.conf
     fi
 }
 

@@ -224,16 +224,6 @@ MOTION_TOPIC="${MOTION_TOPIC:-"$MQTT_TOPIC/motion"}"
 ENABLE_TELNETD="${ENABLE_TELNETD:-0}"
 
 ############################################################
-## Configure Restart daemon                               ##
-############################################################
-
-## See: https://miicam.github.io/configuration/Configuring-Restartd
-
-## Start restartd services watchdog at system boot (0/1)
-ENABLE_RESTARTD="${ENABLE_RESTARTD:-0}"
-
-
-############################################################
 ## Auto night mode                                        ##
 ############################################################
 

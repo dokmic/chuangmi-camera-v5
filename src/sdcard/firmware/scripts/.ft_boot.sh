@@ -197,16 +197,17 @@ fi
 ## Prepare restartd.conf                                                        ##
 ##################################################################################
 
+if ! [ -f /tmp/S99restartd ]; then
+  sed 's|/mnt/data/restartd/restartd.conf|/etc/restartd.conf|' /mnt/data/imi/imi_init/S99restartd > /tmp/S99restartd
+fi
 if ! mount | grep -q /mnt/data/imi/imi_init/S99restartd
 then
-    echo "*** Replacing restartd startup script and config with our own version"
-    cp /tmp/sd/firmware/init/S99restartd /etc/S99restartd
-    mount --bind /etc/S99restartd /mnt/data/imi/imi_init/S99restartd
+    mount --bind /tmp/S99restartd /mnt/data/imi/imi_init/S99restartd
 fi
 
-if [ ! -f /tmp/etc/restartd.conf.org ] && mountpoint -q /etc
+if [ ! -f /tmp/etc/restartd.conf.bak ] && mountpoint -q /etc
 then
-    cp /mnt/data/restartd/restartd.conf /tmp/etc/restartd.conf.org
+    cp /mnt/data/restartd/restartd.conf /tmp/etc/restartd.conf.bak
     cp /mnt/data/restartd/restartd.conf /tmp/etc/restartd.conf
 fi
 
