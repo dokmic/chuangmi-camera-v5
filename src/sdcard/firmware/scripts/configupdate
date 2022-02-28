@@ -72,23 +72,6 @@ ROOT_PASSWORD="${ROOT_PASSWORD:-"Chuangmi720pCam123"}"
 
 
 ############################################################
-## Wait for network connectivity                          ##
-############################################################
-
-## Wait with boot until network comes up
-WAIT_FOR_NETWORK="${WAIT_FOR_NETWORK:-1}"
-
-## The IP to ping to verify if network is up
-PING_IP="${PING_IP:-"8.8.8.8"}"
-
-## Ping Max retries
-PING_RETRIES="${PING_RETRIES:-10}"
-
-## Wait time in seconds
-PING_WAIT="${PING_WAIT:-2}"
-
-
-############################################################
 ## Log settings                                           ##
 ############################################################
 

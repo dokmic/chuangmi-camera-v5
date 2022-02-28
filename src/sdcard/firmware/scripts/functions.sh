@@ -39,49 +39,6 @@ die()
     exit 1
 }
 
-wait_for_network_until()
-{
-    RETRIES="$1"
-    SLEEP="$2"
-    IP="$3"
-
-    if [ "x$IP" = "x" ]
-    then
-        IP="8.8.8.8"
-    fi
-
-    if [ "x${RETRIES}" = "x" ]
-    then
-        RETRIES=10
-    fi
-
-    if [ "x$SLEEP" = "x" ]
-    then
-        SLEEP=5
-    fi
-
-    printf "*** Waiting for ping reply from %s for %s times..." "$IP" "$RETRIES"
-
-    TRIES=0
-    until [ $TRIES -ge $RETRIES ]
-    do
-        ping -c 1 -w 1 "$IP" >/dev/null 2>&1 && break
-        TRIES=$(( $TRIES+1 ))
-        echo -n "."
-        sleep 5
-    done
-
-    if [ $TRIES -ge $RETRIES ]
-    then
-       echo " FAIL"
-       echo "*** No internet connection detected! Sad panda :("
-       return 1
-    else
-       echo " OK"
-       return 0
-    fi
-}
-
 get_last_image()
 {
     ## Find last created snapshot
