@@ -1,4 +1,3 @@
-BUSYBOX_URL := https://busybox.net/downloads/busybox-1.31.1.tar.bz2
 LIBPOPT_URL := http://ftp.rpm.org/mirror/popt/popt-1.16.tar.gz
 ZLIB_URL := https://www.zlib.net/zlib-1.2.12.tar.gz
 
@@ -86,17 +85,6 @@ $(GM): $(BUILD_DIR)/lib/libpopt.so
 $(LIB): $(BUILD_DIR)/lib/libchuangmi_utils.so $(BUILD_DIR)/lib
 	$(LDSHARED) $(CFLAGS) -o $(@) $(SRC_DIR)/lib/$(basename $(@F:lib%=%)).c
 
-$(BUILD_DIR)/bin/busybox: BUSYBOX_ARCHIVE := $(BUILD_DIR)/$(notdir $(BUSYBOX_URL))
-$(BUILD_DIR)/bin/busybox: BUSYBOX_DIR := $(basename $(basename $(BUSYBOX_ARCHIVE)))
-$(BUILD_DIR)/bin/busybox: $(BUILD_DIR)/bin
-	test -f $(BUSYBOX_ARCHIVE) || $(CURL) $(BUSYBOX_ARCHIVE) $(BUSYBOX_URL)
-	test -d $(BUSYBOX_DIR) || tar -xjf $(BUSYBOX_ARCHIVE) -C $(BUILD_DIR)
-	cp $(SRC_DIR)/busybox.config $(BUSYBOX_DIR)/.config
-	cd $(BUSYBOX_DIR) \
-		&& make ARCH=arm CROSS_COMPILE=$(TARGET)- -j$(CPUS) \
-		&& make ARCH=arm CROSS_COMPILE=$(TARGET)- -j$(CPUS) install
-	cp $(BUSYBOX_DIR)/_install/bin/busybox $(@)
-
 $(BUILD_DIR)/lib/libpopt.so: LIBPOPT_ARCHIVE := $(BUILD_DIR)/$(notdir $(LIBPOPT_URL))
 $(BUILD_DIR)/lib/libpopt.so: LIBPOPT_DIR := $(basename $(basename $(LIBPOPT_ARCHIVE)))
 $(BUILD_DIR)/lib/libpopt.so: $(BUILD_DIR)/lib/libz.so $(BUILD_DIR)/lib
@@ -136,7 +124,6 @@ default: \
 	$(GM) \
 	$(LIB) \
 	$(BUILD_DIR)/bin/rtspd \
-	$(BUILD_DIR)/bin/busybox \
 	$(BUILD_DIR)/lib/libpopt.so \
 	$(BUILD_DIR)/lib/libz.so \
 	$(BUILD_DIR)/config.cfg \

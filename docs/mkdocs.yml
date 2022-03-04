@@ -25,8 +25,6 @@ nav:
     - configuration/Using-Auto-Night-Mode.md
     - configuration/Configuring-MQTT.md
     - configuration/Time-settings.md
-    - configuration/Configuring-the-shell-environment.md
-    - configuration/Configuring-your-terminal-profile.md
     - configuration/System-Logging-and-Logfiles.md
     - configuration/Integrating-the-cam-in-your-home-automation.md
     - configuration/Using-this-camera-with-obs.md

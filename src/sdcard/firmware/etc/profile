@@ -1,4 +1,0 @@
-export TERM='xterm-color'
-export PAGER='/bin/more '
-export PATH='/tmp/sd/firmware/bin:/tmp/sd/firmware/scripts:/bin:/sbin:/usr/bin:/usr/sbin:/tmp/sd/ft:/mnt/data/ft'
-export LD_LIBRARY_PATH='/tmp/sd/firmware/lib'

@@ -62,17 +62,6 @@ Chuangmi 720P configuration:
 EOF
 
 ##################################################################################
-## Mounting newer busybox in place                                              ##
-##################################################################################
-
-echo "*** Mounting newer busybox on /bin/busybox"
-
-if ! mountpoint -q /bin/busybox
-then
-    mount --rbind /tmp/sd/firmware/bin/busybox /bin/busybox
-fi
-
-##################################################################################
 ## Syslog                                                                       ##
 ##################################################################################
 
@@ -100,24 +89,6 @@ fi
 if ! mountpoint -q /etc
 then
     mount --rbind /tmp/etc /etc
-fi
-
-##################################################################################
-## Make /root writable                                                          ##
-##################################################################################
-
-echo "*** Mounting /root from sd card"
-
-if ! [ -d /tmp/root ]
-then
-    cp -r ${SD_MOUNTDIR}/firmware/root /tmp/root
-    chown -R root:root /tmp/root
-    chmod -R 0750 /tmp/root
-fi
-
-if ! mountpoint -q /root
-then
-    mount --rbind /tmp/root /root
 fi
 
 ##################################################################################
