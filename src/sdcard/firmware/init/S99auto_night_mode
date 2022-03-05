@@ -15,7 +15,7 @@ fi
 NAME="auto_night_mode"
 DESC="Auto Night Mode"
 DAEMON="/tmp/sd/firmware/bin/auto_night_mode"
-DAEMON_OPTS="${AUTO_NIGHT_MODE_ARGS}"
+DAEMON_OPTS="${AUTO_NIGHT_MODE_ARGS:-"--ev-on 30 --ir-on 90 --ev-off 1000 --ir-off 100 --delay 5 --set-ircut --set-irled"}"
 PIDFILE="/var/run/${NAME}.pid"
 
 check_daemon_bin "${DAEMON}" "${DESC}"

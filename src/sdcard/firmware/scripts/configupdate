@@ -207,19 +207,6 @@ MOTION_TOPIC="${MOTION_TOPIC:-"$MQTT_TOPIC/motion"}"
 ENABLE_TELNETD="${ENABLE_TELNETD:-0}"
 
 ############################################################
-## Auto night mode                                        ##
-############################################################
-
-## See: https://miicam.github.io/configuration/Using-Auto-Night-Mode
-
-## Turn auto night mode on or off (0/1)
-AUTO_NIGHT_MODE="${AUTO_NIGHT_MODE:-0}"
-
-## Command line arguments for the auto night mode and irled switcher
-AUTO_NIGHT_MODE_ARGS="${AUTO_NIGHT_MODE_ARGS:-"--ev-on 30 --ir-on 90 --ev-off 1000 --ir-off 100 --delay 5 --set-ircut --set-irled"}"
-
-
-############################################################
 ## Camera options                                         ##
 ############################################################
 

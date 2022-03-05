@@ -89,7 +89,7 @@ fi
 ## Auto Night Mode                                                              ##
 ##################################################################################
 
-if [ "${AUTO_NIGHT_MODE}" -eq 1 ]
+if [ "${AUTO_NIGHT_MODE:-1}" -eq 1 ]
 then
     sh ${SD_MOUNTDIR}/firmware/init/S99auto_night_mode start
 else
