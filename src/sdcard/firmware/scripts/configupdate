@@ -196,16 +196,6 @@ MOTION_RECORD="${MOTION_RECORD:-0}"
 ## Which topic to publish to
 MOTION_TOPIC="${MOTION_TOPIC:-"$MQTT_TOPIC/motion"}"
 
-
-############################################################
-## Camera Access                                          ##
-############################################################
-
-## See: https://miicam.github.io/configuration/Accessing-the-camera
-
-## Start telnet server at system boot (0/1)
-ENABLE_TELNETD="${ENABLE_TELNETD:-0}"
-
 ############################################################
 ## Camera options                                         ##
 ############################################################

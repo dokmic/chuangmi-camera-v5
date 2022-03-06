@@ -53,16 +53,18 @@ ir_led     --disable
 ## Telnetd                                                                      ##
 ##################################################################################
 
-if [ "${ENABLE_TELNETD}" -eq 1 ]
+if [ "${ENABLE_TELNETD:-0}" -eq 1 ]
 then
-    sh ${SD_MOUNTDIR}/firmware/init/S99telnet start
+  sh /mnt/data/imi/imi_init/_S50telnet start
 
-    if ! grep -q '^telnetd' /tmp/etc/restartd.conf
+  if ! grep -q '^telnetd' /tmp/etc/restartd.conf
+  then
+    echo "telnetd \"/usr/sbin/telnetd\" \"/mnt/data/imi/imi_init/_S50telnet restart\" \"/bin/echo '*** telnetd was restarted from restartd... '\"" >> /tmp/etc/restartd.conf
+    if pgrep restartd >/dev/null
     then
-        echo "telnetd \"/usr/sbin/telnetd\" \"${SD_MOUNTDIR}/firmware/init/S99telnet restart\" \"/bin/echo '*** telnetd was restarted from restartd... '\"" >> /tmp/etc/restartd.conf
+        sh /mnt/data/imi/imi_init/S99restartd restart
     fi
-else
-    sh ${SD_MOUNTDIR}/firmware/init/S99telnet stop
+  fi
 fi
 
 ##################################################################################

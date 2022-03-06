@@ -24,15 +24,3 @@ If boot issues appear due to syntax errors in scripts, the root password is ofte
 ## Enabling the telnet service
 
 The telnet service can be enabled at boot time by setting `ENABLE_TELNETD` to `1` in `config.cfg`.
-
-After changing the setting, you can start the telnet service using the services page in the web interface or by issuing a start using the init script:
-
-```
-/etc/init/S99telnet start
-```
-
-To stop the telnet service use:
-```
-/etc/init/S99telnet stop
-```
-
