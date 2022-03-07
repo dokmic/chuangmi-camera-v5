@@ -7,7 +7,7 @@ BUILD_DIR := $(CURDIR)/build
 SRC_DIR := $(CURDIR)/src
 
 export CFLAGS := -fPIC
-export CPPFLAGS := -I$(BUILD_DIR)/include -I$(SRC_DIR)/gm/include -I$(SRC_DIR)/lib -L$(BUILD_DIR)/lib -L$(SRC_DIR)/gm/lib
+export CPPFLAGS := -I/usr/src/gm_lib/inc -I$(BUILD_DIR)/include -I$(SRC_DIR)/lib -L/usr/src/gm_lib/lib -L$(BUILD_DIR)/lib
 export LDFLAGS := -I$(SRC_DIR)/lib -I$(BUILD_DIR)/include -L$(BUILD_DIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags
 export LDSHAREDFLAGS := -I$(SRC_DIR)/lib -I$(BUILD_DIR)/include -L$(BUILD_DIR)/lib
 
@@ -71,7 +71,7 @@ $(BUILD_DIR)/bin/rtspd: $(BUILD_DIR)/bin
 		-l rt
 
 $(GM): $(BUILD_DIR)/lib/libpopt.so
-	cd $(SRC_DIR)/gm/bin && $(CC) \
+	cd $(SRC_DIR)/bin && $(CC) \
 		$(CPPFLAGS) \
 		-Wall \
 		-o $(@) \
