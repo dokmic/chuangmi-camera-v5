@@ -25,11 +25,6 @@ BIN := \
 	$(BUILD_DIR)/bin/take_video \
 	$(BUILD_DIR)/bin/yellow_led
 
-GM := \
-	$(BUILD_DIR)/bin/audio_playback \
-	$(BUILD_DIR)/bin/encode_with_osd \
-	$(BUILD_DIR)/bin/osd
-
 LIB := \
 	$(BUILD_DIR)/lib/libchuangmi_ircut.so \
 	$(BUILD_DIR)/lib/libchuangmi_isp328.so \
@@ -67,18 +62,6 @@ $(BUILD_DIR)/bin/rtspd: $(BUILD_DIR)/bin
 		librtsp.a \
 		-l gm \
 		-l m \
-		-l pthread \
-		-l rt
-
-$(GM): $(BUILD_DIR)/lib/libpopt.so
-	cd $(SRC_DIR)/bin && $(CC) \
-		$(CPPFLAGS) \
-		-Wall \
-		-o $(@) \
-		$(@F).c \
-		-l gm \
-		-l m \
-		-l popt \
 		-l pthread \
 		-l rt
 
@@ -121,7 +104,6 @@ $(BUILD_DIR)/manufacture.bin:
 
 default: \
 	$(BIN) \
-	$(GM) \
 	$(LIB) \
 	$(BUILD_DIR)/bin/rtspd \
 	$(BUILD_DIR)/lib/libpopt.so \
