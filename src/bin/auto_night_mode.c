@@ -31,9 +31,9 @@ struct State
 void enable_darkness_mode(void)
 {
     if (cli.verbose == 1)
-        fprintf(stderr, "*** Enabling darkness mode\n");
+        fprintf(stderr, "Enabling darkness mode\n");
 
-    system("/tmp/sd/firmware/bin/nightmode -e");
+    system("/tmp/sd/firmware/bin/night_mode -e");
 
     if (cli.ir_led) system("/tmp/sd/firmware/bin/ir_led -e");
     if (cli.ir_cut) system("/tmp/sd/firmware/bin/ir_cut -d");
@@ -42,9 +42,9 @@ void enable_darkness_mode(void)
 void disable_darkness_mode(void)
 {
     if (cli.verbose == 1)
-        fprintf(stderr, "*** Disabling darkness mode\n");
+        fprintf(stderr, "Disabling darkness mode\n");
 
-    system("/tmp/sd/firmware/bin/nightmode -d");
+    system("/tmp/sd/firmware/bin/night_mode -d");
 
     if (cli.ir_led) system("/tmp/sd/firmware/bin/ir_led -d");
     if (cli.ir_cut) system("/tmp/sd/firmware/bin/ir_cut -e");
@@ -53,7 +53,7 @@ void disable_darkness_mode(void)
 void signal_handler(int sig)
 {
     if (cli.verbose == 1)
-        fprintf(stderr, "*** Exiting auto_night_mode: CTRL+C pressed, or exit requested\n");
+        fprintf(stderr, "Exiting auto_night_mode: CTRL+C pressed, or exit requested\n");
 
     isp328_end();
 
@@ -108,7 +108,7 @@ int main(int argc, char *argv[])
         cli.delay = 3;
 
     if (isp328_init() < 0) {
-        fprintf(stderr, "*** Error: ISP328 initialization failed");
+        fprintf(stderr, "Error: ISP328 initialization failed");
         return -1;
     }
 
@@ -118,17 +118,17 @@ int main(int argc, char *argv[])
     signal(SIGTERM, signal_handler);
 
     if (cli.verbose == 1)
-        fprintf(stderr, "*** Auto nightmode started\n");
+        fprintf(stderr, "Auto nightmode started\n");
 
     while(1) {
         if (nightmode_update_values() < 0) {
-            fprintf(stderr, "*** Failed to retrieve EV and IR values!\n");
+            fprintf(stderr, "Failed to retrieve EV and IR values!\n");
             sleep(5);
         }
 
         if (state.ev_value != light_info.ev || state.ir_value != light_info.ir) {
             if (cli.verbose == 1)
-                fprintf(stderr, "*** New measurements: ev=%d ir=%d\n", light_info.ev, light_info.ir);
+                fprintf(stderr, "New measurements: ev=%d ir=%d\n", light_info.ev, light_info.ir);
 
             state.ev_value = light_info.ev;
             state.ir_value = light_info.ir;

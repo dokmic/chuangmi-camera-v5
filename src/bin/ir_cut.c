@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
     }
 
     if (ircut_init() < 0) {
-        fprintf(stderr, "*** Error: IR Cut GPIO initialization failed\n");
+        fprintf(stderr, "Error: IR Cut GPIO initialization failed\n");
         return EXIT_FAILURE;
     }
 

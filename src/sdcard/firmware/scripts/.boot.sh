@@ -115,8 +115,8 @@ fi
 
 if [ "$CEILING_MODE" -eq 1 ]
 then
-    flipmode   --enable
-    mirrormode --enable
+    flip_mode   --enable
+    mirror_mode --enable
 fi
 
 ##################################################################################

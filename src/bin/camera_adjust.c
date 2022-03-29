@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
     }
 
     if (isp328_init() < 0) {
-        fprintf(stderr, "*** Error: ISP328 initialization failed\n");
+        fprintf(stderr, "Error: ISP328 initialization failed\n");
         return EXIT_FAILURE;
     }
 

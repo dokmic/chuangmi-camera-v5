@@ -17,10 +17,6 @@ then
     . "${BASECFG}"
 fi
 
-## Print the last field
-alias last_f="awk '{print \$NF}'"
-
-
 ##################################################################################
 ## System Functions                                                             ##
 ##################################################################################
@@ -380,9 +376,9 @@ led_status()
 {
     ARGS="$1"
 
-    BLUE="$( blue_led     --status | last_f )"
-    YELLOW="$( yellow_led --status | last_f )"
-    IR_LED="$( ir_led     --status | last_f )"
+    BLUE="$( blue_led     --status )"
+    YELLOW="$( yellow_led --status )"
+    IR_LED="$( ir_led     --status )"
 
     if [ "$ARGS" = "--json" ]
     then
@@ -409,10 +405,10 @@ mode_status()
 {
     ARGS="$1"
 
-    NIGHT="$(  nightmode  --status | last_f )"
-    IR_CUT="$( ir_cut     --status | last_f )"
-    MIRROR="$( mirrormode --status | last_f )"
-    FLIP="$( flipmode     --status | last_f )"
+    NIGHT="$( night_mode  --status )"
+    IR_CUT="$( ir_cut     --status )"
+    MIRROR="$( mirror_mode --status )"
+    FLIP="$( flip_mode     --status )"
 
     if [ "$ARGS" = "--json" ]
     then

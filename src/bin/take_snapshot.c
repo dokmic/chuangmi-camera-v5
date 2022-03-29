@@ -9,16 +9,16 @@
 int main(int argc, char *argv[])
 {
     if (request_snapshot() < 0) {
-        fprintf(stderr, "*** Error: Failed to request a snapshot by writing to %s\n", RTSPD_REQUEST_SNAPSHOT);
+        fprintf(stderr, "Error: Failed to request a snapshot by writing to %s\n", RTSPD_REQUEST_SNAPSHOT);
         return EXIT_FAILURE;
     }
 
     // * Wait until file is removed
     if (wait_for_file_removal(RTSPD_REQUEST_SNAPSHOT) == 0) {
-        fprintf(stderr, "*** Success: Snapshot created!\n");
+        fprintf(stderr, "Success: Snapshot created!\n");
     }
     else {
-        fprintf(stderr, "*** Error: No snapshot created! Is rtspd running?\n");
+        fprintf(stderr, "Error: No snapshot created! Is rtspd running?\n");
         return EXIT_FAILURE;
     }
 

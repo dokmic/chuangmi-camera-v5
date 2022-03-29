@@ -59,7 +59,7 @@ int main(int argc, char *argv[])
     }
 
     if (pwm_init() < 0) {
-        fprintf(stderr, "*** Error: PWM initialization failed\n");
+        fprintf(stderr, "Error: PWM initialization failed\n");
         return EXIT_FAILURE;
     }
 

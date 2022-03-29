@@ -21,10 +21,10 @@ int main(int argc, char *argv[])
 {
     poptContext pc;
     struct poptOption po[] = {
-        {"enable",  'e', POPT_ARG_NONE, &cli.enable,  0, "Enable the Nightmode",      "Enable"},
-        {"disable", 'd', POPT_ARG_NONE, &cli.disable, 0, "Disable the Nightmode",     "Disable"},
+        {"enable",  'e', POPT_ARG_NONE, &cli.enable,  0, "Enable the night mode",      "Enable"},
+        {"disable", 'd', POPT_ARG_NONE, &cli.disable, 0, "Disable the night mode",     "Disable"},
         {"status",  's', POPT_ARG_NONE, &cli.status,  0, "Retrieve the status",       "Status"},
-        {"info",    'i', POPT_ARG_NONE, &cli.info,    0, "Retrieve nightmode info",   "Nightmode Info"},
+        {"info",    'i', POPT_ARG_NONE, &cli.info,    0, "Retrieve the night mode info",   "Nightmode Info"},
         {"json",    'j', POPT_ARG_NONE, &cli.json,    0, "Retrieve the info in json", "Status Json"},
         POPT_AUTOHELP
         {NULL}
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
     }
 
     if (isp328_init() < 0) {
-        fprintf(stderr, "*** Error: ISP328 initialization failed\n");
+        fprintf(stderr, "Error: ISP328 initialization failed\n");
         return EXIT_FAILURE;
     }
 

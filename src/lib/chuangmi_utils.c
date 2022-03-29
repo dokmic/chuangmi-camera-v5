@@ -39,7 +39,7 @@ int write_file(const char *file_path, char *content)
 
     fd = fopen(file_path, "w");
     if (!fd) {
-        fprintf(stderr, "*** Error: Failed to open: %s\n", file_path);
+        fprintf(stderr, "Error: Failed to open: %s\n", file_path);
         return -1;
     }
 
@@ -58,7 +58,7 @@ int get_last_file(const char * file_path)
 
     fh = fopen(file_path, "rb");
     if (!fh) {
-        fprintf(stderr, "*** Error: Failed to open: %s\n", file_path);
+        fprintf(stderr, "Error: Failed to open: %s\n", file_path);
         return -1;
     }
 
@@ -76,10 +76,10 @@ int get_last_file(const char * file_path)
 
     if (buffer) {
         buffer[length] = '\0';
-        fprintf(stdout, "*** Created: %s\n", buffer);
+        fprintf(stdout, "Created: %s\n", buffer);
         success = 0;
     } else {
-        fprintf(stderr, "*** Error: Failed to retrieve file from %s.\n", file_path);
+        fprintf(stderr, "Error: Failed to retrieve file from %s.\n", file_path);
         success = -1;
     }
 
@@ -137,11 +137,6 @@ int wait_for_file_removal(const char * file_path)
     else
         return -1;
 }
-
-
-// ********************************************************* //
-// ** GPIO Functions                                      ** //
-// ********************************************************* //
 
 int gpio_export(int pin)
 {

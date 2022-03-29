@@ -50,7 +50,7 @@ get_topic() {
 
 led_blue_status()
 {
-    mqtt_send "${MQTT_TOPIC}/leds/blue" "$( blue_led --status | last_f )"
+    mqtt_send "${MQTT_TOPIC}/leds/blue" "$( blue_led --status )"
 }
 
 led_blue_set()
@@ -163,7 +163,7 @@ ir_cut_set()
 
 mirror_mode_status()
 {
-     mqtt_send "${MQTT_TOPIC}/mirror" "$( mirrormode --status | last_f )"
+    mqtt_send "${MQTT_TOPIC}/mirror" "$( mirror_mode --status )"
 }
 
 
@@ -174,13 +174,13 @@ mirror_mode_set()
     if [ "${VALUE}" == "${MQTT_ON}" ]
     then
     log "MQTT Action: Setting mirror mode to ${VALUE}"
-        mirrormode --enable
+        mirror_mode --enable
         mqtt_send "${MQTT_TOPIC}/mirror_mode" "${MQTT_ON}"
 
     elif [ "${VALUE}" == "${MQTT_OFF}" ]
     then
         log "MQTT Action: Setting mirror mode to ${VALUE}"
-        mirrormode --disable
+        mirror_mode --disable
         mqtt_send "${MQTT_TOPIC}/mirror_mode" "${MQTT_OFF}"
     fi
 }
@@ -192,8 +192,8 @@ mirror_mode_set()
 
 night_mode_status()
 {
-    mqtt_send "${MQTT_TOPIC}/night_mode"      "$( nightmode --status | last_f )"
-    mqtt_send "${MQTT_TOPIC}/night_mode/json" "$( nightmode --json )"
+    mqtt_send "${MQTT_TOPIC}/night_mode"      "$( night_mode --status )"
+    mqtt_send "${MQTT_TOPIC}/night_mode/json" "$( night_mode --json )"
 }
 
 night_mode_set()
@@ -203,13 +203,13 @@ night_mode_set()
     if [ "${VALUE}" == "${MQTT_ON}" ]
     then
         log "MQTT Action: Setting night mode to ${VALUE}"
-        nightmode --enable
+        night_mode --enable
         mqtt_send "${MQTT_TOPIC}/night_mode" "${MQTT_OFF}"
 
     elif [ "${VALUE}" == "${MQTT_OFF}" ]
     then
         log "MQTT Action: Setting night mode to ${VALUE}"
-        nightmode --disable
+        night_mode --disable
         mqtt_send "${MQTT_TOPIC}/night_mode" "${MQTT_OFF}"
     fi
 }
@@ -220,7 +220,7 @@ night_mode_set()
 
 flip_mode_status()
 {
-    mqtt_send "${MQTT_TOPIC}/flip_mode" "$( flipmode --status | last_f )"
+    mqtt_send "${MQTT_TOPIC}/flip_mode" "$( flip_mode --status )"
 }
 
 flip_mode_set()
@@ -230,13 +230,13 @@ flip_mode_set()
     if [ "${VALUE}" == "${MQTT_ON}" ]
     then
         log "MQTT Action: Setting flip mode to ${VALUE}"
-        flipmode --enable
+        flip_mode --enable
         mqtt_send "${MQTT_TOPIC}/flip_mode" "${MQTT_ON}"
 
     elif [ "${VALUE}" == "${MQTT_OFF}" ]
     then
         log "MQTT Action: Setting flip mode to ${VALUE}"
-        flipmode --disable
+        flip_mode --disable
         mqtt_send "${MQTT_TOPIC}/flip_mode" "${MQTT_OFF}"
     fi
 }

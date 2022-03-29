@@ -4,7 +4,6 @@
 #include <unistd.h>
 #include <popt.h>
 
-
 #include "chuangmi_isp328.h"
 
 
@@ -20,9 +19,9 @@ int main(int argc, char *argv[])
 {
    poptContext pc;
     struct poptOption po[] = {
-        {"enable",  'e', POPT_ARG_NONE, &cli.enable,  0, "Enable the Mirrormode",  "Enable"},
-        {"disable", 'd', POPT_ARG_NONE, &cli.disable, 0, "Disable the Mirrormode", "Disable"},
-        {"status",  's', POPT_ARG_NONE, &cli.status,  0, "Retrieve the status",    "Status"},
+        {"enable",  'e', POPT_ARG_NONE, &cli.enable,  0, "Enable the Flipmode",  "Enable"},
+        {"disable", 'd', POPT_ARG_NONE, &cli.disable, 0, "Disable the Flipmode", "Disable"},
+        {"status",  's', POPT_ARG_NONE, &cli.status,  0, "Retrieve the status",  "Status"},
         POPT_AUTOHELP
         {NULL}
     };
@@ -55,17 +54,17 @@ int main(int argc, char *argv[])
     }
 
     if (isp328_init() < 0) {
-        fprintf(stderr, "*** Error: IR Cut GPIO initialization failed\n");
+        fprintf(stderr, "Error: IR Cut GPIO initialization failed\n");
         return EXIT_FAILURE;
     }
 
     int success;
     if (cli.enable)
-        success = mirrormode_on();
+        success = flipmode_on();
     else if (cli.disable)
-        success = mirrormode_off();
+        success = flipmode_off();
     else if (cli.status)
-        success = mirrormode_status();
+        success = flipmode_status();
 
     isp328_end();
     return success;

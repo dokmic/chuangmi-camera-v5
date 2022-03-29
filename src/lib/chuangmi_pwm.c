@@ -26,7 +26,7 @@ int pwm_init(void)
     system("modprobe ftpwmtmr010");
 
     if ((pwm_fd = open(PWM_DEVICE_NAME, O_RDWR)) < 0) {
-        fprintf(stderr, "*** Error: Failed to open %s\n", PWM_DEVICE_NAME);
+        fprintf(stderr, "Error: Failed to open %s\n", PWM_DEVICE_NAME);
         return -1;
     }
 
@@ -69,7 +69,7 @@ int pwm_init(void)
 int pwm_is_initialized(void)
 {
     if ( fcntl(pwm_fd, F_GETFD) < 0 ) {
-        fprintf(stderr, "*** Error: PWM Library is uninitialized.\n");
+        fprintf(stderr, "Error: PWM Library is uninitialized.\n");
         return -1;
     }
     return 0;
@@ -109,11 +109,11 @@ int ir_led_set(unsigned int val)
         return -1;
 
     if (val <= 0xff) {
-        fprintf(stderr, "*** Setting IR led to %d\n", val);
+        fprintf(stderr, "Setting IR led to %d\n", val);
         pwm_set(val);
         return 0;
     } else
-        fprintf(stderr, "*** Error: Use a value in between 0-255\n");
+        fprintf(stderr, "Error: Use a value in between 0-255\n");
         return -1;
 }
 
@@ -149,10 +149,10 @@ int ir_led_status(void)
     ioctl(pwm_fd, PWM_IOCTL_GET_INFO, &pwm[0]);
 
     if (pwm[0].duty_ratio > 0) {
-        fprintf(stdout, "*** IR Led is on\n");
+        fprintf(stdout, "on\n");
         return 0;
     } else {
-        fprintf(stdout, "*** IR Led is off\n");
+        fprintf(stdout, "off\n");
         return -1;
     }
 }
@@ -167,13 +167,11 @@ int ir_led_info(void)
         return -1;
 
     ioctl(pwm_fd, PWM_IOCTL_GET_INFO, &pwm[0]);
-    printf("*************************\n");
     printf("PWM %d information:\n", pwm[0].id);
     printf("  Clock Source: %d\n", pwm[0].clksrc);
     printf("  Frequency: %d\n", pwm[0].freq);
     printf("  Step: %d\n", pwm[0].duty_steps);
     printf("  Duty: %d\n", pwm[0].duty_ratio);
-    printf("*************************\n");
 
     return 0;
 }

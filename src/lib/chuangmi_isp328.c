@@ -13,10 +13,6 @@
 
 #include "chuangmi_isp328.h"
 
-// ************************************************************************** //
-// ** ISP 328 Functions                                                    ** //
-// ************************************************************************** //
-
 /*
  * Initialize the ISP328 device
  */
@@ -24,19 +20,18 @@ int isp328_init(void)
 {
     // * Check if nightmode device can be accessed
     if (access(ISP_DEV_NAME, F_OK) < 0) {
-        fprintf(stderr, "*** Error: Failed to access %s\n", ISP_DEV_NAME);
+        fprintf(stderr, "Error: Failed to access %s\n", ISP_DEV_NAME);
         return -1;
     }
 
     // * Open ISP328 file descriptor
     if ((isp_fd = open(ISP_DEV_NAME, O_RDWR)) < 0) {
-        fprintf(stderr, "*** Error: Failed to open %s\n", ISP_DEV_NAME);
+        fprintf(stderr, "Error: Failed to open %s\n", ISP_DEV_NAME);
         return -1;
     }
 
     return 0;
 }
-
 
 /*
  * Return 0 if the isp328 device is initialized else -1
@@ -44,12 +39,11 @@ int isp328_init(void)
 int isp328_is_initialized(void)
 {
     if (fcntl(isp_fd, F_GETFD) == -1) {
-        fprintf(stderr, "*** Error: ISP328 Library is uninitialized.\n");
+        fprintf(stderr, "Error: ISP328 Library is uninitialized.\n");
         return -1;
     }
     return 0;
 }
-
 
 /*
  * Close the ISP328 device
@@ -62,11 +56,6 @@ int isp328_end(void)
         return -1;
 }
 
-
-// ************************************************************************** //
-// ** Mirror Mode                                                          ** //
-// ************************************************************************** //
-
 /*
  * Set mirror to a value (Valid: 1/0)
  */
@@ -76,15 +65,14 @@ int mirrormode_set(int value)
         return -1;
 
     if (value <= 1) {
-        fprintf(stderr, "*** Setting mirror to %d\n", value);
+        fprintf(stderr, "Setting mirror to %d\n", value);
         ioctl(isp_fd, ISP_IOC_SET_SENSOR_MIRROR, &value);
         return 0;
     } else {
-        fprintf(stderr, "*** Can't set mirror to %d\n", value);
+        fprintf(stderr, "Failed to set mirror to %d\n", value);
         return -1;
     }
 }
-
 
 /*
  * Turn mirror on
@@ -94,7 +82,6 @@ int mirrormode_on(void)
     return mirrormode_set(1);
 }
 
-
 /*
  * Turn mirror off
  */
@@ -102,7 +89,6 @@ int mirrormode_off(void)
 {
     return mirrormode_set(0);
 }
-
 
 /*
  * Get the status for mirror
@@ -113,19 +99,14 @@ int mirrormode_status(void)
 
     int ret = ioctl(isp_fd, ISP_IOC_GET_SENSOR_MIRROR, &mode);
     if (ret < 0) {
-        fprintf(stdout, "*** Errror: Retrieving mirror mode values failed");
+        fprintf(stdout, "Failed to retrieve the mirror mode\n");
         return -1;
     }
 
-    fprintf(stdout, "*** Mirror mode is: %s\n", (mode == 1) ? "on" : "off");
+    fprintf(stdout, "%s\n", (mode == 1) ? "on" : "off");
 
     return 0;
 }
-
-
-// ************************************************************************** //
-// ** Night Mode                                                           ** //
-// ************************************************************************** //
 
 /*
  * Get night mode state (Returns: 1/0)
@@ -153,13 +134,12 @@ int nightmode_set(int value)
         return -1;
 
     if ( value <= 1 ) {
-        fprintf(stderr, "*** Setting nightmode to %d\n", value);
+        fprintf(stderr, "Setting nightmode to %d\n", value);
         ioctl(isp_fd, _IOW(0x6d, 0x0a, int), &value);
         return 0;
     } else
         return -1;
 }
-
 
 /*
  * Update the values in `isp_light_info` struct
@@ -192,7 +172,6 @@ int nightmode_update_values(void)
     return 0;
 }
 
-
 /*
  * Turn nightmode on
  */
@@ -201,7 +180,6 @@ int nightmode_on(void)
     return nightmode_set(1);
 }
 
-
 /*
  * Turn nightmode off
  */
@@ -209,7 +187,6 @@ int nightmode_off(void)
 {
     return nightmode_set(0);
 }
-
 
 /*
  * Get the status for nightmode
@@ -221,10 +198,9 @@ int nightmode_status(void)
 
     int state = nightmode_is_on();
 
-    fprintf(stdout, "*** Night mode is: %s\n", (state == 1) ? "on" : "off");
+    fprintf(stdout, "%s\n", (state == 1) ? "on" : "off");
     return 0;
 }
-
 
 /*
  * Print the light values
@@ -232,7 +208,7 @@ int nightmode_status(void)
 int nightmode_info(void)
 {
     if (nightmode_update_values() < 0) {
-        fprintf(stderr, "*** Failed to retrieve EV and IR values!\n");
+        fprintf(stderr, "Failed to retrieve EV and IR values\n");
         return -1;
     }
 
@@ -242,14 +218,13 @@ int nightmode_info(void)
     return 0;
 }
 
-
 /*
  * Print the light values in json
  */
 int nightmode_info_json(void)
 {
     if (nightmode_update_values() < 0) {
-        fprintf(stderr, "*** Failed to retrieve EV and IR values!\n");
+        fprintf(stderr, "Failed to retrieve EV and IR values\n");
         return -1;
     }
 
@@ -257,11 +232,6 @@ int nightmode_info_json(void)
 
     return 0;
 }
-
-
-// ************************************************************************** //
-// ** Flip Mode                                                            ** //
-// ************************************************************************** //
 
 /*
  * Set flip to a value (Valid: 1/0)
@@ -272,15 +242,14 @@ int flipmode_set(int value)
         return -1;
 
     if (value <= 1) {
-        fprintf(stderr, "*** Setting flip to %d\n", value);
+        fprintf(stderr, "Setting flip to %d\n", value);
         ioctl(isp_fd, ISP_IOC_SET_SENSOR_FLIP, &value);
         return 0;
     } else {
-        fprintf(stderr, "*** Error: Cannot set flip to %d\n", value);
+        fprintf(stderr, "Error: Cannot set flip to %d\n", value);
         return -1;
     }
 }
-
 
 /*
  * Turn flip on
@@ -290,7 +259,6 @@ int flipmode_on(void)
     return flipmode_set(1);
 }
 
-
 /*
  * Turn flip off
  */
@@ -298,7 +266,6 @@ int flipmode_off(void)
 {
     return flipmode_set(0);
 }
-
 
 /*
  * Get the status for flip
@@ -309,19 +276,14 @@ int flipmode_status(void)
 
     int ret = ioctl(isp_fd, ISP_IOC_GET_SENSOR_FLIP, &mode);
     if (ret < 0) {
-        fprintf(stdout, "*** Errror: Retrieving flip mode values failed");
+        fprintf(stdout, "Error: Retrieving flip mode values failed");
         return -1;
     }
 
-    fprintf(stdout, "*** Flip mode is: %s\n", (mode == 1) ? "on" : "off");
+    fprintf(stdout, "%s\n", (mode == 1) ? "on" : "off");
 
     return 0;
 }
-
-
-// ************************************************************************** //
-// ** Brightness                                                           ** //
-// ************************************************************************** //
 
 int brightness_set(int value)
 {
@@ -329,15 +291,15 @@ int brightness_set(int value)
         return -1;
 
     if (value < 0 && value > 255) {
-        fprintf(stderr, "*** Error: Cannot set brightness to %d: Use: (0-255)\n", value);
+        fprintf(stderr, "Error: Cannot set brightness to %d: Use: (0-255)\n", value);
         return -1;
     }
 
-    fprintf(stderr, "*** Setting brightness to %d\n", value);
+    fprintf(stderr, "Setting brightness to %d\n", value);
 
     int ret = ioctl(isp_fd, ISP_IOC_SET_BRIGHTNESS, &value);
     if (ret < 0) {
-        fprintf(stderr, "*** Error: Cannot set value for brightness!\n");
+        fprintf(stderr, "Error: Cannot set value for brightness!\n");
         return -1;
     }
 
@@ -347,10 +309,10 @@ int brightness_set(int value)
 int brightness_reset(void)
 {
     if (brightness_set(128) < 0 ) {
-        fprintf(stderr, "*** Error: Failed to reset brightness to it's default value!\n");
+        fprintf(stderr, "Error: Failed to reset brightness to it's default value!\n");
         return -1;
     } else {
-        fprintf(stderr, "*** Setting brightness has been reset to it's default value (128)\n");
+        fprintf(stderr, "Setting brightness has been reset to it's default value (128)\n");
         return 0;
     }
 }
@@ -373,18 +335,13 @@ int brightness_print(void)
 {
     int value = brightness_get();
     if (value < 0) {
-        fprintf(stderr, "*** Error: Cannot get value for brightness!\n");
+        fprintf(stderr, "Error: Cannot get value for brightness!\n");
         return -1;
     }
 
-    fprintf(stdout, "*** Value for brightness is %d\n", value);
+    fprintf(stdout, "%d\n", value);
     return 0;
 }
-
-
-// ************************************************************************** //
-// ** Contrast                                                             ** //
-// ************************************************************************** //
 
 int contrast_set(int value)
 {
@@ -392,15 +349,15 @@ int contrast_set(int value)
         return -1;
 
     if (value < 0 && value > 255) {
-        fprintf(stderr, "*** Error: Cannot set contrast to %d: Use: (0-255)\n", value);
+        fprintf(stderr, "Error: Cannot set contrast to %d: Use: (0-255)\n", value);
         return -1;
     }
 
-    fprintf(stderr, "*** Setting contrast to %d\n", value);
+    fprintf(stderr, "Setting contrast to %d\n", value);
 
     int ret = ioctl(isp_fd, ISP_IOC_SET_CONTRAST, &value);
     if (ret < 0) {
-        fprintf(stderr, "*** Error: Cannot set value for contrast!\n");
+        fprintf(stderr, "Error: Cannot set value for contrast!\n");
         return -1;
     }
 
@@ -410,10 +367,10 @@ int contrast_set(int value)
 int contrast_reset(void)
 {
     if (contrast_set(128) < 0 ) {
-        fprintf(stderr, "*** Error: Failed to reset contrast to it's default value!\n");
+        fprintf(stderr, "Error: Failed to reset contrast to it's default value!\n");
         return -1;
     } else {
-        fprintf(stderr, "*** Setting contrast has been reset to it's default value (128)\n");
+        fprintf(stderr, "Setting contrast has been reset to it's default value (128)\n");
         return 0;
     }
 }
@@ -438,17 +395,13 @@ int contrast_print(void)
     int value = contrast_get();
 
     if (value < 0) {
-        fprintf(stderr, "*** Error: Cannot get value for contrast!\n");
+        fprintf(stderr, "Error: Cannot get value for contrast!\n");
         return -1;
     }
 
-    fprintf(stdout, "*** Value for contrast is %d\n", value);
+    fprintf(stdout, "%d\n", value);
     return 0;
 }
-
-// ************************************************************************** //
-// ** Hue                                                                  ** //
-// ************************************************************************** //
 
 int hue_set(int value)
 {
@@ -456,15 +409,15 @@ int hue_set(int value)
         return -1;
 
     if (value < 0 && value > 255) {
-        fprintf(stderr, "*** Error: Cannot set hue to %d: Use: (0-255)\n", value);
+        fprintf(stderr, "Error: Cannot set hue to %d: Use: (0-255)\n", value);
         return -1;
     }
 
-    fprintf(stderr, "*** Setting hue to %d\n", value);
+    fprintf(stderr, "Setting hue to %d\n", value);
 
     int ret = ioctl(isp_fd, ISP_IOC_SET_HUE, &value);
     if (ret < 0) {
-        fprintf(stderr, "*** Error: Cannot set value for hue!\n");
+        fprintf(stderr, "Error: Cannot set value for hue!\n");
         return -1;
     }
 
@@ -474,10 +427,10 @@ int hue_set(int value)
 int hue_reset(void)
 {
     if (hue_set(128) < 0 ) {
-        fprintf(stderr, "*** Error: Failed to reset hue to it's default value!\n");
+        fprintf(stderr, "Error: Failed to reset hue to it's default value!\n");
         return -1;
     } else {
-        fprintf(stderr, "*** Setting hue has been reset to it's default value (128)\n");
+        fprintf(stderr, "Setting hue has been reset to it's default value (128)\n");
         return 0;
     }
 }
@@ -502,18 +455,13 @@ int hue_print(void)
     int value = hue_get();
 
     if (value < 0) {
-        fprintf(stderr, "*** Error: Cannot get value for hue!\n");
+        fprintf(stderr, "Error: Cannot get value for hue!\n");
         return -1;
     }
 
-    fprintf(stdout, "*** Value for hue is %d\n", value);
+    fprintf(stdout, "%d\n", value);
     return 0;
 }
-
-
-// ************************************************************************** //
-// ** Saturation                                                           ** //
-// ************************************************************************** //
 
 int saturation_set(int value)
 {
@@ -521,15 +469,15 @@ int saturation_set(int value)
         return -1;
 
     if (value < 0 && value > 255) {
-        fprintf(stderr, "*** Error: Cannot set saturation to %d: Use: (0-255)\n", value);
+        fprintf(stderr, "Error: Cannot set saturation to %d: Use: (0-255)\n", value);
         return -1;
     }
 
-    fprintf(stderr, "*** Setting saturation to %d\n", value);
+    fprintf(stderr, "Setting saturation to %d\n", value);
 
     int ret = ioctl(isp_fd, ISP_IOC_SET_SATURATION, &value);
     if (ret < 0) {
-        fprintf(stderr, "*** Error: Cannot set value for saturation!\n");
+        fprintf(stderr, "Error: Cannot set value for saturation!\n");
         return -1;
     }
 
@@ -539,10 +487,10 @@ int saturation_set(int value)
 int saturation_reset(void)
 {
     if (saturation_set(128) < 0 ) {
-        fprintf(stderr, "*** Error: Failed to reset saturation to it's default value!\n");
+        fprintf(stderr, "Error: Failed to reset saturation to it's default value!\n");
         return -1;
     } else {
-        fprintf(stderr, "*** Setting saturation has been reset to it's default value (128)\n");
+        fprintf(stderr, "Setting saturation has been reset to it's default value (128)\n");
         return 0;
     }
 }
@@ -566,18 +514,13 @@ int saturation_print(void)
     int value = saturation_get();
 
     if (value < 0) {
-        fprintf(stderr, "*** Error: Cannot get value for saturation!\n");
+        fprintf(stderr, "Error: Cannot get value for saturation!\n");
         return -1;
     }
 
-    fprintf(stdout, "*** Value for saturation is %d\n", value);
+    fprintf(stdout, "%d\n", value);
     return 0;
 }
-
-
-// ************************************************************************** //
-// ** Denoise                                                              ** //
-// ************************************************************************** //
 
 int denoise_set(int value)
 {
@@ -585,15 +528,15 @@ int denoise_set(int value)
         return -1;
 
     if (value < 0 && value > 255) {
-        fprintf(stderr, "*** Error: Cannot set denoise to %d: Use: (0-255)\n", value);
+        fprintf(stderr, "Error: Cannot set denoise to %d: Use: (0-255)\n", value);
         return -1;
     }
 
-    fprintf(stderr, "*** Setting denoise to %d\n", value);
+    fprintf(stderr, "Setting denoise to %d\n", value);
 
     int ret = ioctl(isp_fd, ISP_IOC_SET_DENOISE, &value);
     if (ret < 0) {
-        fprintf(stderr, "*** Error: Cannot set value for denoise!\n");
+        fprintf(stderr, "Error: Cannot set value for denoise!\n");
         return -1;
     }
 
@@ -603,10 +546,10 @@ int denoise_set(int value)
 int denoise_reset(void)
 {
     if (denoise_set(128) < 0 ) {
-        fprintf(stderr, "*** Error: Failed to reset denoise to it's default value!\n");
+        fprintf(stderr, "Error: Failed to reset denoise to it's default value!\n");
         return -1;
     } else {
-        fprintf(stderr, "*** Setting denoise has been reset to it's default value (128)\n");
+        fprintf(stderr, "Setting denoise has been reset to it's default value (128)\n");
         return 0;
     }
 }
@@ -629,17 +572,13 @@ int denoise_print(void)
 {
     int value = denoise_get();
     if (value < 0) {
-        fprintf(stderr, "*** Error: Cannot get value for denoise!\n");
+        fprintf(stderr, "Error: Cannot get value for denoise!\n");
         return -1;
     }
 
-    fprintf(stdout, "*** Value for denoise is %d\n", value);
+    fprintf(stdout, "%d\n", value);
     return 0;
 }
-
-// ************************************************************************** //
-// ** Sharpness                                                            ** //
-// ************************************************************************** //
 
 int sharpness_set(int value)
 {
@@ -647,15 +586,15 @@ int sharpness_set(int value)
         return -1;
 
     if (value < 0 && value > 255) {
-        fprintf(stderr, "*** Error: Cannot set sharpness to %d: Use: (0-255)\n", value);
+        fprintf(stderr, "Error: Cannot set sharpness to %d: Use: (0-255)\n", value);
         return -1;
     }
 
-    fprintf(stderr, "*** Setting sharpness to %d\n", value);
+    fprintf(stderr, "Setting sharpness to %d\n", value);
 
     int ret = ioctl(isp_fd, ISP_IOC_SET_SHARPNESS, &value);
     if (ret < 0) {
-        fprintf(stderr, "*** Error: Cannot set value for sharpness!\n");
+        fprintf(stderr, "Error: Cannot set value for sharpness!\n");
         return -1;
     }
 
@@ -665,10 +604,10 @@ int sharpness_set(int value)
 int sharpness_reset(void)
 {
     if (sharpness_set(128) < 0 ) {
-        fprintf(stderr, "*** Error: Failed to reset sharpness to it's default value!\n");
+        fprintf(stderr, "Error: Failed to reset sharpness to it's default value!\n");
         return -1;
     } else {
-        fprintf(stderr, "*** Setting sharpness has been reset to it's default value (128)\n");
+        fprintf(stderr, "Setting sharpness has been reset to it's default value (128)\n");
         return 0;
     }
 }
@@ -693,18 +632,13 @@ int sharpness_print(void)
     int value = sharpness_get();
 
     if (value < 0) {
-        fprintf(stderr, "*** Error: Cannot get value for sharpness!\n");
+        fprintf(stderr, "Error: Cannot get value for sharpness!\n");
         return -1;
     }
 
-    fprintf(stdout, "* Value for sharpness is %d\n", value);
+    fprintf(stdout, "%d\n", value);
     return 0;
 }
-
-
-// ************************************************************************** //
-// ** Status                                                               ** //
-// ************************************************************************** //
 
 int print_camera_info_json(void)
 {
@@ -735,7 +669,7 @@ int print_camera_info_shell(void)
 
 int print_camera_info(void)
 {
-        fprintf(stdout, "*** Settings:\n");
+        fprintf(stdout, "Settings:\n");
         fprintf(stdout, "- Brightness: %d\n", brightness_get());
         fprintf(stdout, "- Contrast:   %d\n", contrast_get());
         fprintf(stdout, "- Hue:        %d\n", hue_get());
@@ -747,13 +681,9 @@ int print_camera_info(void)
         return 0;
 }
 
-// ************************************************************************** //
-// ** Reset                                                                ** //
-// ************************************************************************** //
-
 int reset_camera_adjustments(void)
 {
-    fprintf(stderr, "*** Resetting all settings to default!\n");
+    fprintf(stderr, "Resetting all settings to default!\n");
 
     if (brightness_reset()  < 0 ||
         contrast_reset()    < 0 ||

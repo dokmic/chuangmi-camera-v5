@@ -13,11 +13,6 @@
 #include "chuangmi_utils.h"
 #include "chuangmi_led.h"
 
-
-// ********************************************************* //
-// ** Blue led Functions                                  ** //
-// ********************************************************* //
-
 int blue_led_get_brightness(void)
 {
     int brightness = read_int(BLUE_LED_BRIGHTNESS);
@@ -42,17 +37,17 @@ int blue_led_set_brightness(int value)
 int blue_led_blink_on(void)
 {
     if (write_file(BLUE_LED_TRIGGER, "timer\n") < 0 ) {
-        fprintf(stderr, "*** ERROR: Failed to turn on  blue led blink\n");
+        fprintf(stderr, "ERROR: Failed to turn on  blue led blink\n");
         return -1;
     }
 
     if (write_file(BLUE_LED_DELAY_ON, "100\n") < 0 ) {
-        fprintf(stderr, "*** ERROR: Failed to turn on blue led blink\n");
+        fprintf(stderr, "ERROR: Failed to turn on blue led blink\n");
         return -1;
     }
 
     if (write_file(BLUE_LED_DELAY_OFF, "100\n") < 0 ) {
-        fprintf(stderr, "*** ERROR: Failed to turn on blue led blink\n");
+        fprintf(stderr, "ERROR: Failed to turn on blue led blink\n");
         return -1;
     }
 
@@ -66,7 +61,7 @@ int blue_led_blink_on(void)
 int blue_led_blink_off(void)
 {
     if (write_file(BLUE_LED_TRIGGER, "none\n") < 0 ) {
-        fprintf(stderr, "*** ERROR: Failed to turn off blue led blink\n");
+        fprintf(stderr, "ERROR: Failed to turn off blue led blink\n");
         return -1;
     }
     return 0;
@@ -80,11 +75,11 @@ int blue_led_on(void)
     int success = blue_led_set_brightness(50);
 
     if (success < 0) {
-        fprintf(stderr, "*** Failed to turn the blue led on\n");
+        fprintf(stderr, "Failed to turn the blue led on\n");
         return -1;
     }
 
-    fprintf(stderr, "*** The blue led was turned on\n");
+    fprintf(stderr, "The blue led was turned on\n");
     return 0;
 }
 
@@ -94,11 +89,11 @@ int blue_led_off(void)
         return -1;
 
     if (blue_led_set_brightness(0) < 0) {
-        fprintf(stderr, "*** Failed to turn the blue led off\n");
+        fprintf(stderr, "Failed to turn the blue led off\n");
         return -1;
     }
 
-    fprintf(stderr, "*** The blue led was set off\n");
+    fprintf(stderr, "The blue led was set off\n");
     return 0;
 }
 
@@ -107,13 +102,13 @@ int blue_led_status(void)
     int brightness = blue_led_get_brightness();
 
     if (access(BLUE_LED_DELAY_ON, F_OK) == 0 || brightness > 0) {
-        fprintf(stdout, "*** Blue led is on\n");
+        fprintf(stdout, "on\n");
     }
     else if (brightness == 0) {
-        fprintf(stdout, "*** Blue led is off\n");
+        fprintf(stdout, "off\n");
     }
     else {
-        fprintf(stdout, "*** Blue led is UNKNOWN: brightness: %d\n", brightness);
+        fprintf(stdout, "unknown (brightness=%d)\n", brightness);
         return -1;
     }
 
@@ -137,11 +132,6 @@ int blue_led_status_json(void)
 
     return 0;
 }
-
-
-// ********************************************************* //
-// ** Yellow led Functions                                ** //
-// ********************************************************* //
 
 int yellow_led_get_brightness(void)
 {
@@ -167,17 +157,17 @@ int yellow_led_set_brightness(int value)
 int yellow_led_blink_on(void)
 {
     if (write_file(YELLOW_LED_TRIGGER, "timer\n") < 0 ) {
-        fprintf(stderr, "*** ERROR: Failed to turn on  yellow led blink\n");
+        fprintf(stderr, "ERROR: Failed to turn on  yellow led blink\n");
         return -1;
     }
 
     if (write_file(YELLOW_LED_DELAY_ON, "100\n") < 0 ) {
-        fprintf(stderr, "*** ERROR: Failed to turn on yellow led blink\n");
+        fprintf(stderr, "ERROR: Failed to turn on yellow led blink\n");
         return -1;
     }
 
     if (write_file(YELLOW_LED_DELAY_OFF, "100\n") < 0 ) {
-        fprintf(stderr, "*** ERROR: Failed to turn on yellow led blink\n");
+        fprintf(stderr, "ERROR: Failed to turn on yellow led blink\n");
         return -1;
     }
 
@@ -191,7 +181,7 @@ int yellow_led_blink_on(void)
 int yellow_led_blink_off(void)
 {
     if (write_file(YELLOW_LED_TRIGGER, "none\n") < 0 ) {
-        fprintf(stderr, "*** ERROR: Failed to turn off yellow led blink\n");
+        fprintf(stderr, "ERROR: Failed to turn off yellow led blink\n");
         return -1;
     }
     return 0;
@@ -205,11 +195,11 @@ int yellow_led_on()
     int success = yellow_led_set_brightness(50);
 
     if (success < 0) {
-        fprintf(stderr, "*** Failed to turn the yellow led on\n");
+        fprintf(stderr, "Failed to turn the yellow led on\n");
         return -1;
     }
 
-    fprintf(stderr, "*** The yellow led was turned on\n");
+    fprintf(stderr, "The yellow led was turned on\n");
     return 0;
 }
 
@@ -219,11 +209,11 @@ int yellow_led_off()
         return -1;
 
     if (yellow_led_set_brightness(0) < 0) {
-        fprintf(stderr, "*** Failed to turn the yellow led off\n");
+        fprintf(stderr, "Failed to turn the yellow led off\n");
         return -1;
     }
 
-    fprintf(stderr, "*** The yellow led was set off\n");
+    fprintf(stderr, "The yellow led was set off\n");
     return 0;
 }
 
@@ -232,13 +222,13 @@ int yellow_led_status(void)
     int brightness = yellow_led_get_brightness();
 
     if (access(YELLOW_LED_DELAY_ON, F_OK) == 0 || brightness > 0) {
-        fprintf(stdout, "*** Yellow led is on\n");
+        fprintf(stdout, "on\n");
     }
     else if (brightness == 0) {
-        fprintf(stdout, "*** Yellow led is off\n");
+        fprintf(stdout, "off\n");
     }
     else {
-        fprintf(stdout, "*** Yellow led is UNKNOWN: brightness: %d\n", brightness);
+        fprintf(stdout, "unknown (brightness=%d)\n", brightness);
         return -1;
     }
 
@@ -263,23 +253,18 @@ int yellow_led_status_json(void)
     return 0;
 }
 
-
-// ********************************************************* //
-// ** Combined Led Functions                              ** //
-// ********************************************************* //
-
 int led_status(void)
 {
     int yellow = yellow_led_get_brightness();
     int blue = blue_led_get_brightness();
 
     if ((blue < 0) || (yellow < 0)) {
-        fprintf(stderr, "*** ERROR: Failed to retrieve the brightness of both leds");
+        fprintf(stderr, "ERROR: Failed to retrieve the brightness of both leds");
         return -1;
     }
 
-    fprintf(stdout, "*** Yellow led is %d\n", yellow);
-    fprintf(stdout, "*** Blue led is %d\n", blue);
+    fprintf(stdout, "Yellow led is %d\n", yellow);
+    fprintf(stdout, "Blue led is %d\n", blue);
 }
 
 int led_status_json(void)
@@ -288,7 +273,7 @@ int led_status_json(void)
     int blue = blue_led_get_brightness();
 
     if ((blue < 0) || (yellow < 0)) {
-        fprintf(stderr, "*** ERROR: Failed to retrieve the brightness of both leds");
+        fprintf(stderr, "ERROR: Failed to retrieve the brightness of both leds");
         return -1;
     }
 
