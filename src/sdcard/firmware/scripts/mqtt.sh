@@ -1,0 +1,296 @@
+#!/bin/sh
+
+. "/tmp/sd/firmware/scripts/functions.sh"
+
+if [ "${ENABLE_MQTT}" -ne 1 ]
+then
+    echo "MQTT is disabled in the configuration."
+    exit 1
+fi
+
+MQTT_ID=$(cat /sys/class/net/wlan0/address | tr -d ':')
+MQTT_NAME=${MQTT_NAME:-$MQTT_ID}
+MQTT_TOPIC=${MQTT_TOPIC:-miicam}/$MQTT_NAME
+MQTT_TOPIC_AVAILABILITY=$MQTT_TOPIC/availability
+MQTT_DISCOVERY_NAME=${MQTT_DISCOVERY_NAME:-$MQTT_NAME}
+MQTT_DISCOVERY_TOPIC=${MQTT_DISCOVERY_TOPIC:-homeassistant}
+MQTT_RETAIN=$([ "${MQTT_RETAIN:-1}" = "1" ] && echo "true" || echo "false")
+MQTT_DEVICE='{
+  "identifiers": "'"$MQTT_ID"'",
+  "manufacturer": "Xiaomi",
+  "model": "chuangmi.camera.v5",
+  "name": "'"$MQTT_DISCOVERY_NAME"'"
+}'
+MQTT_OPTIONS="\
+  --host $MQTT_HOST \
+  --port $MQTT_PORT \
+"
+
+if [ "$MQTT_USER" != "" ] && [ "$MQTT_PASS" != "" ]; then
+  MQTT_OPTIONS="$MQTT_OPTIONS --username $MQTT_USER --pw $MQTT_PASS"
+fi
+
+CEILING_MODE_TOPIC=$MQTT_TOPIC/ceiling-mode
+CEILING_MODE_TOPIC_DISCOVERY=$MQTT_DISCOVERY_TOPIC/switch/$MQTT_ID/ceiling-mode/config
+CEILING_MODE_TOPIC_SET=$CEILING_MODE_TOPIC/set
+CEILING_MODE_CONFIG='{
+  "name": "'"$MQTT_DISCOVERY_NAME Ceiling Mode"'",
+  "availability_topic": "'"$MQTT_TOPIC_AVAILABILITY"'",
+  "command_topic": "'"$CEILING_MODE_TOPIC_SET"'",
+  "device": '"$MQTT_DEVICE"',
+  "retain": '"$MQTT_RETAIN"',
+  "state_topic": "'"$CEILING_MODE_TOPIC"'",
+  "unique_id": "'"$MQTT_ID-ceiling-mode"'"
+}'
+
+CLOUD_TOPIC=$MQTT_TOPIC/cloud
+CLOUD_TOPIC_DISCOVERY=$MQTT_DISCOVERY_TOPIC/switch/$MQTT_ID/cloud/config
+CLOUD_TOPIC_SET=$CLOUD_TOPIC/set
+CLOUD_CONFIG='{
+  "name": "'"$MQTT_DISCOVERY_NAME Cloud"'",
+  "availability_topic": "'"$MQTT_TOPIC_AVAILABILITY"'",
+  "command_topic": "'"$CLOUD_TOPIC_SET"'",
+  "device": '"$MQTT_DEVICE"',
+  "retain": '"$MQTT_RETAIN"',
+  "state_topic": "'"$CLOUD_TOPIC"'",
+  "unique_id": "'"$MQTT_ID-cloud"'"
+}'
+
+INDICATOR_TOPIC=$MQTT_TOPIC/indicator
+INDICATOR_TOPIC_DISCOVERY=$MQTT_DISCOVERY_TOPIC/switch/$MQTT_ID/indicator/config
+INDICATOR_TOPIC_SET=$INDICATOR_TOPIC/set
+INDICATOR_CONFIG='{
+  "name": "'"$MQTT_DISCOVERY_NAME Indicator"'",
+  "availability_topic": "'"$MQTT_TOPIC_AVAILABILITY"'",
+  "command_topic": "'"$INDICATOR_TOPIC_SET"'",
+  "device": '"$MQTT_DEVICE"',
+  "retain": '"$MQTT_RETAIN"',
+  "state_topic": "'"$INDICATOR_TOPIC"'",
+  "unique_id": "'"$MQTT_ID-indicator"'"
+}'
+
+MOTION_TOPIC=$MQTT_TOPIC/motion
+MOTION_TOPIC_DISCOVERY=$MQTT_DISCOVERY_TOPIC/binary_sensor/$MQTT_ID/motion/config
+MOTION_CONFIG='{
+  "name": "'"$MQTT_DISCOVERY_NAME Motion"'",
+  "availability_topic": "'"$MQTT_TOPIC_AVAILABILITY"'",
+  "device": '"$MQTT_DEVICE"',
+  "device_class": "motion",
+  "state_topic": "'"$MOTION_TOPIC"'",
+  "unique_id": "'"$MQTT_ID-motion"'"
+}'
+
+NIGHT_MODE_TOPIC=$MQTT_TOPIC/night-mode
+NIGHT_MODE_TOPIC_DISCOVERY=$MQTT_DISCOVERY_TOPIC/select/$MQTT_ID/night-mode/config
+NIGHT_MODE_TOPIC_SET=$NIGHT_MODE_TOPIC/set
+NIGHT_MODE_CONFIG='{
+  "name": "'"$MQTT_DISCOVERY_NAME Night Mode"'",
+  "availability_topic": "'"$MQTT_TOPIC_AVAILABILITY"'",
+  "command_topic": "'"$NIGHT_MODE_TOPIC_SET"'",
+  "device": '"$MQTT_DEVICE"',
+  "options": ["AUTO", "ON", "OFF"],
+  "retain": '"$MQTT_RETAIN"',
+  "state_topic": "'"$NIGHT_MODE_TOPIC"'",
+  "unique_id": "'"$MQTT_ID-night-mode"'"
+}'
+
+OTA_TOPIC=$MQTT_TOPIC/ota
+OTA_TOPIC_DISCOVERY=$MQTT_DISCOVERY_TOPIC/switch/$MQTT_ID/ota/config
+OTA_TOPIC_SET=$OTA_TOPIC/set
+OTA_CONFIG='{
+  "name": "'"$MQTT_DISCOVERY_NAME OTA"'",
+  "availability_topic": "'"$MQTT_TOPIC_AVAILABILITY"'",
+  "command_topic": "'"$OTA_TOPIC_SET"'",
+  "device": '"$MQTT_DEVICE"',
+  "retain": '"$MQTT_RETAIN"',
+  "state_topic": "'"$OTA_TOPIC"'",
+  "unique_id": "'"$MQTT_ID-ota"'"
+}'
+
+RTSP_TOPIC=$MQTT_TOPIC/rtsp
+RTSP_TOPIC_DISCOVERY=$MQTT_DISCOVERY_TOPIC/switch/$MQTT_ID/rtsp/config
+RTSP_TOPIC_SET=$RTSP_TOPIC/set
+RTSP_CONFIG='{
+  "name": "'"$MQTT_DISCOVERY_NAME RTSP"'",
+  "availability_topic": "'"$MQTT_TOPIC_AVAILABILITY"'",
+  "command_topic": "'"$RTSP_TOPIC_SET"'",
+  "device": '"$MQTT_DEVICE"',
+  "retain": '"$MQTT_RETAIN"',
+  "state_topic": "'"$RTSP_TOPIC"'",
+  "unique_id": "'"$MQTT_ID-rtsp"'"
+}'
+
+alias mqtt_pub="mosquitto_pub $MQTT_OPTIONS --id $MQTT_ID.pub --retain"
+alias mqtt_sub="mosquitto_sub $MQTT_OPTIONS \
+  --id $MQTT_ID.sub \
+  --keepalive 10 \
+  --verbose \
+  --will-topic $MQTT_TOPIC_AVAILABILITY \
+  --will-payload offline \
+  --will-retain \
+"
+alias upper="tr [:lower:] [:upper:]"
+
+alias auto_night_mode="/tmp/sd/firmware/init/S99auto_night_mode"
+alias disable_cloud="/tmp/sd/firmware/init/S50disable_cloud"
+alias disable_ota="/tmp/sd/firmware/init/S50disable_ota"
+alias rtsp="/tmp/sd/firmware/init/S99rtsp"
+
+get_value() {
+  local INPUT=$1
+  local TOPIC=$(echo "$INPUT" | cut -d " " -f 1)
+
+  echo "$INPUT" | sed -e "s#$TOPIC##g"
+}
+
+get_topic() {
+  local INPUT=$1
+
+  echo $INPUT | cut -d " " -f 1
+}
+
+set_ceiling_mode() {
+  flip_mode $([ "$1" = ON ] && echo --enable || echo --disable)
+  mirror_mode $([ "$1" = ON ] && echo --enable || echo --disable)
+}
+
+set_cloud() {
+  disable_cloud $([ "$1" = ON ] && echo stop || echo start)
+}
+
+set_indicator() {
+  blue_led $([ "$1" = ON ] && echo --enable || echo --disable)
+}
+
+set_night_mode() {
+  if [ "$1" = AUTO ]; then
+    auto_night_mode start
+  else
+    auto_night_mode status >/dev/null && auto_night_mode stop
+    night_mode $([ "$1" = ON ] && echo --enable || echo --disable)
+  fi
+}
+
+set_ota() {
+  disable_ota $([ "$1" = ON ] && echo stop || echo start)
+}
+
+set_rtsp() {
+  rtsp $([ "$1" = ON ] && echo start || echo stop)
+}
+
+update_availability() {
+  mqtt_pub --topic $MQTT_TOPIC_AVAILABILITY --message $1
+}
+
+update_discovery() {
+  mqtt_pub --topic $CEILING_MODE_TOPIC_DISCOVERY --message "$CEILING_MODE_CONFIG"
+  mqtt_pub --topic $CLOUD_TOPIC_DISCOVERY --message "$CLOUD_CONFIG"
+  mqtt_pub --topic $INDICATOR_TOPIC_DISCOVERY --message "$INDICATOR_CONFIG"
+  mqtt_pub --topic $MOTION_TOPIC_DISCOVERY --message "$MOTION_CONFIG"
+  mqtt_pub --topic $NIGHT_MODE_TOPIC_DISCOVERY --message "$NIGHT_MODE_CONFIG"
+  mqtt_pub --topic $OTA_TOPIC_DISCOVERY --message "$OTA_CONFIG"
+  mqtt_pub --topic $RTSP_TOPIC_DISCOVERY --message "$RTSP_CONFIG"
+}
+
+update_ceiling_mode() {
+  if [ $(flip_mode --status) = on -a $(mirror_mode --status) = on ]; then
+    STATE=ON
+  else
+    STATE=OFF
+  fi
+
+  mqtt_pub --topic $CEILING_MODE_TOPIC --message $STATE
+}
+
+update_cloud() {
+  mqtt_pub --topic $CLOUD_TOPIC --message $(disable_cloud status >/dev/null && echo "OFF" || echo "ON")
+}
+
+update_indicator() {
+  mqtt_pub --topic $INDICATOR_TOPIC --message $(blue_led --status | upper)
+}
+
+update_motion() {
+  mqtt_pub --topic $MOTION_TOPIC --message $(echo "$1" | upper)
+}
+
+update_night_mode() {
+  if auto_night_mode status >/dev/null; then
+    STATE=AUTO
+  else
+    STATE=$(night_mode --status | upper)
+  fi
+
+  mqtt_pub --topic $NIGHT_MODE_TOPIC --message $STATE
+}
+
+update_ota() {
+  mqtt_pub --topic $OTA_TOPIC --message $(disable_ota status >/dev/null && echo "OFF" || echo "ON")
+}
+
+update_rtsp() {
+  mqtt_pub --topic $RTSP_TOPIC --message $(rtsp status >/dev/null && echo "ON" || echo "OFF")
+}
+
+if [ "$1" = --motion ]; then
+  update_motion $2
+
+  exit 0
+fi
+
+update_discovery
+update_ceiling_mode
+update_cloud
+update_indicator
+update_motion off
+update_night_mode
+update_ota
+update_rtsp
+
+killall mosquitto_sub 2>/dev/null
+
+while :; do
+  update_availability online
+  mqtt_sub --topic "$MQTT_TOPIC/#" | while read -r LINE; do
+    echo "Incoming MQTT message: $LINE"
+    VALUE=$(get_value "$LINE" | upper)
+    TOPIC=$(get_topic "$LINE")
+
+    case "$TOPIC" in
+      "$MQTT_TOPIC_AVAILABILITY")
+        [ $VALUE = "OFFLINE" ] && update_availability online
+      ;;
+
+      "$CEILING_MODE_TOPIC_SET")
+        set_ceiling_mode $VALUE
+        update_ceiling_mode
+      ;;
+
+      "$CLOUD_TOPIC_SET")
+        set_cloud $VALUE
+        update_cloud
+      ;;
+
+      "$INDICATOR_TOPIC_SET")
+        set_indicator $VALUE
+        update_indicator
+      ;;
+
+      "$NIGHT_MODE_TOPIC_SET")
+        set_night_mode $VALUE
+        update_night_mode
+      ;;
+
+      "$OTA_TOPIC_SET")
+        set_ota $VALUE
+        update_ota
+      ;;
+
+      "$RTSP_TOPIC_SET")
+        set_rtsp $VALUE
+        update_rtsp
+      ;;
+    esac
+  done
+done

@@ -12,9 +12,9 @@ else
     exit 1
 fi
 
-NAME="mqtt-control"
-DESC="MQTT Status Daemon"
-DAEMON="${SD_MOUNTDIR}/firmware/scripts/mqtt-control.sh"
+NAME="mqtt"
+DESC="MQTT Daemon"
+DAEMON="${SD_MOUNTDIR}/firmware/scripts/mqtt.sh"
 
 PIDFILE="/var/run/${NAME}.pid"
 

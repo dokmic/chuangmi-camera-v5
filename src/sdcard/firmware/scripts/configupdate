@@ -109,39 +109,6 @@ TIMEZONE="${TIMEZONE:-"UTC"}"
 NTP_SERVER="${NTP_SERVER:-"pool.ntp.org"}"
 
 ############################################################
-## MQTT Settings                                          ##
-############################################################
-
-## See: https://miicam.github.io/configuration/Configuring-MQTT
-
-## Enable or disable MQTT service
-ENABLE_MQTT="${ENABLE_MQTT:-0}"
-
-## Connection options for broker server
-MQTT_USER="${MQTT_USER:-"mqtt-user"}"
-MQTT_PASS="${MQTT_PASS:-"mqtt-password"}"
-MQTT_HOST="${MQTT_HOST:-"mqtt-host"}"
-MQTT_PORT="${MQTT_PORT:-1883}"
-
-## Define the base topic used by the camera
-MQTT_TOPIC="${MQTT_TOPIC:-"home/\$CAMERA_HOSTNAME"}"
-
-## Define additional options for Mosquitto here.
-MOSQUITTOOPTS="${MOSQUITTOOPTS:-""}"
-
-## Add options for mosquitto_pub (IE: -r for retaining messages)
-MOSQUITTOPUBOPTS="${MOSQUITTOPUBOPTS:-"-r "}"
-
-## Send a mqtt statusupdate every n seconds
-MQTT_STATUSINTERVAL="${MQTT_STATUSINTERVAL:-30}"
-
-## What to publish over MQTT For on/off values (used for motion and mqtt control)
-## Set ENABLE_MQTT=1 to enable
-MQTT_ON="${MQTT_ON:-"ON"}"
-MQTT_OFF="${MQTT_OFF:-"OFF"}"
-
-
-############################################################
 ## RTSP Settings                                          ##
 ############################################################
 

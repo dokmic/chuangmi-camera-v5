@@ -105,8 +105,7 @@ fi
 
 if [ "${ENABLE_MQTT}" -eq 1 ]
 then
-    sh ${SD_MOUNTDIR}/firmware/init/S99mqtt-interval start
-    sh ${SD_MOUNTDIR}/firmware/init/S99mqtt-control  start
+    sh ${SD_MOUNTDIR}/firmware/init/S99mqtt start
 fi
 
 ##################################################################################

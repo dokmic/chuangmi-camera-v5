@@ -70,6 +70,7 @@ enable_cloud() {
         sh /mnt/data/imi/imi_init/S99restartd restart
     fi
 
+    sleep 1
     ok_fail "$?"
 }
 
