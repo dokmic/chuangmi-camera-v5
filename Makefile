@@ -94,9 +94,6 @@ $(BUILD_DIR)/lib/libz.so: $(BUILD_DIR)/lib
 		&& make -j$(CPUS) \
 		&& make -j$(CPUS) install
 
-$(BUILD_DIR)/config.cfg:
-	$(SRC_DIR)/sdcard/firmware/scripts/configupdate $(@)
-
 $(BUILD_DIR)/manufacture.bin:
 	tar -cf $(@) -C $(SRC_DIR) manufacture/test_drv
 
@@ -108,7 +105,6 @@ default: \
 	$(BUILD_DIR)/bin/rtspd \
 	$(BUILD_DIR)/lib/libpopt.so \
 	$(BUILD_DIR)/lib/libz.so \
-	$(BUILD_DIR)/config.cfg \
 	$(BUILD_DIR)/manufacture.bin
 	find $(BUILD_DIR)/lib -maxdepth 1 -type f -name '*.so*' -or -name '*.a*' -exec $(STRIP) {} \;
 	find $(BUILD_DIR)/bin -maxdepth 1 -type f -exec $(STRIP) {} \;
@@ -117,7 +113,7 @@ install: default
 	rm -rf $(BUILD_DIR)/dist
 	mkdir -p $(BUILD_DIR)/dist
 	cp -r --preserve=links $(SRC_DIR)/sdcard  $(BUILD_DIR)/dist
-	cp $(BUILD_DIR)/manufacture.bin $(BUILD_DIR)/config.cfg $(BUILD_DIR)/dist/sdcard
+	cp $(BUILD_DIR)/manufacture.bin $(BUILD_DIR)/dist/sdcard
 	mkdir -p $(BUILD_DIR)/dist/sdcard/firmware/bin $(BUILD_DIR)/dist/sdcard/firmware/lib
 	find $(BUILD_DIR)/lib -maxdepth 1 \( -type f -or -type l \) \( -name '*.so*' -or -name '*.a*' \) -exec cp --no-dereference {} $(BUILD_DIR)/dist/sdcard/firmware/lib/. \;
 	find $(BUILD_DIR)/bin -maxdepth 1 -type f -exec cp {} $(BUILD_DIR)/dist/sdcard/firmware/bin \;
