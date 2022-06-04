@@ -115,7 +115,7 @@ install: default
 	cp -r --preserve=links $(SRC_DIR)/sdcard  $(BUILD_DIR)/dist
 	cp $(BUILD_DIR)/manufacture.bin $(BUILD_DIR)/dist/sdcard
 	mkdir -p $(BUILD_DIR)/dist/sdcard/firmware/bin $(BUILD_DIR)/dist/sdcard/firmware/lib
-	find $(BUILD_DIR)/lib -maxdepth 1 \( -type f -or -type l \) \( -name '*.so*' -or -name '*.a*' \) -exec cp --no-dereference {} $(BUILD_DIR)/dist/sdcard/firmware/lib/. \;
+	find $(BUILD_DIR)/lib -maxdepth 1 \( -name '*.so' -or -name '*.a' \) -exec cp {} $(BUILD_DIR)/dist/sdcard/firmware/lib/. \;
 	find $(BUILD_DIR)/bin -maxdepth 1 -type f -exec cp {} $(BUILD_DIR)/dist/sdcard/firmware/bin \;
 	sync
 
