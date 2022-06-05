@@ -24,7 +24,7 @@ To work around this issue, you can downgrade the firmware to a working version [
 
 ### Prepare the SD card
 
-Format a micro SD card in fat32 (vfat) format and copy the content of the **sdcard/** folder in the root of your SD card.
+Format a micro SD card in fat32 (vfat) format and copy the contents to the root of your SD card.
 
 ### Configure the Chuangmi camera on the SD card
 

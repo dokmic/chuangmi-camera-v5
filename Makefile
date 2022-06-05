@@ -111,16 +111,15 @@ default: \
 
 install: default
 	rm -rf $(BUILD_DIR)/dist
-	mkdir -p $(BUILD_DIR)/dist
-	cp -r --preserve=links $(SRC_DIR)/sdcard  $(BUILD_DIR)/dist
-	cp $(BUILD_DIR)/manufacture.bin $(BUILD_DIR)/dist/sdcard
-	mkdir -p $(BUILD_DIR)/dist/sdcard/firmware/bin $(BUILD_DIR)/dist/sdcard/firmware/lib
-	find $(BUILD_DIR)/lib -maxdepth 1 \( -name '*.so' -or -name '*.a' \) -exec cp {} $(BUILD_DIR)/dist/sdcard/firmware/lib/. \;
-	find $(BUILD_DIR)/bin -maxdepth 1 -type f -exec cp {} $(BUILD_DIR)/dist/sdcard/firmware/bin \;
+	cp -r --preserve=links $(SRC_DIR)/sd  $(BUILD_DIR)/dist
+	cp $(BUILD_DIR)/manufacture.bin $(BUILD_DIR)/dist
+	mkdir -p $(BUILD_DIR)/dist/firmware/bin $(BUILD_DIR)/dist/firmware/lib
+	find $(BUILD_DIR)/lib -maxdepth 1 \( -name '*.so' -or -name '*.a' \) -exec cp {} $(BUILD_DIR)/dist/firmware/lib/. \;
+	find $(BUILD_DIR)/bin -maxdepth 1 -type f -exec cp {} $(BUILD_DIR)/dist/firmware/bin \;
 	sync
 
 dist: install
-	tar czf $(BUILD_DIR)/MiiCam.tar.gz -C $(BUILD_DIR)/dist sdcard
+	tar czf $(BUILD_DIR)/MiiCam.tar.gz -C $(BUILD_DIR)/dist .
 	md5sum $(BUILD_DIR)/MiiCam.tar.gz > $(BUILD_DIR)/MiiCam.tar.gz.md5
 
 clean:
