@@ -168,18 +168,9 @@ fi
 ## Prepare restartd.conf                                                        ##
 ##################################################################################
 
-if ! [ -f /tmp/S99restartd ]; then
-  sed 's|/mnt/data/restartd/restartd.conf|/etc/restartd.conf|' /mnt/data/imi/imi_init/S99restartd > /tmp/S99restartd
-fi
-if ! mount | grep -q /mnt/data/imi/imi_init/S99restartd
+if [ ! -f /mnt/data/restartd/restartd.conf.bak ] && mountpoint -q /etc
 then
-    mount --bind /tmp/S99restartd /mnt/data/imi/imi_init/S99restartd
-fi
-
-if [ ! -f /tmp/etc/restartd.conf.bak ] && mountpoint -q /etc
-then
-    cp /mnt/data/restartd/restartd.conf /tmp/etc/restartd.conf.bak
-    cp /mnt/data/restartd/restartd.conf /tmp/etc/restartd.conf
+    cp /mnt/data/restartd/restartd.conf /mnt/data/restartd/restartd.conf.bak
 fi
 
 ##################################################################################

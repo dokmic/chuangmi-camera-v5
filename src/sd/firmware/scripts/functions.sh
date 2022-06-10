@@ -86,9 +86,9 @@ disable_binary()
     fi
 
     # update restartd.conf
-    if [ -n "${RESTART}" ] && [ -f /tmp/etc/restartd.conf ] && (grep -q ^"${RESTART} " /tmp/etc/restartd.conf)
+    if [ -n "${RESTART}" ] && [ -f /mnt/data/restartd/restartd.conf ] && (grep -q ^"${RESTART} " /mnt/data/restartd/restartd.conf)
     then
-        sed -i "/^${RESTART} /d" /tmp/etc/restartd.conf
+        sed -i "/^${RESTART} /d" /mnt/data/restartd/restartd.conf
     fi
 }
 
@@ -106,9 +106,9 @@ enable_binary()
     fi
 
     # update restartd.conf
-    if [ -n "${RESTART}" ] && [ -f /tmp/etc/restartd.conf ] && ! grep -q ^"${RESTART} " /tmp/etc/restartd.conf
+    if [ -n "${RESTART}" ] && [ -f /mnt/data/restartd/restartd.conf ] && ! grep -q ^"${RESTART} " /mnt/data/restartd/restartd.conf
     then
-        grep ^"${RESTART} " /tmp/etc/restartd.conf.bak >> /tmp/etc/restartd.conf
+        grep ^"${RESTART} " /mnt/data/restartd/restartd.conf.bak >> /mnt/data/restartd/restartd.conf
     fi
 }
 

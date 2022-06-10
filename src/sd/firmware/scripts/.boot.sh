@@ -57,9 +57,9 @@ if [ "${ENABLE_TELNETD:-0}" -eq 1 ]
 then
   sh /mnt/data/imi/imi_init/S50telnet start
 
-  if ! grep -q '^telnetd' /tmp/etc/restartd.conf
+  if ! grep -q '^telnetd' /mnt/data/restartd/restartd.conf
   then
-    echo "telnetd \"/usr/sbin/telnetd\" \"/mnt/data/imi/imi_init/S50telnet restart\" \"/bin/echo '*** telnetd was restarted from restartd... '\"" >> /tmp/etc/restartd.conf
+    echo "telnetd \"/usr/sbin/telnetd\" \"/mnt/data/imi/imi_init/S50telnet restart\" \"/bin/echo '*** telnetd was restarted from restartd... '\"" >> /mnt/data/restartd/restartd.conf
     if pgrep restartd >/dev/null
     then
         sh /mnt/data/imi/imi_init/S99restartd restart
@@ -73,9 +73,9 @@ fi
 
 sh ${SD_MOUNTDIR}/firmware/init/S51ntpd start
 
-if ! grep -q '^ntpd' /tmp/etc/restartd.conf
+if ! grep -q '^ntpd' /mnt/data/restartd/restartd.conf
 then
-    echo "ntpd \"/usr/sbin/ntpd\" \"${SD_MOUNTDIR}/firmware/init/S51ntpd restart\" \"/bin/echo '*** NTPd was restarted from restartd... '\"" >> /tmp/etc/restartd.conf
+    echo "ntpd \"/usr/sbin/ntpd\" \"${SD_MOUNTDIR}/firmware/init/S51ntpd restart\" \"/bin/echo '*** NTPd was restarted from restartd... '\"" >> /mnt/data/restartd/restartd.conf
 fi
 
 ##################################################################################
