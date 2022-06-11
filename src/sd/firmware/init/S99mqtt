@@ -3,10 +3,9 @@
 ## license: GPLv3+, http://www.gnu.org/licenses/gpl-3.0.html
 ## author: Jan Sperling , 2017
 
-SD_MOUNTDIR="/tmp/sd"
-if [ -r "${SD_MOUNTDIR}/firmware/scripts/functions.sh" ]
+if [ -r "$SD/firmware/scripts/functions.sh" ]
 then
-    . "${SD_MOUNTDIR}/firmware/scripts/functions.sh"
+    . "$SD/firmware/scripts/functions.sh"
 else
     echo "Unable to load basic functions"
     exit 1
@@ -14,7 +13,7 @@ fi
 
 NAME="mqtt"
 DESC="MQTT Daemon"
-DAEMON="${SD_MOUNTDIR}/firmware/scripts/mqtt.sh"
+DAEMON="$SD/firmware/scripts/mqtt.sh"
 
 PIDFILE="/var/run/${NAME}.pid"
 

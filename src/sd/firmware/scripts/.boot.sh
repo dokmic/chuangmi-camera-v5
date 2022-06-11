@@ -5,19 +5,17 @@
 ## author: Jan Sperling , 2017                                                  ##
 ##################################################################################
 
-SD_MOUNTDIR="/tmp/sd"
-
-if [ -r "${SD_MOUNTDIR}/firmware/scripts/functions.sh" ]
+if [ -r "$SD/firmware/scripts/functions.sh" ]
 then
-    . "${SD_MOUNTDIR}/firmware/scripts/functions.sh"
+    . "$SD/firmware/scripts/functions.sh"
 else
     echo "Unable to load basic functions"
     exit 1
 fi
 
 export LOGFILE="${LOGDIR}/ft_boot.log"
-export PATH="/tmp/sd/firmware/bin:$PATH"
-export LD_LIBRARY_PATH=/tmp/sd/firmware/lib
+export PATH="$SD/firmware/bin:$PATH"
+export LD_LIBRARY_PATH=$SD/firmware/lib
 
 (
 
@@ -27,10 +25,10 @@ echo "*** Executing /mnt/data/test/boot.sh... "
 ## Put our bins into PATH                                                       ##
 ##################################################################################
 
-if [ -d "${SD_MOUNTDIR}/firmware/bin" ] && ! mountpoint -q /tmp/sd/ft
+if [ -d "$SD/firmware/bin" ] && ! mountpoint -q $SD/ft
 then
-    echo "*** Mounting ${SD_MOUNTDIR}/firmware/bin on /tmp/sd/ft... "
-    mount --rbind "${SD_MOUNTDIR}/firmware/bin" /tmp/sd/ft
+    echo "*** Mounting $SD/firmware/bin on $SD/ft... "
+    mount --rbind "$SD/firmware/bin" $SD/ft
 fi
 
 ##################################################################################
@@ -71,11 +69,11 @@ fi
 ## NTPd                                                                         ##
 ##################################################################################
 
-sh ${SD_MOUNTDIR}/firmware/init/S51ntpd start
+sh $SD/firmware/init/S51ntpd start
 
 if ! grep -q '^ntpd' /mnt/data/restartd/restartd.conf
 then
-    echo "ntpd \"/usr/sbin/ntpd\" \"${SD_MOUNTDIR}/firmware/init/S51ntpd restart\" \"/bin/echo '*** NTPd was restarted from restartd... '\"" >> /mnt/data/restartd/restartd.conf
+    echo "ntpd \"/usr/sbin/ntpd\" \"$SD/firmware/init/S51ntpd restart\" \"/bin/echo '*** NTPd was restarted from restartd... '\"" >> /mnt/data/restartd/restartd.conf
 fi
 
 ##################################################################################
@@ -84,7 +82,7 @@ fi
 
 if [ "${ENABLE_RTSP}" -eq 1 ]
 then
-    sh ${SD_MOUNTDIR}/firmware/init/S99rtsp start
+    sh $SD/firmware/init/S99rtsp start
 fi
 
 ##################################################################################
@@ -93,9 +91,9 @@ fi
 
 if [ "${AUTO_NIGHT_MODE:-1}" -eq 1 ]
 then
-    sh ${SD_MOUNTDIR}/firmware/init/S99auto_night_mode start
+    sh $SD/firmware/init/S99auto_night_mode start
 else
-    sh ${SD_MOUNTDIR}/firmware/init/S99auto_night_mode stop
+    sh $SD/firmware/init/S99auto_night_mode stop
 
 fi
 
@@ -105,7 +103,7 @@ fi
 
 if [ "${ENABLE_MQTT}" -eq 1 ]
 then
-    sh ${SD_MOUNTDIR}/firmware/init/S99mqtt start
+    sh $SD/firmware/init/S99mqtt start
 fi
 
 ##################################################################################

@@ -3,10 +3,9 @@
 ## license: GPLv3+, http://www.gnu.org/licenses/gpl-3.0.html
 ## author: Jan Sperling , 2018
 
-SD_MOUNTDIR="/tmp/sd"
-if [ -r "${SD_MOUNTDIR}/firmware/scripts/functions.sh" ]
+if [ -r "$SD/firmware/scripts/functions.sh" ]
 then
-    . "${SD_MOUNTDIR}/firmware/scripts/functions.sh"
+    . "$SD/firmware/scripts/functions.sh"
 else
     echo "Unable to load basic functions"
     exit 1
@@ -14,7 +13,7 @@ fi
 
 NAME="auto_night_mode"
 DESC="Auto Night Mode"
-DAEMON="/tmp/sd/firmware/bin/auto_night_mode"
+DAEMON="$SD/firmware/bin/auto_night_mode"
 DAEMON_OPTS="${AUTO_NIGHT_MODE_ARGS:-"--ev-on 30 --ir-on 90 --ev-off 1000 --ir-off 100 --delay 5 --set-ircut --set-irled"}"
 PIDFILE="/var/run/${NAME}.pid"
 

@@ -6,11 +6,9 @@
 ## author: Jan Sperling, 2018                                                   ##
 ##################################################################################
 
-SD_MOUNTDIR="/tmp/sd"
-
-LOGDIR="${SD_MOUNTDIR}/log"
+LOGDIR="$SD/log"
 LOGFILE="${LOGDIR}/ft_boot.log"
-BASECFG="${SD_MOUNTDIR}/config.cfg"
+BASECFG="$SD/config.cfg"
 
 if [ -f "${BASECFG}" ]
 then
@@ -30,9 +28,9 @@ log()
 get_last_image()
 {
     ## Find last created snapshot
-    if [ -d /tmp/sd/RECORDED_IMAGES ]
+    if [ -d $SD/RECORDED_IMAGES ]
     then
-        find /tmp/sd/RECORDED_IMAGES/ -type f | sort -r | tail -n 1
+        find $SD/RECORDED_IMAGES/ -type f | sort -r | tail -n 1
     fi
 
     return $?
@@ -42,9 +40,9 @@ get_last_image()
 get_last_video()
 {
     ## Find last created video
-    if [ -d /tmp/sd/RECORDED_VIDEOS ]
+    if [ -d $SD/RECORDED_VIDEOS ]
     then
-        find /tmp/sd/RECORDED_VIDEOS/ -type f | sort -r | tail -n 1
+        find $SD/RECORDED_VIDEOS/ -type f | sort -r | tail -n 1
     fi
 
     return $?

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-. "/tmp/sd/firmware/scripts/functions.sh"
+. "$SD/firmware/scripts/functions.sh"
 
 if [ "${ENABLE_MQTT}" -ne 1 ]
 then
@@ -131,10 +131,10 @@ alias mqtt_sub="mosquitto_sub $MQTT_OPTIONS \
 "
 alias upper="tr [:lower:] [:upper:]"
 
-alias auto_night_mode="/tmp/sd/firmware/init/S99auto_night_mode"
-alias disable_cloud="/tmp/sd/firmware/init/S50disable_cloud"
-alias disable_ota="/tmp/sd/firmware/init/S50disable_ota"
-alias rtsp="/tmp/sd/firmware/init/S99rtsp"
+alias auto_night_mode="$SD/firmware/init/S99auto_night_mode"
+alias disable_cloud="$SD/firmware/init/S50disable_cloud"
+alias disable_ota="$SD/firmware/init/S50disable_ota"
+alias rtsp="$SD/firmware/init/S99rtsp"
 
 get_value() {
   local INPUT=$1

@@ -3,10 +3,9 @@
 # Start logging
 #
 
-SD_MOUNTDIR="/tmp/sd"
-if [ -r "${SD_MOUNTDIR}/firmware/scripts/functions.sh" ]
+if [ -r "$SD/firmware/scripts/functions.sh" ]
 then
-    . "${SD_MOUNTDIR}/firmware/scripts/functions.sh"
+    . "$SD/firmware/scripts/functions.sh"
 else
     echo "Unable to load basic functions"
     exit 1
@@ -47,7 +46,7 @@ fi
 
 
 ## Use syslog configuration file if existent
-SYSLOG_CONFIG="${SD_MOUNTDIR}/firmware/etc/syslog.conf"
+SYSLOG_CONFIG="$SD/firmware/etc/syslog.conf"
 if [ -f "${SYSLOG_CONFIG}" ]
 then
     DAEMON_OPTS="${DAEMON_OPTS} -F ${SYSLOG_CONFIG}"

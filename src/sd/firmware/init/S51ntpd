@@ -3,9 +3,8 @@
 # Start the ntpd
 #
 
-SD_MOUNTDIR="/tmp/sd"
-if [ -r "${SD_MOUNTDIR}/firmware/scripts/functions.sh" ]; then
-  . "${SD_MOUNTDIR}/firmware/scripts/functions.sh"
+if [ -r "$SD/firmware/scripts/functions.sh" ]; then
+  . "$SD/firmware/scripts/functions.sh"
 else
   echo "Unable to load basic functions"
   exit 1

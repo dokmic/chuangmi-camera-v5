@@ -6,35 +6,33 @@
 ## author: Jan Sperling , 2017                                                  ##
 ##################################################################################
 
-if [ ! -d "${LOGDIR}" ]
-then
-    mkdir -p "${LOGDIR}"
-fi
+LOGDIR=$SD/log
+LOGFILE=$LOGDIR/ft_boot.log
+mkdir -p $LOGDIR
 
 ##################################################################################
 ## Config                                                                       ##
 ##################################################################################
 
-export LD_LIBRARY_PATH=/tmp/sd/firmware/lib
-export PATH="/tmp/sd/firmware/bin:$PATH"
-export SD_MOUNTDIR=/tmp/sd
+export LD_LIBRARY_PATH=$SD/firmware/lib:$LD_LIBRARY_PATH
+export PATH=$SD/firmware/bin:$PATH
 
-if [ ! -f "${SD_MOUNTDIR}/config.cfg" ]
+if [ ! -f "$SD/config.cfg" ]
 then
     echo "Config not found, starting normal boot sequence." | tee -a "${LOGFILE}"
     echo 0 > /tmp/ft_mode
-    do_vg_boot
+    vg_boot
     exit
 fi
 
 ## Load the config file
-. "${SD_MOUNTDIR}/config.cfg"
+. "$SD/config.cfg"
 
 if [ "${?}" -ne 0 ]
 then
-    echo "Failed to load ${SD_MOUNTDIR}/config.cfg, starting normal boot sequence" | tee -a "${LOGFILE}"
+    echo "Failed to load $SD/config.cfg, starting normal boot sequence" | tee -a "${LOGFILE}"
     echo 0 > /tmp/ft_mode
-    do_vg_boot
+    vg_boot
     exit
 fi
 
@@ -43,7 +41,7 @@ if [ "${DISABLE_HACK}" -eq 1 ]
 then
     echo "Hack disabled in config.cfg, starting normal boot sequence" | tee -a "${LOGFILE}"
     echo 0 > /tmp/ft_mode
-    do_vg_boot
+    vg_boot
     exit
 fi
 
@@ -69,27 +67,12 @@ echo "*** Enabling logging"
 
 if [ "$ENABLE_LOGGING" -eq 1 ]
 then
-    sh "${SD_MOUNTDIR}/firmware/init/S01logging" restart
+    sh "$SD/firmware/init/S01logging" restart
 else
-    sh "${SD_MOUNTDIR}/firmware/init/S01logging" stop
+    sh "$SD/firmware/init/S01logging" stop
 fi
 
-##################################################################################
-## Make /etc writeable                                                          ##
-##################################################################################
-
-echo "*** Making /etc writable"
-
-if ! [ -d /tmp/etc ]
-then
-    cp -r /etc /tmp/
-    cp -r ${SD_MOUNTDIR}/firmware/etc/* /tmp/etc
-fi
-
-if ! mountpoint -q /etc
-then
-    mount --rbind /tmp/etc /etc
-fi
+cp -r $SD/firmware/etc/* /etc
 
 ##################################################################################
 ## WIFI                                                                         ##
@@ -97,10 +80,10 @@ fi
 
 echo "*** Setting up WIFI configuration"
 
-if [ -s "${SD_MOUNTDIR}/firmware/scripts/configure_wifi" ]
+if [ -s "$SD/firmware/scripts/configure_wifi" ]
 then
     echo "*** Configuring WIFI... "
-    sh "${SD_MOUNTDIR}/firmware/scripts/configure_wifi"
+    sh "$SD/firmware/scripts/configure_wifi"
 fi
 
 ##################################################################################
@@ -109,9 +92,9 @@ fi
 
 echo "*** Setting up our own gmlib config"
 
-if [ -f /tmp/sd/firmware/etc/gmlib.cfg ]
+if [ -f $SD/firmware/etc/gmlib.cfg ]
 then
-    mount --rbind /tmp/sd/firmware/etc/gmlib.cfg /gm/config/gmlib.cfg
+    mount --rbind $SD/firmware/etc/gmlib.cfg /gm/config/gmlib.cfg
 fi
 
 ##################################################################################
@@ -157,10 +140,10 @@ then
     echo "*** Configuring new /etc/hosts file... "
     echo -e "127.0.0.1 \tlocalhost\n127.0.1.1 \t$CAMERA_HOSTNAME\n\n" > /etc/hosts
 
-    if [ -f "${SD_MOUNTDIR}/firmware/etc/hosts" ]
+    if [ -f "$SD/firmware/etc/hosts" ]
     then
-        echo "*** Appending ${SD_MOUNTDIR}/firmware/etc/hosts to /etc/hosts"
-        cat ${SD_MOUNTDIR}/firmware/etc/hosts >> /etc/hosts
+        echo "*** Appending $SD/firmware/etc/hosts to /etc/hosts"
+        cat $SD/firmware/etc/hosts >> /etc/hosts
     fi
 fi
 
@@ -179,14 +162,14 @@ fi
 
 if [ "${DISABLE_CLOUD}" -eq 1 ]
 then
-    sh "${SD_MOUNTDIR}/firmware/init/S50disable_cloud" start
-    sh "${SD_MOUNTDIR}/firmware/init/S50disable_ota" start
+    sh "$SD/firmware/init/S50disable_cloud" start
+    sh "$SD/firmware/init/S50disable_ota" start
 
 elif [ "${DISABLE_OTA}" -eq 1 ]
 then
-    sh "${SD_MOUNTDIR}/firmware/init/S50disable_ota" start
+    sh "$SD/firmware/init/S50disable_ota" start
 else
-    sh "${SD_MOUNTDIR}/firmware/init/S50disable_ota" stop
+    sh "$SD/firmware/init/S50disable_ota" stop
 fi
 
 ##################################################################################
@@ -195,7 +178,7 @@ fi
 
 if ! [ -f /mnt/data/test/boot.sh ]
 then
-    ln -s -f ${SD_MOUNTDIR}/firmware/scripts/.boot.sh /mnt/data/test/boot.sh
+    ln -s -f $SD/firmware/scripts/.boot.sh /mnt/data/test/boot.sh
 fi
 
 ) >> "${LOGFILE}" 2>&1

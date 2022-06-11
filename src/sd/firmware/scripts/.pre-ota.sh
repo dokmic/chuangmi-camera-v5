@@ -1,7 +1,5 @@
 #!/bin/sh
 
-SD_MOUNTDIR="/tmp/sd"
-
 sync
 echo 3 > /proc/sys/vm/drop_caches
 
@@ -20,7 +18,7 @@ TMP_LIBC_MD5=`md5sum /tmp/libc.so.0 | awk {'print $1'}`
 
 if [ $BIN_BUSYBOX_MD5 == $TMP_BUSYBOX_MD5 ] &&
    [ $LIB_LIBC_MD5 == $TMP_LIBC_MD5 ] &&
-   [ $LIB_LDLIBC_MD5 == $TMP_LDLIBC_MD5 ];then
+   [ $LIB_LDLIBC_MD5 == $TMP_LDLIBC_MD5 ]; then
     echo "OTA: before we start, free out more memory..." | /tmp/busybox logger -t miio_ota
     /mnt/data/imi/imi_init/S99restartd stop
     /mnt/data/imi/imi_init/S95miio_smb stop
@@ -28,7 +26,7 @@ if [ $BIN_BUSYBOX_MD5 == $TMP_BUSYBOX_MD5 ] &&
     /mnt/data/imi/imi_init/S93miot_devicekit stop
     /mnt/data/imi/imi_init/_S50mosquitto_noUsed stop
     /mnt/data/imi/imi_init/S50telnet stop
-    for i in ${SD_MOUNTDIR}/firmware/init/S99* ;do
+    for i in $SD/firmware/init/S99* ;do
       $i stop
     done
 

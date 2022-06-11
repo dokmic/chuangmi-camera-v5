@@ -3,9 +3,8 @@
 ## license: GPLv3+, http://www.gnu.org/licenses/gpl-3.0.html
 ## author: Jan Sperling , 2017
 
-SD_MOUNTDIR="/tmp/sd"
-if [ -r "${SD_MOUNTDIR}/firmware/scripts/functions.sh" ]; then
-  . "${SD_MOUNTDIR}/firmware/scripts/functions.sh"
+if [ -r "$SD/firmware/scripts/functions.sh" ]; then
+  . "$SD/firmware/scripts/functions.sh"
 else
   echo "Unable to load basic functions"
   exit 1
@@ -19,7 +18,7 @@ fi
 
 NAME="rtspd"
 DESC="RTSP server"
-DAEMON="${SD_MOUNTDIR}/firmware/bin/${NAME}"
+DAEMON="$SD/firmware/bin/${NAME}"
 PIDFILE="/var/run/${NAME}.pid"
 
 DAEMON_OPTS=" -f$RTSP_FRAMERATE -w$RTSP_WIDTH -h$RTSP_HEIGHT -b$RTSP_BITRATE -m$RTSP_BITRATE_MODE $RTSP_EXTRA_ARGS"

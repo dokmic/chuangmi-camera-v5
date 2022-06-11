@@ -7,10 +7,9 @@
 ## Load functions                     ##
 ########################################
 
-SD_MOUNTDIR="/tmp/sd"
-if [ -r "${SD_MOUNTDIR}/firmware/scripts/functions.sh" ]
+if [ -r "$SD/firmware/scripts/functions.sh" ]
 then
-    . "${SD_MOUNTDIR}/firmware/scripts/functions.sh"
+    . "$SD/firmware/scripts/functions.sh"
 else
     echo "Unable to load basic functions"
     exit 1
