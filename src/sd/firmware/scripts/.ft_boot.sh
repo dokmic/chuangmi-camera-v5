@@ -1,10 +1,13 @@
-#!/bin/sh
+#!/bin/sh -l
 
 ##################################################################################
 ## purpose: Initialize the Chuangmi 720P hack                                   ##
 ## license: GPLv3+, http://www.gnu.org/licenses/gpl-3.0.html                    ##
 ## author: Jan Sperling , 2017                                                  ##
 ##################################################################################
+
+cp -r $SD/firmware/etc/* /etc
+. /etc/profile
 
 LOGDIR=$SD/log
 LOGFILE=$LOGDIR/ft_boot.log
@@ -13,9 +16,6 @@ mkdir -p $LOGDIR
 ##################################################################################
 ## Config                                                                       ##
 ##################################################################################
-
-export LD_LIBRARY_PATH=$SD/firmware/lib:$LD_LIBRARY_PATH
-export PATH=$SD/firmware/bin:$PATH
 
 if [ ! -f "$SD/config.cfg" ]
 then
@@ -67,12 +67,10 @@ echo "*** Enabling logging"
 
 if [ "$ENABLE_LOGGING" -eq 1 ]
 then
-    sh "$SD/firmware/init/S01logging" restart
+    $SD/firmware/init/S01logging restart
 else
-    sh "$SD/firmware/init/S01logging" stop
+    $SD/firmware/init/S01logging stop
 fi
-
-cp -r $SD/firmware/etc/* /etc
 
 ##################################################################################
 ## WIFI                                                                         ##
@@ -162,14 +160,14 @@ fi
 
 if [ "${DISABLE_CLOUD}" -eq 1 ]
 then
-    sh "$SD/firmware/init/S50disable_cloud" start
-    sh "$SD/firmware/init/S50disable_ota" start
+    $SD/firmware/init/S50disable_cloud start
+    $SD/firmware/init/S50disable_ota start
 
 elif [ "${DISABLE_OTA}" -eq 1 ]
 then
-    sh "$SD/firmware/init/S50disable_ota" start
+    $SD/firmware/init/S50disable_ota start
 else
-    sh "$SD/firmware/init/S50disable_ota" stop
+    $SD/firmware/init/S50disable_ota stop
 fi
 
 ##################################################################################

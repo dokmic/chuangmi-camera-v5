@@ -29,6 +29,6 @@ cp -r /etc /tmp/
 mount --rbind /tmp/etc /etc
 echo "export SD=$SD" > /etc/profile.d/sd.sh
 
-. $SD/firmware/scripts/.ft_boot.sh
+$SD/firmware/scripts/.ft_boot.sh
 
 vg_boot

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/sh -l
 ##################################################################################
 ## purpose: Start enabled services and stop with LED blinking                   ##
 ## license: GPLv3+, http://www.gnu.org/licenses/gpl-3.0.html                    ##
@@ -14,22 +14,10 @@ else
 fi
 
 export LOGFILE="${LOGDIR}/ft_boot.log"
-export PATH="$SD/firmware/bin:$PATH"
-export LD_LIBRARY_PATH=$SD/firmware/lib
 
 (
 
 echo "*** Executing /mnt/data/test/boot.sh... "
-
-##################################################################################
-## Put our bins into PATH                                                       ##
-##################################################################################
-
-if [ -d "$SD/firmware/bin" ] && ! mountpoint -q $SD/ft
-then
-    echo "*** Mounting $SD/firmware/bin on $SD/ft... "
-    mount --rbind "$SD/firmware/bin" $SD/ft
-fi
 
 ##################################################################################
 ## Status LED                                                                   ##
@@ -53,14 +41,14 @@ ir_led     --disable
 
 if [ "${ENABLE_TELNETD:-0}" -eq 1 ]
 then
-  sh /mnt/data/imi/imi_init/S50telnet start
+  /mnt/data/imi/imi_init/S50telnet start
 
   if ! grep -q '^telnetd' /mnt/data/restartd/restartd.conf
   then
     echo "telnetd \"/usr/sbin/telnetd\" \"/mnt/data/imi/imi_init/S50telnet restart\" \"/bin/echo '*** telnetd was restarted from restartd... '\"" >> /mnt/data/restartd/restartd.conf
     if pgrep restartd >/dev/null
     then
-        sh /mnt/data/imi/imi_init/S99restartd restart
+        /mnt/data/imi/imi_init/S99restartd restart
     fi
   fi
 fi
@@ -69,7 +57,7 @@ fi
 ## NTPd                                                                         ##
 ##################################################################################
 
-sh $SD/firmware/init/S51ntpd start
+$SD/firmware/init/S51ntpd start
 
 if ! grep -q '^ntpd' /mnt/data/restartd/restartd.conf
 then
@@ -82,7 +70,7 @@ fi
 
 if [ "${ENABLE_RTSP}" -eq 1 ]
 then
-    sh $SD/firmware/init/S99rtsp start
+    $SD/firmware/init/S99rtsp start
 fi
 
 ##################################################################################
@@ -91,9 +79,9 @@ fi
 
 if [ "${AUTO_NIGHT_MODE:-1}" -eq 1 ]
 then
-    sh $SD/firmware/init/S99auto_night_mode start
+    $SD/firmware/init/S99auto_night_mode start
 else
-    sh $SD/firmware/init/S99auto_night_mode stop
+    $SD/firmware/init/S99auto_night_mode stop
 
 fi
 
@@ -103,7 +91,7 @@ fi
 
 if [ "${ENABLE_MQTT}" -eq 1 ]
 then
-    sh $SD/firmware/init/S99mqtt start
+    $SD/firmware/init/S99mqtt start
 fi
 
 ##################################################################################
