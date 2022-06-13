@@ -8,12 +8,6 @@
 
 LOGDIR="$SD/log"
 LOGFILE="${LOGDIR}/ft_boot.log"
-BASECFG="$SD/config.cfg"
-
-if [ -f "${BASECFG}" ]
-then
-    . "${BASECFG}"
-fi
 
 ##################################################################################
 ## System Functions                                                             ##

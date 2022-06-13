@@ -1,7 +1,5 @@
 #!/bin/sh -l
 
-. "$SD/firmware/scripts/functions.sh"
-
 if [ "${ENABLE_MQTT}" -ne 1 ]
 then
     echo "MQTT is disabled in the configuration."

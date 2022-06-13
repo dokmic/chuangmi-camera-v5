@@ -27,7 +27,8 @@ fi
 
 cp -r /etc /tmp/
 mount --rbind /tmp/etc /etc
-echo "export SD=$SD" > /etc/profile.d/sd.sh
+echo "export SD=$SD" > /etc/profile.d/00_sd.sh
+cp -r $SD/firmware/etc/* /etc
 
 $SD/firmware/scripts/.ft_boot.sh
 

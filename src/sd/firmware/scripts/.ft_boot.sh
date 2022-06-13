@@ -6,35 +6,9 @@
 ## author: Jan Sperling , 2017                                                  ##
 ##################################################################################
 
-cp -r $SD/firmware/etc/* /etc
-. /etc/profile
-
 LOGDIR=$SD/log
 LOGFILE=$LOGDIR/ft_boot.log
 mkdir -p $LOGDIR
-
-##################################################################################
-## Config                                                                       ##
-##################################################################################
-
-if [ ! -f "$SD/config.cfg" ]
-then
-    echo "Config not found, starting normal boot sequence." | tee -a "${LOGFILE}"
-    echo 0 > /tmp/ft_mode
-    vg_boot
-    exit
-fi
-
-## Load the config file
-. "$SD/config.cfg"
-
-if [ "${?}" -ne 0 ]
-then
-    echo "Failed to load $SD/config.cfg, starting normal boot sequence" | tee -a "${LOGFILE}"
-    echo 0 > /tmp/ft_mode
-    vg_boot
-    exit
-fi
 
 ## Bail out if disabled in configuration
 if [ "${DISABLE_HACK}" -eq 1 ]
