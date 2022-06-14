@@ -1,0 +1,33 @@
+#!/bin/sh
+
+SSID=$1
+PASSWORD=$2
+KEY_MANAGEMENT=$([ -z "$PASSWORD" ] && echo NONE || echo WPA-PSK)
+
+[ -z "$SSID" ] && exit 0
+
+get_nvram() {
+  nvram get $1 | xargs
+
+  return $?
+}
+
+set_nvram() {
+  VARIABLE="$1"
+  VALUE="$2"
+
+  [ -z "$VARIABLE" -o -z "$VALUE" ] && return 1
+  [ $(get_nvram $VARIABLE) = "$VALUE" ] && return 0
+
+  nvram set $VARIABLE="$VALUE"
+  nvram commit
+
+  return $?
+}
+
+[ $(get_nvram miio_ssid) != "$SSID" ] && set_nvram miio_ssid $SSID
+[ $(get_nvram miio_key_mgmt) != $KEY_MANAGEMENT ] && set_nvram miio_key_mgmt $KEY_MANAGEMENT
+[ $(get_nvram miio_passwd) != "$PASSWORD" ] && set_nvram miio_passwd "$PASSWORD"
+[ $(get_nvram wifi_ready) != yes ] && set_nvram wifi_ready yes
+
+pgrep wpa_supplicant >/dev/null && /mnt/data/imi/imi_init/S92wifi restart

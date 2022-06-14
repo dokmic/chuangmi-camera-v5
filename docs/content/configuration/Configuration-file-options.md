@@ -22,7 +22,7 @@ this page contains a list of some options, a description and sometimes links to 
 
 | Configuration            | Options                        | Description |
 | ---                      | ---                            | ---         |
-| `WIFI_PASS`              | The wifi password string       | The WIFI Password. Will be saved in nvram, so can be cleared for privacy purposes. |
+| `WIFI_PASSWORD`              | The wifi password string       | The WIFI Password. Will be saved in nvram, so can be cleared for privacy purposes. |
 | `WIFI_SSID`              | The wifi SSID string           | The WIFI SSID. Will be saved in nvram at boot, so can be cleared after first boot. |
 
 

@@ -232,43 +232,6 @@ get_daemon_state()
     return "${RC}"
 }
 
-
-##################################################################################
-## NVRAM Functions                                                              ##
-##################################################################################
-
-## get NVRAM variable
-get_nvram()
-{
-    VARIABLE="$1"
-
-    /usr/sbin/nvram get "${VARIABLE}" | xargs
-    RC="$?"
-
-    return "${RC}"
-}
-
-## Save NVRAM variable
-set_nvram()
-{
-    VARIABLE="$1"
-    VALUE="$2"
-
-    [ "x$VARIABLE" == "x" ] || [ "x$VALUE" == "x" ] && return 1
-
-    RC="0"
-
-    if [ "$( get_nvram "${VARIABLE}" )" != "${VALUE}" ]
-    then
-        /usr/sbin/nvram set ${VARIABLE}="${VALUE}"
-        RC="$?"
-        /usr/sbin/nvram commit
-        RC="$?"
-    fi
-
-    return "${RC}"
-}
-
 ##################################################################################
 ## Create /var/run if nonexistent                                               ##
 ##################################################################################

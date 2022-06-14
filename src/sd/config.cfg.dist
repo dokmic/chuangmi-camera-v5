@@ -42,7 +42,7 @@ REMOTE_SYSLOG_HOST=""
 WIFI_SSID=""
 
 ## Set WIFI STA password
-WIFI_PASS=""
+WIFI_PASSWORD=""
 
 ############################################################
 ## Time Settings                                          ##

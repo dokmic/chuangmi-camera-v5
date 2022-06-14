@@ -46,17 +46,7 @@ else
     $SD/firmware/init/S01logging stop
 fi
 
-##################################################################################
-## WIFI                                                                         ##
-##################################################################################
-
-echo "*** Setting up WIFI configuration"
-
-if [ -s "$SD/firmware/scripts/configure_wifi" ]
-then
-    echo "*** Configuring WIFI... "
-    sh "$SD/firmware/scripts/configure_wifi"
-fi
+wifi "$WIFI_SSID" "$WIFI_PASSWORD"
 
 ##################################################################################
 ## Mount GMLIB configuration                                                    ##
