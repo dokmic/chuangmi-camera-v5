@@ -33,6 +33,13 @@ Chuangmi 720P configuration:
 ################################
 EOF
 
+mkdir -p /tmp/restartd
+touch /tmp/restartd/restartd
+cp /mnt/data/restartd/restartd.conf /tmp/restartd
+mount --bind /mnt/data/restartd/restartd /tmp/restartd/restartd
+mount --rbind /tmp/restartd /mnt/data/restartd
+echo "restartd \"/mnt/data/restartd/restartd\" \"/mnt/data/imi/imi_init/S99restartd restart\" \"/bin/echo 'restartd is running'\"" >> /mnt/data/restartd/restartd.conf
+
 ##################################################################################
 ## Syslog                                                                       ##
 ##################################################################################
@@ -107,15 +114,6 @@ then
         echo "*** Appending $SD/firmware/etc/hosts to /etc/hosts"
         cat $SD/firmware/etc/hosts >> /etc/hosts
     fi
-fi
-
-##################################################################################
-## Prepare restartd.conf                                                        ##
-##################################################################################
-
-if [ ! -f /mnt/data/restartd/restartd.conf.bak ] && mountpoint -q /etc
-then
-    cp /mnt/data/restartd/restartd.conf /mnt/data/restartd/restartd.conf.bak
 fi
 
 ##################################################################################

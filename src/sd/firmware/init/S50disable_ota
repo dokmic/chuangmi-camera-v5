@@ -15,7 +15,7 @@ fi
 disable_ota() {
   echo "*** Disabling OTA... "
 
-  disable_binary "/mnt/data/miio_ota/miio_ota" "miio_ota"
+  binary --disable /mnt/data/miio_ota/miio_ota miio_ota
 
   if pgrep restartd >/dev/null
   then
@@ -35,7 +35,7 @@ enable_ota() {
   fi
 
   #/mnt/data/imi/imi_init/S95miio_ota
-  enable_binary "/mnt/data/miio_ota/miio_ota" "miio_ota"
+  binary --enable /mnt/data/miio_ota/miio_ota miio_ota
 
   if pgrep restartd >/dev/null
   then

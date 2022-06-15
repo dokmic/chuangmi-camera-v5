@@ -1,0 +1,51 @@
+#!/bin/sh
+
+disable() {
+  BINARY="$1"
+  ALIAS="$2"
+
+  if [ ! -x /tmp/disabled ]; then
+    cat > /tmp/disabled <<  EOF
+#!/bin/sh
+echo "\$0 is disabled."
+EOF
+    chmod +x /tmp/disabled
+  fi
+
+  if pgrep "$BINARY" >/dev/null; then
+    pkill -9 "$BINARY"
+  fi
+
+  if ! ( mount | grep -q "$BINARY" ); then
+    mount --bind /tmp/disabled "$BINARY"
+  fi
+
+  if [ -n "$ALIAS" ]; then
+    sed -i "s/^$ALIAS /#\0/" /mnt/data/restartd/restartd.conf
+  fi
+}
+
+enable() {
+  BINARY="$1"
+  ALIAS="$2"
+
+  if mount | grep -q "$BINARY"; then
+    umount "$BINARY"
+  fi
+
+  if [ -n "$ALIAS" ]; then
+    sed -i "s/^#\($ALIAS \)/\1/" /mnt/data/restartd/restartd.conf
+  fi
+}
+
+COMMAND=$1
+shift
+
+case "$COMMAND" in
+  --enable)
+    enable $@
+  ;;
+  --disable)
+    disable $@
+  ;;
+esac

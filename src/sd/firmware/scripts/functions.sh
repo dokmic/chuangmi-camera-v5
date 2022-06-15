@@ -43,69 +43,6 @@ get_last_video()
 }
 
 ##################################################################################
-## Binary manipulation functions                                                ##
-##################################################################################
-
-## Creates /tmp/disable-binary
-create_disable_binary()
-{
-
-    if [ ! -x /tmp/disable-binary ]
-    then
-        echo -e '#!/bin/sh\necho "$0 disabled with MiiCam"' > /tmp/disable-binary
-        chmod +x /tmp/disable-binary
-    fi
-}
-
-## Disable binary and optionally delete it from restartd.conf
-disable_binary()
-{
-    BINARY="$1"
-    RESTART="$2"
-
-    create_disable_binary
-
-    printf "*** Disabling %s... \n" "${1##*/}"
-
-    if pgrep "${BINARY}" >/dev/null
-    then
-        pkill -9 "${BINARY}"
-    fi
-
-    if ! ( mount | grep -q "${BINARY}" )
-    then
-        mount --bind /tmp/disable-binary "${BINARY}"
-    fi
-
-    # update restartd.conf
-    if [ -n "${RESTART}" ] && [ -f /mnt/data/restartd/restartd.conf ] && (grep -q ^"${RESTART} " /mnt/data/restartd/restartd.conf)
-    then
-        sed -i "/^${RESTART} /d" /mnt/data/restartd/restartd.conf
-    fi
-}
-
-## Enable binary and optionally add it to restartd.conf
-enable_binary()
-{
-    BINARY="$1"
-    RESTART="$2"
-
-    printf "*** Enabling %s... \n" "${1##*/}"
-
-    if ( mount | grep -q "${BINARY}" )
-    then
-        umount "${BINARY}"
-    fi
-
-    # update restartd.conf
-    if [ -n "${RESTART}" ] && [ -f /mnt/data/restartd/restartd.conf ] && ! grep -q ^"${RESTART} " /mnt/data/restartd/restartd.conf
-    then
-        grep ^"${RESTART} " /mnt/data/restartd/restartd.conf.bak >> /mnt/data/restartd/restartd.conf
-    fi
-}
-
-
-##################################################################################
 ## Daemon functions                                                             ##
 ##################################################################################
 
