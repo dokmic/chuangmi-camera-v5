@@ -130,7 +130,6 @@ alias mqtt_sub="mosquitto_sub $MQTT_OPTIONS \
 alias upper="tr [:lower:] [:upper:]"
 
 alias auto_night_mode="$SD/firmware/init/S99auto_night_mode"
-alias disable_cloud="$SD/firmware/init/S50disable_cloud"
 alias disable_ota="$SD/firmware/init/S50disable_ota"
 alias rtsp="$SD/firmware/init/S99rtsp"
 
@@ -153,7 +152,7 @@ set_ceiling_mode() {
 }
 
 set_cloud() {
-  disable_cloud $([ "$1" = ON ] && echo stop || echo start)
+  cloud $([ "$1" = ON ] && echo --enable || echo --disable)
 }
 
 set_indicator() {
@@ -202,7 +201,7 @@ update_ceiling_mode() {
 }
 
 update_cloud() {
-  mqtt_pub --topic $CLOUD_TOPIC --message $(disable_cloud status >/dev/null && echo "OFF" || echo "ON")
+  mqtt_pub --topic $CLOUD_TOPIC --message $(cloud --status | upper)
 }
 
 update_indicator() {

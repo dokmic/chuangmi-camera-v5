@@ -116,14 +116,7 @@ then
     fi
 fi
 
-##################################################################################
-## Disable Cloud Services and OTA                                               ##
-##################################################################################
-
-if [ "${DISABLE_CLOUD}" -eq 1 ]
-then
-    $SD/firmware/init/S50disable_cloud start
-    $SD/firmware/init/S50disable_ota start
+[ "${ENABLE_CLOUD:-0}" -eq 0 ] && cloud --disable
 
 elif [ "${DISABLE_OTA}" -eq 1 ]
 then

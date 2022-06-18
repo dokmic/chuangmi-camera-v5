@@ -1,11 +1,7 @@
 ## Disable the execution of the hack scripts (0/1)
 DISABLE_HACK="0"
 
-## Fully Disconnect from Xioami servers, including disabling streaming and OTA updater (0/1)
-DISABLE_CLOUD="1"
-
 ## Manage the camera via cloud but prevent online updates (0/1)
-## This option is superseded by DISABLE_CLOUD=1
 DISABLE_OTA="1"
 
 ############################################################

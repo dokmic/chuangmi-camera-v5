@@ -1,0 +1,71 @@
+#!/bin/sh
+
+disable() {
+  # /mnt/data/imi/imi_init/S60miio_avstreamer
+  binary --disable /mnt/data/miio_av/miio_avstreamer miio_avstreamer
+
+  # /mnt/data/imi/imi_init/S93miio_client
+  binary --disable /mnt/data/ot_wifi_tool/miio_client miio_client
+  binary --disable /mnt/data/ot_wifi_tool/miio_client_helper_nomqtt.sh miio_client_helper
+
+  # /mnt/data/imi/imi_init/S93miot_devicekit
+  binary --disable /mnt/data/miot/miot_devicekit miot_devicekit
+
+  # /mnt/data/imi/imi_init/S93miot_qrcode
+  binary --disable /mnt/data/miot/miot_qrcode.sh
+
+  # /mnt/data/imi/imi_init/S95miio_smb
+  binary --disable /mnt/data/miio_smb/miio_smb miio_smb
+
+  # cron
+  binary --disable /mnt/data/miot/logmi.sh
+
+  (pgrep restartd && /mnt/data/imi/imi_init/S99restartd restart) >/dev/null
+
+  echo "Cloud services are disabled."
+}
+
+
+enable() {
+  # /mnt/data/imi/imi_init/S60miio_avstreamer
+  binary --enable /mnt/data/miio_av/miio_avstreamer miio_avstreamer
+
+  # /mnt/data/imi/imi_init/S93miio_client
+  binary --enable /mnt/data/ot_wifi_tool/miio_client miio_client
+  binary --enable /mnt/data/ot_wifi_tool/miio_client_helper_nomqtt.sh miio_client_helper
+
+  # /mnt/data/imi/imi_init/S93miot_devicekit
+  binary --enable /mnt/data/miot/miot_devicekit miot_devicekit
+
+  # /mnt/data/imi/imi_init/S93miot_qrcode
+  binary --enable /mnt/data/miot/miot_qrcode.sh
+
+  # /mnt/data/imi/imi_init/S95miio_smb
+  binary --enable /mnt/data/miio_smb/miio_smb miio_smb
+
+  # cron
+  binary --enable /mnt/data/miot/logmi.sh
+
+  if pgrep restartd >/dev/null; then
+    /mnt/data/imi/imi_init/S99restartd restart >/dev/null
+    sleep 1
+  fi
+
+  echo "Cloud services are enabled."
+}
+
+status() {
+  pgrep miio_avstreamer >/dev/null && echo on || echo off
+}
+
+case "$1" in
+  --disable)
+    disable
+  ;;
+  --enable)
+    enable
+  ;;
+  --status)
+    status
+  ;;
+esac
