@@ -1,0 +1,50 @@
+#!/bin/sh -l
+
+local pre_ota=/mnt/data/miio_ota/pre-ota.sh
+
+disable() {
+  binary --disable /mnt/data/miio_ota/miio_ota miio_ota
+  (pgrep restartd && /mnt/data/imi/imi_init/S99restartd restart) >/dev/null
+  mount | grep -q $pre_ota && umount $pre_ota
+
+  echo "OTA is disabled."
+}
+
+enable() {
+  local patch='\
+    for service in '$SD'/firmware/init/S99*; do $service stop; done\
+    sync\
+    echo 3 >/proc/sys/vm/drop_caches\
+  '
+
+  if ! mount | grep -q $pre_ota; then
+    sed "/^\s*exit 0/i$patch" $pre_ota >/tmp/pre-ota.sh
+    mount --bind /tmp/pre-ota.sh $pre_ota
+  fi
+
+  # /mnt/data/imi/imi_init/S95miio_ota
+  binary --enable /mnt/data/miio_ota/miio_ota miio_ota
+
+  if pgrep restartd >/dev/null; then
+    /mnt/data/imi/imi_init/S99restartd restart >/dev/null
+    sleep 1
+  fi
+
+  echo "OTA is enabled."
+}
+
+status() {
+  pgrep miio_ota >/dev/null && echo on || echo off
+}
+
+case "$1" in
+  --disable)
+    disable
+  ;;
+  --enable)
+    enable
+  ;;
+  --status)
+    status
+  ;;
+esac

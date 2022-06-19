@@ -9,7 +9,7 @@ this page contains a list of some options, a description and sometimes links to 
 | ---             | ---                            | ---     |
 | `DISABLE_HACK`  | `1` to enable, `0` to disable. | Disable the custom firmware and boot the chinese firmware. |
 | `ENABLE_CLOUD`  | `1` to enable, `0` to disable. | Control all xiaomi functionality including the cloud streaming, audio, record on motion detection and firmware updates. |
-| `DISABLE_OTA`   | `1` to enable, `0` to disable. | Allow cloud functionality like record on motion detection and usage of the Mii Home App, but disable firmware updates of the official firmware. |
+| `ENABLE_OTA`   | `1` to enable, `0` to disable. | Control firmware updates of the official firmware. |
 
 ## System Settings
 

@@ -130,7 +130,6 @@ alias mqtt_sub="mosquitto_sub $MQTT_OPTIONS \
 alias upper="tr [:lower:] [:upper:]"
 
 alias auto_night_mode="$SD/firmware/init/S99auto_night_mode"
-alias disable_ota="$SD/firmware/init/S50disable_ota"
 alias rtsp="$SD/firmware/init/S99rtsp"
 
 get_value() {
@@ -169,7 +168,7 @@ set_night_mode() {
 }
 
 set_ota() {
-  disable_ota $([ "$1" = ON ] && echo stop || echo start)
+  ota $([ "$1" = ON ] && echo --enable || echo --disable)
 }
 
 set_rtsp() {
@@ -223,7 +222,7 @@ update_night_mode() {
 }
 
 update_ota() {
-  mqtt_pub --topic $OTA_TOPIC --message $(disable_ota status >/dev/null && echo "OFF" || echo "ON")
+  mqtt_pub --topic $OTA_TOPIC --message $(ota --status | upper)
 }
 
 update_rtsp() {

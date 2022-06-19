@@ -117,13 +117,7 @@ then
 fi
 
 [ "${ENABLE_CLOUD:-0}" -eq 0 ] && cloud --disable
-
-elif [ "${DISABLE_OTA}" -eq 1 ]
-then
-    $SD/firmware/init/S50disable_ota start
-else
-    $SD/firmware/init/S50disable_ota stop
-fi
+ota $([ "${ENABLE_OTA:-0}" -eq 1 ] && echo --enable || echo --disable)
 
 ##################################################################################
 ## Start enabled Services                                                       ##
