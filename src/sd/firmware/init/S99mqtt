@@ -1,48 +1,40 @@
 #!/bin/sh -l
-## purpose: Init script for Chuangmi MQTT Control
-## license: GPLv3+, http://www.gnu.org/licenses/gpl-3.0.html
-## author: Jan Sperling , 2017
 
-if [ -r "$SD/firmware/scripts/functions.sh" ]
-then
-    . "$SD/firmware/scripts/functions.sh"
-else
-    echo "Unable to load basic functions"
-    exit 1
-fi
+local pid_file=/var/run/mqtt.pid
 
-NAME="mqtt"
-DESC="MQTT Daemon"
-DAEMON="$SD/firmware/scripts/mqtt.sh"
+status() {
+  [ -f $pid_file ] && kill -0 $(cat $pid_file) >/dev/null 2>&1 || return 1
+}
 
-PIDFILE="/var/run/${NAME}.pid"
+start() {
+  status || start-stop-daemon \
+    --background \
+    --exec mqtt \
+    --make-pidfile \
+    --oknodo \
+    --pidfile $pid_file \
+    --quiet \
+    --start
+}
 
-check_daemon_bin "${DAEMON}" "${DESC}"
+stop() {
+  status && start-stop-daemon \
+    --oknodo \
+    --pidfile $pid_file \
+    --quiet \
+    --stop
+}
 
 case "$1" in
-    start)
-        if ! pgrep ${DAEMON##*/} >/dev/null
-        then
-            start_daemon_background
-        else
-            echo "${DESC} already running."
-        fi
-    ;;
-    stop)
-        stop_daemon
-    ;;
-    restart|reload)
-        "$0" stop
-        "$0" start
-    ;;
-    status)
-        status_daemon
-    ;;
-    *)
-        echo "Usage: $0 {start|stop|restart|status}"
-        exit 1
-    ;;
+  start)
+    start
+  ;;
+  stop)
+    stop
+  ;;
+  status)
+    status
+  ;;
 esac
 
 exit $?
-

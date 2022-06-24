@@ -1,11 +1,5 @@
 #!/bin/sh -l
 
-if [ "${ENABLE_MQTT}" -ne 1 ]
-then
-    echo "MQTT is disabled in the configuration."
-    exit 1
-fi
-
 MQTT_ID=$(cat /sys/class/net/wlan0/address | tr -d ':')
 MQTT_NAME=${MQTT_NAME:-$MQTT_ID}
 MQTT_TOPIC=${MQTT_TOPIC:-miicam}/$MQTT_NAME
@@ -229,11 +223,19 @@ update_rtsp() {
   mqtt_pub --topic $RTSP_TOPIC --message $(rtsp status >/dev/null && echo "ON" || echo "OFF")
 }
 
-if [ "$1" = --motion ]; then
-  update_motion $2
+stop() {
+  for pid in $(pgrep -P $$); do
+    pkill -P $pid
+    kill $pid
+  done
 
-  exit 0
-fi
+  exit
+}
+
+printf mqtt >/proc/$$/comm
+trap stop HUP INT QUIT ABRT TERM
+trap "update_motion on" USR1
+trap "update_motion off" USR2
 
 update_discovery
 update_ceiling_mode
@@ -247,6 +249,11 @@ update_rtsp
 killall mosquitto_sub 2>/dev/null
 
 while :; do
+  if [ -z "$READY" ]; then
+    printf mqtt.sub >/proc/$(sh -c 'echo $PPID')/comm
+    READY=1
+  fi
+
   update_availability online
   mqtt_sub --topic "$MQTT_TOPIC/#" | while read -r LINE; do
     echo "Incoming MQTT message: $LINE"
@@ -289,4 +296,8 @@ while :; do
       ;;
     esac
   done
+done &
+
+while :; do
+  sleep 1
 done

@@ -65,8 +65,8 @@
 #define MAX_SNAPSHOT_LEN         (256 * 1024)
 #define MD_DATA_LEN              (720 * 576 / 4)
 
-#define MOTION_ON_SCRIPT         "/tmp/sd/firmware/scripts/mqtt.sh --motion on"
-#define MOTION_OFF_SCRIPT        "/tmp/sd/firmware/scripts/mqtt.sh --motion off"
+#define MOTION_ON_SCRIPT         "kill -USR1 $(pidof -s mqtt)"
+#define MOTION_OFF_SCRIPT        "kill -USR2 $(pidof -s mqtt)"
 
 #define RTSPD_LOGFILE            "/tmp/sd/log/rtspd.log"
 
