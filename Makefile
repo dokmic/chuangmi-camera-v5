@@ -117,6 +117,7 @@ install: default
 	find $(BUILD_DIR)/lib -maxdepth 1 \( -name '*.so' -or -name '*.a' \) -exec cp {} $(BUILD_DIR)/dist/firmware/lib/. \;
 	find $(BUILD_DIR)/bin -maxdepth 1 -type f -exec cp {} $(BUILD_DIR)/dist/firmware/bin \;
 	sync
+	sleep 3
 
 dist: install
 	tar czf $(BUILD_DIR)/MiiCam.tar.gz -C $(BUILD_DIR)/dist .
