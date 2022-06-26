@@ -100,10 +100,10 @@ When the IR Led goes on, it does not make much sense to filter the IR led as wel
 
 | Configuration            | Options                        | Description |
 | ---                      | ---                            | ---         |
-| `AUTO_NIGHT_MODE`        | `1` to enable, `0` to disable. | Enable or disable the auto nightmode service (no auth) |
-| `AUTO_NIGHT_MODE_ARGS`   | CLI arguments                  | Set the cli arguments for the auto nightmode daemon |
+| `NIGHT_MODE`             | `1` to enable, `0` to disable, or `AUTO` to control automatically. | Enable or disable the auto nightmode service (no auth) |
+| `NIGHT_MODE_AUTO_ARGS`   | CLI arguments                  | Set the cli arguments for the auto nightmode daemon |
 
-Default arguments: `AUTO_NIGHT_MODE_ARGS="-d 120 -e 200 -i 5 -l -n -v"`
+Default arguments: `NIGHT_MODE_AUTO_ARGS="-d 120 -e 200 -i 5 -l -n -v"`
 
 ## Use the old, original nightmode switcher
 

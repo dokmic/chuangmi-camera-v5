@@ -30,7 +30,7 @@ this page contains a list of some options, a description and sometimes links to 
 
 | Configuration            | Options                        | Description |
 | ---                      | ---                            | ---         |
-| `AUTO_NIGHT_MODE`        | `1` to enable, `0` to disable. | Enable or disable the automatic night mode daemon |
+| `NIGHT_MODE`             | `1` to enable, `0` to disable, or `AUTO` to control automatically. | Enable or disable the automatic night mode daemon |
 
 
 ### Camera Options

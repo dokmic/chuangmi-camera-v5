@@ -1,48 +1,41 @@
 #!/bin/sh -l
-## purpose: Init and config script for night vison mode
-## license: GPLv3+, http://www.gnu.org/licenses/gpl-3.0.html
-## author: Jan Sperling , 2018
 
-if [ -r "$SD/firmware/scripts/functions.sh" ]
-then
-    . "$SD/firmware/scripts/functions.sh"
-else
-    echo "Unable to load basic functions"
-    exit 1
-fi
+local pid_file=/var/run/auto_night_mode.pid
 
-NAME="auto_night_mode"
-DESC="Auto Night Mode"
-DAEMON="$SD/firmware/bin/auto_night_mode"
-DAEMON_OPTS="${AUTO_NIGHT_MODE_ARGS:-"--ev-on 30 --ir-on 90 --ev-off 1000 --ir-off 100 --delay 5 --set-ircut --set-irled"}"
-PIDFILE="/var/run/${NAME}.pid"
+status() {
+  [ -f $pid_file ] && kill -0 $(cat $pid_file) >/dev/null 2>&1 || return 1
+}
 
-check_daemon_bin "${DAEMON}" "${DESC}"
+start() {
+  status || start-stop-daemon \
+    --background \
+    --exec auto_night_mode \
+    --make-pidfile \
+    --oknodo \
+    --pidfile $pid_file \
+    --quiet \
+    --start \
+    -- ${NIGHT_MODE_AUTO_ARGS:---ev-on 30 --ir-on 90 --ev-off 1000 --ir-off 100 --delay 5 --set-ircut --set-irled}
+}
+
+stop() {
+  status && start-stop-daemon \
+    --oknodo \
+    --pidfile $pid_file \
+    --quiet \
+    --stop
+}
 
 case "$1" in
-    start)
-        if ! pgrep ${DAEMON##*/} >/dev/null
-        then
-            start_daemon_background
-        else
-            echo "${DESC} already running."
-        fi
-    ;;
-    stop)
-        stop_daemon_background
-    ;;
-    restart|reload)
-        "$0" stop
-        "$0" start
-    ;;
-    status)
-        status_daemon
-    ;;
-    *)
-        echo "Usage: $0 {start|stop|restart|status}"
-        exit 1
-    ;;
+  start)
+    start
+  ;;
+  stop)
+    stop
+  ;;
+  status)
+    status
+  ;;
 esac
 
 exit $?
-

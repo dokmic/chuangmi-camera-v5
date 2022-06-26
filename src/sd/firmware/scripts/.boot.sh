@@ -73,16 +73,11 @@ then
     $SD/firmware/init/S99rtsp start
 fi
 
-##################################################################################
-## Auto Night Mode                                                              ##
-##################################################################################
-
-if [ "${AUTO_NIGHT_MODE:-1}" -eq 1 ]
-then
-    $SD/firmware/init/S99auto_night_mode start
+if [ "${NIGHT_MODE:-AUTO}" = AUTO ]; then
+  $SD/firmware/init/S99auto_night_mode start
 else
-    $SD/firmware/init/S99auto_night_mode stop
-
+  $SD/firmware/init/S99auto_night_mode stop
+  night_mode $([ "$NIGHT_MODE" -eq 1 ] && echo --enable || echo --disable)
 fi
 
 [ "${ENABLE_MQTT:-0}" -eq 1 ] && $SD/firmware/init/S99mqtt start

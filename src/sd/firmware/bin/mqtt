@@ -156,7 +156,7 @@ set_night_mode() {
   if [ "$1" = AUTO ]; then
     auto_night_mode start
   else
-    auto_night_mode status >/dev/null && auto_night_mode stop
+    auto_night_mode stop
     night_mode $([ "$1" = ON ] && echo --enable || echo --disable)
   fi
 }
@@ -206,7 +206,7 @@ update_motion() {
 }
 
 update_night_mode() {
-  if auto_night_mode status >/dev/null; then
+  if auto_night_mode status; then
     STATE=AUTO
   else
     STATE=$(night_mode --status | upper)

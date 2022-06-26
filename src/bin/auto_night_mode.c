@@ -33,10 +33,10 @@ void enable_darkness_mode(void)
     if (cli.verbose == 1)
         fprintf(stderr, "Enabling darkness mode\n");
 
-    system("/tmp/sd/firmware/bin/night_mode -e");
+    system("night_mode -e");
 
-    if (cli.ir_led) system("/tmp/sd/firmware/bin/ir_led -e");
-    if (cli.ir_cut) system("/tmp/sd/firmware/bin/ir_cut -d");
+    if (cli.ir_led) system("ir_led -e");
+    if (cli.ir_cut) system("ir_cut -d");
 }
 
 void disable_darkness_mode(void)
@@ -44,10 +44,10 @@ void disable_darkness_mode(void)
     if (cli.verbose == 1)
         fprintf(stderr, "Disabling darkness mode\n");
 
-    system("/tmp/sd/firmware/bin/night_mode -d");
+    system("night_mode -d");
 
-    if (cli.ir_led) system("/tmp/sd/firmware/bin/ir_led -d");
-    if (cli.ir_cut) system("/tmp/sd/firmware/bin/ir_cut -e");
+    if (cli.ir_led) system("ir_led -d");
+    if (cli.ir_cut) system("ir_cut -e");
 }
 
 void signal_handler(int sig)
