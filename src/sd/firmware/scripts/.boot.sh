@@ -53,16 +53,7 @@ then
   fi
 fi
 
-##################################################################################
-## NTPd                                                                         ##
-##################################################################################
-
-$SD/firmware/init/S51ntpd start
-
-if ! grep -q '^ntpd' /mnt/data/restartd/restartd.conf
-then
-    echo "ntpd \"/usr/sbin/ntpd\" \"$SD/firmware/init/S51ntpd restart\" \"/bin/echo '*** NTPd was restarted from restartd... '\"" >> /mnt/data/restartd/restartd.conf
-fi
+echo "ntpd \"ntpd\" \"$SD/firmware/init/S51ntpd start\" \"/bin/echo 'ntpd is running'\"" >> /mnt/data/restartd/restartd.conf
 
 ##################################################################################
 ## RTSP server                                                                  ##

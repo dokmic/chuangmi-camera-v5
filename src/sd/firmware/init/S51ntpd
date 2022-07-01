@@ -1,41 +1,41 @@
 #!/bin/sh -l
-#
-# Start the ntpd
-#
 
-if [ -r "$SD/firmware/scripts/functions.sh" ]; then
-  . "$SD/firmware/scripts/functions.sh"
-else
-  echo "Unable to load basic functions"
-  exit 1
-fi
+local pid_file=/var/run/ntpd.pid
 
-NAME="ntpd"
-DESC="NTP Daemon"
-DAEMON="/usr/sbin/${NAME}"
-DAEMON_OPTS="-p ${NTP_SERVER}"
-PIDFILE="/var/run/${NAME}.pid"
+status() {
+  [ -f $pid_file ] && kill -0 $(cat $pid_file) >/dev/null 2>&1 || return 1
+}
 
-check_daemon_bin "${DAEMON}" "${DESC}"
+start() {
+  status || start-stop-daemon \
+    --background \
+    --exec ntpd \
+    --make-pidfile \
+    --oknodo \
+    --pidfile $pid_file \
+    --quiet \
+    --start \
+    -- -n -p "${NTP_SERVER:-pool.ntp.org}"
+}
+
+stop() {
+  status && start-stop-daemon \
+    --oknodo \
+    --pidfile $pid_file \
+    --quiet \
+    --stop
+}
 
 case "$1" in
-    start)
-        start_daemon
-    ;;
-    stop)
-        stop_daemon "${PIDFILE}"
-    ;;
-    status)
-        status_daemon
-    ;;
-    restart|reload)
-        "$0" stop
-        "$0" start
-    ;;
-    *)
-        echo "Usage: $0 {start|stop|restart}"
-        exit 1
-    ;;
+  start)
+    start
+  ;;
+  stop)
+    stop
+  ;;
+  status)
+    status
+  ;;
 esac
 
 exit $?

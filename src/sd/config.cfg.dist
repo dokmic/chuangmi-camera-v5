@@ -46,9 +46,6 @@ WIFI_PASSWORD=""
 ## Set timezone
 TIMEZONE="UTC"
 
-## Prefered NTP server
-NTP_SERVER="pool.ntp.org"
-
 ############################################################
 ## RTSP Settings                                          ##
 ############################################################
