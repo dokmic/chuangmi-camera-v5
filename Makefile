@@ -21,8 +21,6 @@ BIN := \
 	$(BUILD_DIR)/bin/ir_led \
 	$(BUILD_DIR)/bin/mirror_mode \
 	$(BUILD_DIR)/bin/night_mode \
-	$(BUILD_DIR)/bin/take_snapshot \
-	$(BUILD_DIR)/bin/take_video \
 	$(BUILD_DIR)/bin/yellow_led
 
 LIB := \

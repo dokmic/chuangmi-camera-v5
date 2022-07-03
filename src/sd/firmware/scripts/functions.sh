@@ -19,29 +19,6 @@ log()
     echo "$( date ) - $*" | tee -a $LOGFILE
 }
 
-get_last_image()
-{
-    ## Find last created snapshot
-    if [ -d $SD/RECORDED_IMAGES ]
-    then
-        find $SD/RECORDED_IMAGES/ -type f | sort -r | tail -n 1
-    fi
-
-    return $?
-}
-
-
-get_last_video()
-{
-    ## Find last created video
-    if [ -d $SD/RECORDED_VIDEOS ]
-    then
-        find $SD/RECORDED_VIDEOS/ -type f | sort -r | tail -n 1
-    fi
-
-    return $?
-}
-
 ##################################################################################
 ## Daemon functions                                                             ##
 ##################################################################################

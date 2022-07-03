@@ -62,22 +62,12 @@
 #define START_BS_EVENT           1
 #define STOP_BS_EVENT            2
 
-#define MAX_SNAPSHOT_LEN         (256 * 1024)
 #define MD_DATA_LEN              (720 * 576 / 4)
 
 #define MOTION_ON_SCRIPT         "kill -USR1 $(pidof -s mqtt)"
 #define MOTION_OFF_SCRIPT        "kill -USR2 $(pidof -s mqtt)"
 
 #define RTSPD_LOGFILE            "/tmp/sd/log/rtspd.log"
-
-#define CREATE_SNAPSHOT_FILE     "/dev/shm/rtspd_snapshot"
-#define LAST_SNAPSHOT_PATH       "/dev/shm/rtspd_last_snapshot_path"
-
-#define CREATE_VIDEO_FILE        "/dev/shm/rtspd_video"
-#define LAST_VIDEO_PATH          "/dev/shm/rtspd_last_video_path"
-
-#define RECORDING_DURATION       20
-#define RECORDING_MAX_DURATION   30
 
 #define CHECK_CHANNUM_AND_SUBNUM(ch_num, sub_num)    \
     do {    \
@@ -177,7 +167,6 @@ typedef struct st_av {
 pthread_t enqueue_thread_id   = 0;
 pthread_t encode_thread_id    = 0;
 pthread_t motion_thread_id    = 0;
-pthread_t media_thread_id     = 0;
 
 unsigned int sys_tick         = 0;
 struct timeval sys_sec        = {-1, -1};
@@ -187,10 +176,6 @@ char *ipptr                   = NULL;
 static int rtspd_sysinit      = 0;
 static int rtspd_set_event    = 0;
 static int rtspd_avail_ch     = 0;
-
-char *snapshot_buf            = 0;
-static int snapshot_create    = 0;
-static int video_create       = 0;
 
 static int motion_detected    = 0;
 
@@ -207,14 +192,6 @@ void *sub_bindfd;                 // * Create encoder object (scaler) bind
 
 FILE *logfile = NULL;             // * File for logging
 
-struct VideoRecording {
-    int recording;
-    int waiting_for_keyframe;
-    struct timeval record_start;
-    FILE *fh;
-    char file_path[80];
-} VideoRecorder;
-
 struct timeval last_motion;
 
 struct CommandLineArguments {
@@ -224,8 +201,6 @@ struct CommandLineArguments {
     int bitrate;
     int bitrateMode;
     int encoderType;
-    int snapshot;
-    int record;
     int motion;
 } cliArgs;
 
@@ -239,109 +214,6 @@ static char *rtsp_enc_type_str[] = {
 char *rtsp_password = NULL;
 char *rtsp_username = NULL;
 static int rtsp_use_auth = 0;
-
-
-static void create_directory(const char *dir)
-{
-    char tmp[256];
-    char *p = NULL;
-    size_t len;
-
-    snprintf(tmp, sizeof(tmp), "%s", dir);
-    len = strlen(tmp);
-
-    if (tmp[len - 1] == '/')
-        tmp[len - 1] = 0;
-
-    for(p = tmp + 1; *p; p++) {
-        if(*p == '/') {
-           *p = 0;
-           mkdir(tmp, S_IRWXU);
-           *p = '/';
-        }
-    }
-    mkdir(tmp, S_IRWXU);
-}
-
-
-int start_recording(void)
-{
-    struct tm *sTm;
-    time_t now = time(0);
-    sTm = gmtime(&now);
-
-    char dirstring[40];
-    char filestring[40];
-
-    strftime(dirstring, sizeof(dirstring), "/tmp/sd/RECORDED_VIDEOS/%Y/%m/%d", sTm);
-
-    struct stat st = {0};
-    if (stat(dirstring, &st) != 0) {
-        create_directory(dirstring);
-    }
-
-    strftime(filestring, sizeof(filestring), "video_%H%M%S.h264", sTm);
-
-    sprintf(VideoRecorder.file_path, "%s/%s%c", dirstring, filestring, '\0');
-    log_info("Video recording to %s", VideoRecorder.file_path);
-
-    // * Open video recording file
-    VideoRecorder.fh = fopen(VideoRecorder.file_path, "wb");
-    if (VideoRecorder.fh == NULL) {
-        log_error("Failed to open file %s", VideoRecorder.file_path);
-        return -1;
-    }
-
-    // * Write filename of last video to file
-    FILE *last_video_path = fopen(LAST_VIDEO_PATH, "wb");
-    if (last_video_path == NULL) {
-        log_error("Failed to open file: %s", LAST_VIDEO_PATH);
-        return -1;
-    }
-
-    fputs(VideoRecorder.file_path, last_video_path);
-    fclose(last_video_path);
-
-    gettimeofday(&VideoRecorder.record_start, NULL);
-    VideoRecorder.recording = 1;
-    VideoRecorder.waiting_for_keyframe = 1;
-
-    return 0;
-}
-
-
-int stop_recording(void)
-{
-    struct timeval now;
-    gettimeofday(&now, NULL);
-
-    log_info("Stopping video recording after %ld seconds", now.tv_sec - VideoRecorder.record_start.tv_sec);
-
-    // * Close video file
-    if (VideoRecorder.fh)
-        fclose(VideoRecorder.fh);
-
-    // * Reset all Recorder settings to zero
-    VideoRecorder.waiting_for_keyframe = 1;
-    VideoRecorder.recording = 0;
-    VideoRecorder.file_path[0] = '\0';
-
-    return 0;
-}
-
-int init_recording(void) {
-    // * Only create when it doesn't exist (we'll write it in init script)
-    if (access(LAST_VIDEO_PATH, F_OK ) == -1) {
-        FILE *last_video_path = fopen(LAST_VIDEO_PATH, "wb");
-        if (last_video_path == NULL) {
-            log_error("Failed to open file: %s", LAST_VIDEO_PATH);
-            return -1;
-        }
-        fputs("unknown", last_video_path);
-        fclose(last_video_path);
-    }
-    return 0;
-}
 
 static int set_cap_motion(int cap_vch, unsigned int id, unsigned int value)
 {
@@ -420,92 +292,6 @@ err_ext:
     if (mdt_alg.mb_cell_en)
         free(mdt_alg.mb_cell_en);
     return ret;
-}
-
-
-int init_snapshot(void)
-{
-    // * Only create the file if it doesn't exist (it's filled it init script)
-    if (access(LAST_SNAPSHOT_PATH, F_OK ) == -1) {
-        FILE *fd = fopen(LAST_SNAPSHOT_PATH, "wb");
-        if (fd == NULL) {
-            log_error("Failed to open file %s", LAST_SNAPSHOT_PATH);
-            return -1;
-        }
-        fputs("unknown", fd);
-        fclose(fd);
-    }
-
-    return 0;
-}
-
-void take_snapshot(void)
-{
-    struct tm *sTm;
-    time_t now = time(0);
-    sTm = gmtime(&now);
-
-    char dirstring[40];
-    char filestring[40];
-    char full_file_path[80];
-
-    int snapshot_len = 0;
-    FILE *snapshot_fd = NULL;
-    FILE *snapshot_name_fd = NULL;
-
-    gm_enc_t *param;
-    snapshot_t snapshot;
-
-    param = &enc_param[0][0];
-    snapshot.bindfd = param->bindfd[0];
-    snapshot.image_quality = 80;                        // The value of image quality from 1(worst) ~ 100(best)
-    snapshot.bs_buf = snapshot_buf;
-    snapshot.bs_buf_len = MAX_SNAPSHOT_LEN;
-    snapshot.bs_width = 1280;
-    snapshot.bs_height = 720;
-
-    snapshot_len = gm_request_snapshot(&snapshot, 500); // Timeout value 500ms
-
-    if (snapshot_len > 0) {
-        strftime(dirstring, sizeof(dirstring), "/tmp/sd/RECORDED_IMAGES/%Y/%m/%d", sTm);
-
-        struct stat st = {0};
-        if (stat(dirstring, &st) != 0) {
-            create_directory(dirstring);
-        }
-
-        strftime(filestring, sizeof(filestring), "snapshot_%H%M%S.jpg", sTm);
-        sprintf(full_file_path, "%s/%s%c", dirstring, filestring, '\0');
-
-        log_info("Image %s size %d bytes", full_file_path, snapshot_len);
-
-        // * Write image to file
-        snapshot_fd = fopen(full_file_path, "wb");
-        if (snapshot_fd == NULL) {
-            log_error("Failed to open file %s", full_file_path);
-            exit(EXIT_FAILURE);
-        }
-        fwrite(snapshot_buf, 1, snapshot_len, snapshot_fd);
-        fclose(snapshot_fd);
-
-        // * Write filename to /dev/shm
-        snapshot_name_fd = fopen(LAST_SNAPSHOT_PATH, "wb");
-        if (snapshot_name_fd == NULL) {
-            log_error("Failed to open file %s", LAST_SNAPSHOT_PATH);
-            exit(EXIT_FAILURE);
-        }
-        fputs(full_file_path, snapshot_name_fd);
-        fclose(snapshot_name_fd);
-    }
-	else {
-        if (snapshot_len == -1) {
-            log_error("Failed to retrieve snapshot data");
-        } else if (snapshot_len == -2) {
-            log_error("Buffer too small to store snapshot data");
-        } else if (snapshot_len == -4) {
-            log_error("Timeout while waiting for snapshot data");
-        }
-	}
 }
 
 static int do_queue_alloc(int type)
@@ -927,7 +713,7 @@ static void print_enc_average(int ch_num, int sub_num, int bs_len, struct timeva
                 get_enc_res(gm_enc, &enc_type, &w, &h);
                 sprintf(res_str, "%dx%d", w, h);
 
-                log_info("path=/live/ch%02d_%d cap=%d_%d size=%s enc=%s fps=%d.%d kbps=%d record=%d motion=%d",
+                log_info("path=/live/ch%02d_%d cap=%d_%d size=%s enc=%s fps=%d.%d kbps=%d motion=%d",
                         i,
                         j,
                         pb->video.cap_ch,
@@ -937,13 +723,8 @@ static void print_enc_average(int ch_num, int sub_num, int bs_len, struct timeva
                         (frame_counts[i][j] * 1000 / total_ms),
                         (frame_counts[i][j] * 100000 / total_ms) % 100,
                         (rec_bs_len[i][j] * 8 / 1024) * 1000 / total_ms,
-                        VideoRecorder.recording,
                         motion_detected
                 );
-
-                if (VideoRecorder.recording == 1) {
-                    log_info("Recording to %s", VideoRecorder.file_path);
-                }
 
                 frame_counts[i][j] = 0;
                 rec_bs_len[i][j] = 0;
@@ -1080,77 +861,10 @@ cmd_cb_err:
     return ret;
 }
 
-
-static void *media_thread(void *arg)
-{
-    struct timeval now;
-
-    // * Reset all to zero before entering loop
-    VideoRecorder.recording    = 0;
-    VideoRecorder.file_path[0] = '\0';
-    VideoRecorder.fh           = NULL;
-
-    // * Inititialize recording
-    if (init_recording() < 0)
-        log_error("Failed to initialize recording");
-
-    // * Inititialize snapshot
-    if (init_snapshot() < 0)
-        log_error("Failed to initialize snapshot");
-
-    while (rtspd_sysinit) {
-        // * Check for external snapshot trigger
-        if (access(CREATE_SNAPSHOT_FILE, F_OK ) != -1 ) {
-            unlink(CREATE_SNAPSHOT_FILE);
-            snapshot_create = 1;
-        }
-
-        // * Check for internal snapshot trigger
-        if (snapshot_create == 1) {
-            log_info("Creating a snapshot of the current data stream");
-            snapshot_create = 0;
-            take_snapshot();
-        }
-
-        // * Check for external video record trigger
-        if (access(CREATE_VIDEO_FILE, F_OK ) != -1 ) {
-            unlink(CREATE_VIDEO_FILE);
-            video_create = 1;
-        }
-
-        // * Check for internal video record trigger
-        if (video_create == 1) {
-            video_create = 0;
-
-            if (VideoRecorder.recording != 1) {
-                log_info("Creating a video of the next %d seconds of the data stream", RECORDING_DURATION);
-
-                if (start_recording() < 0)
-                    log_error("Failed to start recording in media thread");
-            }
-        }
-
-        // * Check if recordings duration is over 30 seconds
-        if (VideoRecorder.recording == 1) {
-            gettimeofday(&now, NULL);
-            if (now.tv_sec - VideoRecorder.record_start.tv_sec > (long)RECORDING_MAX_DURATION) {
-                if (stop_recording() < 0)
-                    log_error("Failed to stop recording in media thread");
-            }
-        }
-
-        usleep(1000);
-    }
-
-    return 0;
-}
-
-
 static void *motion_thread(void *arg)
 {
     int ch;
     int ret;
-    struct timeval now;
 
     gm_enc_t *param;
     param = &enc_param[0][0];
@@ -1216,12 +930,6 @@ static void *motion_thread(void *arg)
                     gettimeofday(&last_motion, NULL);
                     motion_detected = 1;
 
-                    if (cliArgs.snapshot == 1)
-                        snapshot_create = 1;
-
-                    if (cliArgs.record == 1)
-                        video_create = 1;
-
                     log_info("Motion ON - executing motion on script");
                     system(MOTION_ON_SCRIPT);
                 }
@@ -1232,15 +940,6 @@ static void *motion_thread(void *arg)
                 if (motion_detected == 1) {
                     motion_detected = 0;
 
-                    // * Turn recording off after 20 seconds
-                    if (VideoRecorder.recording == 1) {
-                        gettimeofday(&now, NULL);
-
-                        if (now.tv_sec - last_motion.tv_sec >= (long)RECORDING_DURATION) {
-                            if (stop_recording() < 0)
-                                log_error("Failed to stop recording in motion thread");
-                        }
-                    }
                     log_info("Motion OFF - executing motion off script");
                     system(MOTION_OFF_SCRIPT);
                 }
@@ -1792,15 +1491,6 @@ void *encode_thread(void *ptr)
 
                 else if (bs[i][j].retval == GM_SUCCESS) {
 
-                    if (bs[i][j].bs.keyframe == 1)
-                        VideoRecorder.waiting_for_keyframe = 0;
-
-                    // * Write buffer to file in case recording is enabled
-                    if (VideoRecorder.recording == 1 && VideoRecorder.fh != NULL && VideoRecorder.waiting_for_keyframe == 0) {
-                        fwrite(bs[i][j].bs.bs_buf, 1, bs[i][j].bs.bs_len, VideoRecorder.fh);
-                        fflush(VideoRecorder.fh);
-                    }
-
                     if (avbs->video.enc_type != ENC_TYPE_MJPEG) {
                         if ((pb->play == 1) && (bs[i][j].bs.keyframe == 1))
                             first_play[i][j] = 1;
@@ -1947,14 +1637,6 @@ static int rtspd_start(int port)
         pthread_attr_destroy(&attr);
     }
 
-    // * Snapshot Thread
-    if (media_thread_id == (pthread_t)NULL) {
-        pthread_attr_init(&attr);
-        pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-        ret = pthread_create(&media_thread_id, &attr, &media_thread, NULL);
-        pthread_attr_destroy(&attr);
-    }
-
     // * Motion Thread
     if (cliArgs.motion == 1) {
         if (motion_thread_id == (pthread_t)NULL) {
@@ -2009,11 +1691,6 @@ static void rtspd_stop(void)
 
     if (cliArgs.motion == 1)
         motion_detection_end();
-
-    if (cliArgs.record == 1 && VideoRecorder.recording == 1) {
-        if (stop_recording() < 0)
-            log_error("Failed to stop recording in rtspd_stop");
-    }
 }
 
 
@@ -2046,8 +1723,6 @@ static void print_usage(void)
         "-4 (optional)  - Use MPEG4 encoding      (default: off)\n\n"
 
         "-d (optional)  - Enable motion detection (default: off)\n"
-        "-s (optional)  - Take a snapshot when motion detected (default: off)\n"
-        "-r (optional)  - Record a 10 second clip on motion    (default: off)\n"
     );
 
 	exit(EXIT_FAILURE);
@@ -2080,12 +1755,6 @@ int main(int argc, char *argv[])
     // * Setup logging
     setup_logging();
 
-    snapshot_buf = (char *)malloc(MAX_SNAPSHOT_LEN);
-    if (snapshot_buf == NULL) {
-        log_error("Failed allocating snapshot memory buffer");
-        exit(1);
-    }
-
     cliArgs.bitrate     = 8192;
     cliArgs.framerate   = 15;
     cliArgs.width       = 1280;
@@ -2093,8 +1762,6 @@ int main(int argc, char *argv[])
     cliArgs.bitrateMode = GM_EVBR;
     cliArgs.encoderType = ENC_TYPE_H264;
 
-    cliArgs.snapshot    = 0;
-    cliArgs.record      = 0;
     cliArgs.motion      = 0;
 
     if (argc > 1) {
@@ -2107,12 +1774,6 @@ int main(int argc, char *argv[])
                 switch (argv[i][1]) {
                     case 'd':
                         cliArgs.motion      = 1;    // * Enable motion detection
-                        break;
-                    case 's':
-                        cliArgs.snapshot    = 1;    // * Enable snapshot when motion detected
-                        break;
-                    case 'r':
-                        cliArgs.record      = 1;    // * Enable record stream when motion detected
                         break;
                     case 'b':
                         cliArgs.bitrate     = atoi(&argv[i][2]);
@@ -2142,11 +1803,6 @@ int main(int argc, char *argv[])
                 }
             }
         }
-    }
-
-    if ((cliArgs.motion != 1) && (cliArgs.snapshot == 1 || cliArgs.record == 1)) {
-        log_error("-d is required when using -s or -r");
-        return 1;
     }
 
     if ((cliArgs.bitrate < 1) || (cliArgs.bitrate > 8192)) {

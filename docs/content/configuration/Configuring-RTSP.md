@@ -1,9 +1,5 @@
 # Configuring RTSP
 
-The RTSP daemon can be used to create a local video stream instead of using the cloud functionality.
-
-**The RTSP daemon is required for using the snapshot and recording functions in the web interface.**
-
 ## Enabling the RTSP daemon
 
 **WARNING: The RTSP daemon has authentication but without encryption! 
@@ -178,16 +174,6 @@ Stream #0:0: Video: h264, yuv420p(progressive), 1280x720, 15.08 tbr, 90k tbn, 18
 
 The rtspd has motion detection functionality. To enable it, 
 have a look at the [docs about motion detection](/configuration/Setting-up-motion-detection)
-
-
-## Recording and snapshots
-
-You can create snapshot images and record video using the RTSP software. 
-This can be both on command and when motion is detected.
-
-To create a snapshot from the command line use the `take_snapshot` utility. 
-To start a recording of 30 seconds, use `take_video`.
-
 
 ## Configuration options
 

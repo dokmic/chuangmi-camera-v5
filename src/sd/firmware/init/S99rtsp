@@ -23,13 +23,6 @@ PIDFILE="/var/run/${NAME}.pid"
 
 DAEMON_OPTS=" -f$RTSP_FRAMERATE -w$RTSP_WIDTH -h$RTSP_HEIGHT -b$RTSP_BITRATE -m$RTSP_BITRATE_MODE $RTSP_EXTRA_ARGS"
 
-## Find last created snapshot and print to file
-get_last_image > /dev/shm/rtspd_last_snapshot_path
-
-## Find last created  video and print to file
-get_last_video > /dev/shm/rtspd_last_video_path
-
-
 ## Set max FPS to 30 if fps > 15
 if [ "$RTSP_FRAMERATE" -gt 15 ]
 then
@@ -40,16 +33,6 @@ fi
 ## Enable motion detection
 if [ "$MOTION_DETECTION" -eq 1 ] ; then
     DAEMON_OPTS="${DAEMON_OPTS} -d"
-fi
-
-## Enable take snapshot on motion
-if [ "$MOTION_TAKE_SNAPSHOT" -eq 1 ] ; then
-    DAEMON_OPTS="${DAEMON_OPTS} -s"
-fi
-
-## Enable record on motion
-if [ "$MOTION_RECORD" -eq 1 ] ; then
-    DAEMON_OPTS="${DAEMON_OPTS} -r"
 fi
 
 ## export RTSP settings for subshells

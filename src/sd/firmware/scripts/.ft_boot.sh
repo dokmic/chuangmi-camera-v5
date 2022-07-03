@@ -56,17 +56,6 @@ fi
 wifi "$WIFI_SSID" "$WIFI_PASSWORD"
 
 ##################################################################################
-## Mount GMLIB configuration                                                    ##
-##################################################################################
-
-echo "*** Setting up our own gmlib config"
-
-if [ -f $SD/firmware/etc/gmlib.cfg ]
-then
-    mount --rbind $SD/firmware/etc/gmlib.cfg /gm/config/gmlib.cfg
-fi
-
-##################################################################################
 ## Set root Password                                                            ##
 ##################################################################################
 
