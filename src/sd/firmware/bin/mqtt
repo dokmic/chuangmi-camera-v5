@@ -124,7 +124,7 @@ alias mqtt_sub="mosquitto_sub $MQTT_OPTIONS \
 alias upper="tr [:lower:] [:upper:]"
 
 alias auto_night_mode="$SD/firmware/init/S99auto_night_mode"
-alias rtsp="$SD/firmware/init/S99rtsp"
+alias rtsp="$SD/firmware/init/S99rtspd"
 
 get_value() {
   local INPUT=$1
@@ -220,7 +220,7 @@ update_ota() {
 }
 
 update_rtsp() {
-  mqtt_pub --topic $RTSP_TOPIC --message $(rtsp status >/dev/null && echo "ON" || echo "OFF")
+  mqtt_pub --topic $RTSP_TOPIC --message $(rtsp status && echo "ON" || echo "OFF")
 }
 
 stop() {

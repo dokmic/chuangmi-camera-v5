@@ -1832,7 +1832,7 @@ int main(int argc, char *argv[])
 
     log_info("Starting the RTSP Daemon");
 
-    rtsp_password = getenv("RTSP_PASS");
+    rtsp_password = getenv("RTSP_PASSWORD");
     rtsp_username = getenv("RTSP_USER");
 
     if (rtsp_username != NULL && strcmp(rtsp_username, "") != 0 && rtsp_password != NULL && strcmp(rtsp_password, "") != 0) {

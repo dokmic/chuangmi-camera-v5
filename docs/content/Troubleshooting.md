@@ -120,7 +120,7 @@ The RTSP credentials are by default set to:
 | Var         | Value    |
 | ---         | ---      |
 | `RTSP_USER` | `stream` |
-| `RTSP_PASS` | `bJ2xnahtCgninraelmI` |
+| `RTSP_PASSWORD` | `bJ2xnahtCgninraelmI` |
 
 **Before using the rtsp make sure you change these credentials!**
 

@@ -1,0 +1,49 @@
+#!/bin/sh -l
+
+local pid_file=/var/run/rtspd.pid
+
+status() {
+  [ -f $pid_file ] && kill -0 $(cat $pid_file) >/dev/null 2>&1 || return 1
+}
+
+start() {
+  status || start-stop-daemon \
+    --background \
+    --exec rtspd \
+    --make-pidfile \
+    --oknodo \
+    --pidfile $pid_file \
+    --quiet \
+    --start \
+    -- \
+      -f${RTSP_FRAMERATE:-15} \
+      -w${RTSP_WIDTH:-1280} \
+      -h${RTSP_HEIGHT:-720} \
+      -b${RTSP_BITRATE:-8192} \
+      -m${RTSP_BITRATE_MODE:-4} \
+      $([ "${RTSP_MOTION_DETECTION:-0}" -eq 1 ] && echo -d) \
+      $([ "${RTSP_MJPEG:-0}" -eq 1 ] && echo -j) \
+      $([ "${RTSP_MPEG4:-0}" -eq 1 ] && echo -4)
+}
+
+stop() {
+  status && start-stop-daemon \
+    --oknodo \
+    --pidfile $pid_file \
+    --quiet \
+    --stop
+}
+
+case "$1" in
+  start)
+    start
+  ;;
+  stop)
+    stop
+  ;;
+  status)
+    status
+  ;;
+esac
+
+exit $?

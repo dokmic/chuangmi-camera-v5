@@ -23,76 +23,6 @@ log()
 ## Daemon functions                                                             ##
 ##################################################################################
 
-## Start daemon
-start_daemon()
-{
-    echo "*** Starting ${NAME} ${DESC}... "
-
-    start-stop-daemon --start --quiet --oknodo --exec "${DAEMON}" -- ${DAEMON_OPTS}
-    RC="$?"
-
-
-    return "${RC}"
-}
-
-## Start a process as background daemon
-start_daemon_background()
-{
-    echo "*** Starting ${NAME} ${DESC}... "
-
-    start-stop-daemon --start --quiet --oknodo --pidfile "${PIDFILE}" --make-pidfile --background --exec "${DAEMON}" -- ${DAEMON_OPTS}
-    RC="$?"
-
-    return "${RC}"
-}
-
-## Stop daemon
-stop_daemon()
-{
-    echo "*** Stopping ${NAME} ${DESC} ..."
-
-    start-stop-daemon --stop --quiet --oknodo --pidfile "${PIDFILE}"
-    RC="$?"
-
-    return "${RC}"
-}
-
-## Stop background daemon
-stop_daemon_background()
-{
-    stop_daemon
-
-    if [ "${RC}" -eq 0 ] && [ -f "${PIDFILE}" ]
-    then
-        rm "${PIDFILE}"
-    fi
-
-    return "${RC}"
-}
-
-## Status of a daemon
-status_daemon()
-{
-    PID="$( cat "${PIDFILE}" 2>/dev/null )"
-
-    if [ "${PID}" ]
-    then
-        if kill -0 "${PID}" >/dev/null 2>/dev/null
-        then
-            echo "${DESC} is running with PID: ${PID}"
-            RC="0"
-        else
-            echo "${DESC} is dead"
-            RC="1"
-        fi
-    else
-        echo "${DESC} is not running"
-        RC="3"
-    fi
-
-    return "${RC}"
-}
-
 ## Check for daemon executable
 check_daemon_bin()
 {
@@ -120,30 +50,6 @@ ok_fail()
     else
         echo "FAIL"
     fi
-}
-
-
-## Status of a daemon
-get_daemon_state()
-{
-    DAEMON="$1"
-    PIDFILE="/var/run/$DAEMON"
-    PID="$( cat "${PIDFILE}" 2>/dev/null )"
-    RC="$?"
-
-    if [ "${PID}" ]
-    then
-        if kill -0 "${PID}" >/dev/null 2>/dev/null
-        then
-            echo "on"
-        else
-            echo "off"
-        fi
-    else
-        echo "off"
-    fi
-
-    return "${RC}"
 }
 
 ##################################################################################

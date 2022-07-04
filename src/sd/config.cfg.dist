@@ -59,38 +59,7 @@ ENABLE_RTSP="1"
 RTSP_USER="stream"
 
 ## The password to connect to the rtsp stream
-RTSP_PASS="bJ2xnahtCgninraelmI"
-
-## The image width of the rtsp stream
-## Only downscaling is possible.
-RTSP_WIDTH="1280"
-
-## The image height of the rtsp stream
-## Only downscaling is possible
-RTSP_HEIGHT="720"
-
-## Set the max framerate of the rtsp daemon.
-## A framerate of 15 fps is the max supported by the camera
-RTSP_FRAMERATE="15"
-
-## Configure the maximum bitrate to use
-RTSP_BITRATE="4096"
-
-## The bitrate mode (see wiki)
-RTSP_BITRATE_MODE="4"
-
-## Extra command line arguments for the RTSP daemon
-RTSP_EXTRA_ARGS=""
-
-
-############################################################
-## Motion Settings                                        ##
-############################################################
-
-## See: https://miicam.github.io/configuration/Setting-up-motion-detection
-
-## Enable motion detection
-MOTION_DETECTION="0"
+RTSP_PASSWORD="bJ2xnahtCgninraelmI"
 
 ############################################################
 ## Camera options                                         ##

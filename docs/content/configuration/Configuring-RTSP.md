@@ -17,32 +17,13 @@ rtsp://your-camera-ip/live/ch00_0
 
 **For stability reasons disable cloud services while using RTSP.**
 
-
-## Manually starting, stopping and requesting the status of the RTSP service
-
-Using the init script, you can easily start and stop the rtsp daemon:
-
-```bash
-## Start
-/etc/init/S99rtsp start
-
-## Stop
-/etc/init/S99rtsp stop
-
-## Restart
-/etc/init/S99rtsp restart
-
-## Retrieve the status
-/etc/init/S99rtsp status
-```
-
 ## Authentication
 
 Since `v0.959` the rtsp stream uses authentication to keep unwanted viewers from watching you in your underpants.
 
-Set the `RTSP_USER` and `RTSP_PASS` to something you can remember.
+Set the `RTSP_USER` and `RTSP_PASSWORD` to something you can remember.
 
-To completely disable the authentication, set the variables to `RTSP_PASS=` and `RTSP_USER=` (to an empty string).
+To completely disable the authentication, set the variables to `RTSP_PASSWORD=` and `RTSP_USER=` (to an empty string).
 
 ## Changing settings of the RTSP stream
 
@@ -91,89 +72,13 @@ The available bitrate modes are:
 | 3            | `GM_ECBR`             | Enhanced Constant Bitrate.
 | 4            | `GM_EVBR`             | Enhanced Variable Bitrate.
 
-
 ## Encoder type option of the rtspd binary.
 
 The RTSP service supports multiple encoder types.
 These settings are accepted as command line arguments of the `rtspd` binary.
 
 As `H264` gives the best results in performance and image quality, this is the recommended and default encoding used.
-You can use `Mjpeg` and `mpeg4` as well, by adding the command flag to the RTSP_EXTRA_ARGS variable in `config.cfg`.
-
-
-### Changing the encoder type
-
-To switch to another encoding, you can add the command flag to the RTSP_EXTRA_ARGS.
-This adds the flag to the commandline arguments that are used to start the daemon.
-
-
-The default startup options are:
-
-```bash
-DAEMON_OPTS=" -f$RTSP_FRAMERATE -w$RTSP_WIDTH -h$RTSP_HEIGHT -b$RTSP_BITRATE -m$RTSP_BITRATE_MODE $RTSP_EXTRA_ARGS"
-```
-
-If you want to use MJPEG, the additional command line option you need to add to `RTSP_EXTRA_ARGS` is the `-j` flag, 
-if you want to use `MPEG4` the required flag is `-4`.
-To use `H264` encoding, no additional edits are needed as this is the default option.
-
-For example, to configure MJPEG encoding, change the `RTSP_EXTRA_ARGS` variable in `config.cfg` to:
-
-```bash
-RTSP_EXTRA_ARGS=" -j"
-```
-
-Now save your changes and restart the RTSP service as described ealier in this article.
-
-
-### Testing your changes
-
-There are 2 test we can do to verify whether our changes are effective: 
-Check the command line arguments of the RTSP service and second: use ffmpeg to verify which encoding is used.
-
-First we'll check the command line arguments:
-
-```bash
-ps -ef | grep rtsp
-```
-
-This should result the process of the RTSP service and the commandline arguments used:
-```
-  519 root     274:52 /tmp/sd/firmware/bin/rtspd -f15 -w1280 -h720 -b8091 -m1 -j
-```
-
-Now verify if the correct encoding is used by retrieving the stream with ffprobe:
-```bash
-# ffprobe rtsp://localhost:554/live/ch00_0
-ffprobe version 4.0.2 Copyright (c) 2007-2018 the FFmpeg developers
-  built with gcc 4.4.0 (Buildroot 2012.02) 20100318 (experimental)
-  configuration: --pkg-config-flags=--static --extra-cflags=-I/build/prefix/include --extra-cxxflags=-I/build/prefix --extra-ldflags=-L/build/prefix/lib --arch=arm --target-os=linux --cross-prefix=arm-unknown-linux-uclibcgnueabi- --prefix=/build/prefix --disable-shared --disable-ffplay --disable-doc --disable-w32threads --enable-avcodec --enable-avformat --enable-avfilter --enable-swresample --enable-swscale --enable-ffmpeg --enable-filters --enable-gpl --enable-iconv --enable-libx264 --enable-nonfree --enable-pthreads --enable-runtime-cpudetect --enable-small --enable-static --enable-version3 --enable-zlib
-  libavutil      56. 14.100 / 56. 14.100
-  libavcodec     58. 18.100 / 58. 18.100
-  libavformat    58. 12.100 / 58. 12.100
-  libavdevice    58.  3.100 / 58.  3.100
-  libavfilter     7. 16.100 /  7. 16.100
-  libswscale      5.  1.100 /  5.  1.100
-  libswresample   3.  1.100 /  3.  1.100
-  libpostproc    55.  1.100 / 55.  1.100
-Input #0, rtsp, from 'rtsp://localhost:554/live/ch00_0':
-  Metadata:
-    title           : RTSP Server Live
-    comment         : ICL Streaming Media
-  Duration: N/A, start: 0.000000, bitrate: N/A
-    Stream #0:0: Video: h264, yuv420p(progressive), 1280x720, 15.08 tbr, 90k tbn, 180k tbc
-```
-
-In the metadata you can see the `h264` encoding is being used:
-
-```
-Stream #0:0: Video: h264, yuv420p(progressive), 1280x720, 15.08 tbr, 90k tbn, 180k tbc
-```
-
-## Motion detection
-
-The rtspd has motion detection functionality. To enable it, 
-have a look at the [docs about motion detection](/configuration/Setting-up-motion-detection)
+You can use `Mjpeg` and `mpeg4` as well, by adding the RTSP_MJPEG or RTSP_MPEG4 variables accordingly in `config.cfg`.
 
 ## Configuration options
 
@@ -185,43 +90,12 @@ The options for the RTSP service are:
 | ---                      | ---                            | ---         |
 | `ENABLE_RTSP`            | `1` to enable, `0` to disable. | Enable or disable the rtspd service |
 | `RTSP_USER`              | The username string to connect | Set to enable password authentication |
-| `RTSP_PASS`              | The password string to connect | Set to enable password authentication |
+| `RTSP_PASSWORD`          | The password string to connect | Set to enable password authentication |
 | `RTSP_WIDTH`             | An integer below `1280`        | Set the image width of the rtsp stream |
 | `RTSP_HEIGHT`            | An integer below `720`         | Set the image height of the rtsp stream |
 | `RTSP_FRAMERATE`         | An integer below `15`          | Set the max fps of the rtsp stream |
 | `RTSP_BITRATE`           | An integer below `8192`        | Set the max bitrate of the rtsp stream |
 | `RTSP_BITRATE_MODE`      | An integer between `0` and `4` | Set the bitrate mode of the rtsp stream |
-| `RTSP_EXTRA_ARGS`        | A command line string          | Set extra commandline arguments to the rtspd |
-
-
-## Configuration example
-
-```bash
-## Start local streaming server at system boot (0/1)
-ENABLE_RTSP=1
-
-## The username to connect to the rtsp stream
-RTSP_USER="stream"
-
-## The password to connect to the rtsp stream
-RTSP_PASS="bJ2xnahtCgninraelmI"
-
-## The image width of the RTSP stream
-RTSP_WIDTH=1280
-
-## The image height of the RTSP stream
-## Downscaling is possible
-RTSP_HEIGHT=720
-
-## Set the max framerate of the RTSP daemon.
-## A framerate of 15 fps is the max supported by the camera
-RTSP_FRAMERATE=15
-
-## The max bitrate
-RTSP_BITRATE=8192
-RTSP_BITRATE_MODE=4
-
-## Extra command line arguments for the RTSP daemon
-RTSP_EXTRA_ARGS=""
-```
-
+| `RTSP_MOTION_DETECTION`  | `1` to enable, `0` to disable  | Enable motion detection |
+| `RTSP_MJPEG`             | `1` to enable, `0` to disable  | Enable MJPEG encoding |
+| `RTSP_MPEG4`             | `1` to enable, `0` to disable  | Enable MPEG4 encoding |

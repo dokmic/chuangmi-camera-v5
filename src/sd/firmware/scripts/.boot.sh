@@ -55,15 +55,6 @@ fi
 
 echo "ntpd \"ntpd\" \"$SD/firmware/init/S51ntpd start\" \"/bin/echo 'ntpd is running'\"" >> /mnt/data/restartd/restartd.conf
 
-##################################################################################
-## RTSP server                                                                  ##
-##################################################################################
-
-if [ "${ENABLE_RTSP}" -eq 1 ]
-then
-    $SD/firmware/init/S99rtsp start
-fi
-
 if [ "${NIGHT_MODE:-AUTO}" = AUTO ]; then
   $SD/firmware/init/S99auto_night_mode start
 else
@@ -72,6 +63,7 @@ else
 fi
 
 [ "${ENABLE_MQTT:-0}" -eq 1 ] && $SD/firmware/init/S99mqtt start
+[ "${ENABLE_RTSP:-0}" -eq 1 ] && $SD/firmware/init/S99rtspd start
 
 ##################################################################################
 ## Ceiling camera mode                                                          ##

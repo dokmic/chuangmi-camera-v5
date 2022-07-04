@@ -21,7 +21,6 @@ nav:
     - configuration/Configuration-file-options.md
     - configuration/Camera-Options.md
     - configuration/Configuring-RTSP.md
-    - configuration/Setting-up-motion-detection.md
     - configuration/Using-Auto-Night-Mode.md
     - configuration/Time-settings.md
     - configuration/System-Logging-and-Logfiles.md
