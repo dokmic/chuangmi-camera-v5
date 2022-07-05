@@ -12,8 +12,10 @@ EOF
     chmod +x /tmp/disabled
   fi
 
-  if pgrep "$BINARY" >/dev/null; then
-    pkill -9 "$BINARY"
+  local pid=$(pgrep -o "$BINARY" || fuser "$BINARY")
+  if [ -n "$pid" ]; then
+    pkill -P $pid
+    kill $pid
   fi
 
   if ! ( mount | grep -q "$BINARY" ); then
