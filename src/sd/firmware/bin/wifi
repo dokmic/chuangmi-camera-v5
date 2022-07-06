@@ -4,7 +4,7 @@ SSID=$1
 PASSWORD=$2
 KEY_MANAGEMENT=$([ -z "$PASSWORD" ] && echo NONE || echo WPA-PSK)
 
-[ -z "$SSID" ] && exit 0
+[ -z "$SSID" ] && exit 1
 
 get_nvram() {
   nvram get $1 | xargs

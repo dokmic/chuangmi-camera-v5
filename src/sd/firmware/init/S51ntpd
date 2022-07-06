@@ -28,9 +28,11 @@ stop() {
 
 case "$1" in
   start)
+    echo "Starting NTP client."
     start
   ;;
   stop)
+    echo "Stopping NTP client."
     stop
   ;;
   status)

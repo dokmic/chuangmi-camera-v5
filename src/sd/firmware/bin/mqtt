@@ -296,7 +296,7 @@ while :; do
       ;;
     esac
   done
-done &
+done | logger -t mqtt &
 
 while :; do
   sleep 1

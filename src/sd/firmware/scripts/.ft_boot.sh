@@ -6,54 +6,30 @@
 ## author: Jan Sperling , 2017                                                  ##
 ##################################################################################
 
-LOGDIR=$SD/log
-LOGFILE=$LOGDIR/ft_boot.log
-mkdir -p $LOGDIR
-
 ## Bail out if disabled in configuration
 if [ "${DISABLE_HACK}" -eq 1 ]
 then
-    echo "Hack disabled in config.cfg, starting normal boot sequence" | tee -a "${LOGFILE}"
     echo 0 > /tmp/ft_mode
     vg_boot
     exit
 fi
 
 (
-cat << EOF
-################################
-## Running Chuangmi 720P hack ##
-################################
-
-Chuangmi 720P configuration:
-
-  HOSTNAME       = ${CAMERA_HOSTNAME}
-  TIMEZONE       = ${TIMEZONE}
-
-################################
-EOF
+/mnt/data/imi/imi_init/S01logging $([ "${ENABLE_LOGGING:-0}" -eq 1 ] && echo restart || echo stop)
+echo 0 > /tmp/ft_mode
 
 mkdir -p /tmp/restartd
 touch /tmp/restartd/restartd
 cp /mnt/data/restartd/restartd.conf /tmp/restartd
 mount --bind /mnt/data/restartd/restartd /tmp/restartd/restartd
 mount --rbind /tmp/restartd /mnt/data/restartd
+sed -i 's~^miio_client .*~miio_client "/mnt/data/ot_wifi_tool/miio_client -D" "/mnt/data/imi/imi_init/S93miio_client start" "/bin/echo '\''miio_client is running'\''"~' /mnt/data/restartd/restartd.conf
 echo "restartd \"/mnt/data/restartd/restartd\" \"/mnt/data/imi/imi_init/S99restartd restart\" \"/bin/echo 'restartd is running'\"" >> /mnt/data/restartd/restartd.conf
 
-##################################################################################
-## Syslog                                                                       ##
-##################################################################################
-
-echo "*** Enabling logging"
-
-if [ "$ENABLE_LOGGING" -eq 1 ]
-then
-    $SD/firmware/init/S01logging restart
-else
-    $SD/firmware/init/S01logging stop
+if [ -n "$WIFI_SSID" ]; then
+  echo "Configuring WiFi to '$WIFI_SSID'."
+  wifi "$WIFI_SSID" "$WIFI_PASSWORD"
 fi
-
-wifi "$WIFI_SSID" "$WIFI_PASSWORD"
 
 ##################################################################################
 ## Set root Password                                                            ##
@@ -61,7 +37,7 @@ wifi "$WIFI_SSID" "$WIFI_PASSWORD"
 
 if [ -n "${ROOT_PASSWORD}" ]
 then
-    echo "*** Setting root password... "
+    echo "Setting root password."
     echo "root:${ROOT_PASSWORD}" | chpasswd
 else
     echo "WARN: root password must be set for SSH and or Telnet access"
@@ -73,7 +49,7 @@ fi
 
 if [ -n "${TIMEZONE}" ]
 then
-    echo "*** Configure time zone... "
+    echo "Setting timezone to '$TIMEZONE'."
 
     if [ -f "/usr/share/zoneinfo/uclibc/$TIMEZONE" ]
     then
@@ -91,16 +67,14 @@ fi
 
 if [ -n "${CAMERA_HOSTNAME}" ]
 then
-    echo "*** Setting hostname... "
+    echo "Setting hostname to '$CAMERA_HOSTNAME'."
     echo "${CAMERA_HOSTNAME}" > /etc/hostname
     hostname "${CAMERA_HOSTNAME}"
 
-    echo "*** Configuring new /etc/hosts file... "
     echo -e "127.0.0.1 \tlocalhost\n127.0.1.1 \t$CAMERA_HOSTNAME\n\n" > /etc/hosts
 
     if [ -f "$SD/firmware/etc/hosts" ]
     then
-        echo "*** Appending $SD/firmware/etc/hosts to /etc/hosts"
         cat $SD/firmware/etc/hosts >> /etc/hosts
     fi
 fi
@@ -117,4 +91,4 @@ then
     ln -s -f $SD/firmware/scripts/.boot.sh /mnt/data/test/boot.sh
 fi
 
-) >> "${LOGFILE}" 2>&1
+) | logger -t firmware

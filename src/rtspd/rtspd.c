@@ -26,10 +26,10 @@
 #include <netinet/in.h>
 #include <net/if.h>
 #include <dirent.h>
+#include <syslog.h>
 
 #include "gmlib.h"
 #include "librtsp.h"
-#include "log/log.h"
 #include "algorithm/capture_motion_detection.c"
 
 #define DVR_ENC_EBST_ENABLE      0x55887799
@@ -67,8 +67,6 @@
 #define MOTION_ON_SCRIPT         "kill -USR1 $(pidof -s mqtt)"
 #define MOTION_OFF_SCRIPT        "kill -USR2 $(pidof -s mqtt)"
 
-#define RTSPD_LOGFILE            "/tmp/sd/log/rtspd.log"
-
 #define CHECK_CHANNUM_AND_SUBNUM(ch_num, sub_num)    \
     do {    \
         if ((ch_num >= CAP_CH_NUM || ch_num < 0) || \
@@ -77,6 +75,10 @@
             return -1; \
         }    \
     } while(0)    \
+
+#define log_info(...) syslog(LOG_INFO, __VA_ARGS__)
+#define log_error(...) syslog(LOG_ERR, __VA_ARGS__)
+#define log_fatal(...) syslog(LOG_CRIT, __VA_ARGS__)
 
 struct mdt_alg_t mdt_alg = {mb_cell_en: NULL};
 struct mdt_result_t mdt_result[ENC_TRACK_NUM];
@@ -189,8 +191,6 @@ void *capture_object;
 void *encode_object;
 void *sub_enc_object;             // * Create encoder object (scaler)
 void *sub_bindfd;                 // * Create encoder object (scaler) bind
-
-FILE *logfile = NULL;             // * File for logging
 
 struct timeval last_motion;
 
@@ -1735,15 +1735,9 @@ void signal_handler(int sig)
 
     rtspd_stop();
     gm_graph_release();
+    closelog();
 
     exit(EXIT_SUCCESS);
-}
-
-void setup_logging(void)
-{
-    logfile = fopen(RTSPD_LOGFILE, "a");
-    if(logfile)
-        log_set_fp(logfile);
 }
 
 
@@ -1752,8 +1746,7 @@ int main(int argc, char *argv[])
     int i;
     int cap_ch, cap_path, rec_track;
 
-    // * Setup logging
-    setup_logging();
+    openlog("rtspd", LOG_PID, LOG_DAEMON);
 
     cliArgs.bitrate     = 8192;
     cliArgs.framerate   = 15;
@@ -1847,7 +1840,7 @@ int main(int argc, char *argv[])
 
     log_info("Width        : %d", cliArgs.width);
     log_info("Height       : %d", cliArgs.height);
-    log_info("Encoder      : %d", cliArgs.encoderType == ENC_TYPE_H264 ? "H264" : cliArgs.encoderType == ENC_TYPE_MJPEG ? "MJPEG" : "MPEG4");
+    log_info("Encoder      : %s", cliArgs.encoderType == ENC_TYPE_H264 ? "H264" : cliArgs.encoderType == ENC_TYPE_MJPEG ? "MJPEG" : "MPEG4");
     log_info("Framerate    : %d", cliArgs.framerate);
     log_info("Bitrate      : %d", cliArgs.bitrate);
     log_info("Bitrate Mode : %d", cliArgs.bitrateMode);

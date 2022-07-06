@@ -11,22 +11,6 @@ CAMERA_HOSTNAME="camera"
 ## Password for root user, needed for SSH server and telnet (careful when using special chars, never use !;#)
 ROOT_PASSWORD="Chuangmi720pCam123"
 
-
-############################################################
-## Log settings                                           ##
-############################################################
-
-## See: https://miicam.github.io/configuration/System-Logging-and-Logfiles
-
-## Enable klogd and syslogging
-ENABLE_LOGGING="1"
-
-## Enable remote syslogging
-ENABLE_REMOTE_SYSLOG="0"
-
-## The remote syslog host (use host:port to set a non-default syslog port)
-REMOTE_SYSLOG_HOST=""
-
 ############################################################
 ## Wifi Settings                                          ##
 ############################################################

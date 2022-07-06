@@ -36,9 +36,11 @@ stop() {
 
 case "$1" in
   start)
+    echo "Starting RTSP server."
     start
   ;;
   stop)
+    echo "Stopping RTSP server."
     stop
   ;;
   status)

@@ -27,9 +27,11 @@ stop() {
 
 case "$1" in
   start)
+    echo "Starting MQTT service."
     start
   ;;
   stop)
+    echo "Stopping MQTT service."
     stop
   ;;
   status)

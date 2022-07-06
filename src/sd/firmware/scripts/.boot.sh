@@ -5,20 +5,7 @@
 ## author: Jan Sperling , 2017                                                  ##
 ##################################################################################
 
-if [ -r "$SD/firmware/scripts/functions.sh" ]
-then
-    . "$SD/firmware/scripts/functions.sh"
-else
-    echo "Unable to load basic functions"
-    exit 1
-fi
-
-export LOGFILE="${LOGDIR}/ft_boot.log"
-
 (
-
-echo "*** Executing /mnt/data/test/boot.sh... "
-
 ##################################################################################
 ## Status LED                                                                   ##
 ##################################################################################
@@ -85,5 +72,4 @@ then
 fi
 
 
-) >> "${LOGFILE}" 2>&1
-
+) | logger -t firmware

@@ -7,26 +7,6 @@ Using the `ENABLE_LOGGING` setting in `config.cfg` you can enable and disable th
 | Configuration            | Options                        | Description |
 | ---                      | ---                            | ---         |
 | `ENABLE_LOGGING`         | `1` to enable, `0` to disable. | Enable klogd and syslogd |
-| `ENABLE_REMOTE_SYSLOG`   | `1` to enable, `0` to disable. | Send logging to a remote syslog server |
-| `REMOTE_SYSLOG_HOST`     | `Host:Port`                    | The remote syslog server host |
-| `PURGE_LOGFILES_AT_BOOT` | `1` to enable, `0` to disable. | Remove all log files in /tmp/sd/logs at boot time. |
-
-## Purge log files
-
-When debugging boot issues or startup errors, it is recommended to set `PURGE_LOGFILES_AT_BOOT` to `0`.
-
-This prevents the camera from deleting the log files every time the camera starts, wiping out your history.
-
-## Remote syslog
-
-You can use remote syslogging to a syslog server by setting the `ENABLE_REMOTE_SYSLOG` to `1` 
-and defining a remote syslog host in `REMOTE_SYSLOG_HOST`. 
-If your syslog server uses a non-default port, set the port as well, using: `host:port`.
-
-## Using `/etc/syslog.conf`
-
-You can define a syslog configuration file by creating a configuration file in `/etc/syslog.conf`. 
-The busybox syslog daemon uses a similar syntax as the rsyslog daemon.
 
 ## Kernel logging
 

@@ -56,7 +56,6 @@ $(BUILD_DIR)/bin/rtspd: $(BUILD_DIR)/bin
 		-Wall \
 		-o $(@) \
 		$(@F).c \
-		log/log.c \
 		librtsp.a \
 		-l gm \
 		-l m \

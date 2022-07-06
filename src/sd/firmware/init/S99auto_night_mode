@@ -28,9 +28,11 @@ stop() {
 
 case "$1" in
   start)
+    echo "Starting automatic night mode."
     start
   ;;
   stop)
+    echo "Stopping automatic night mode."
     stop
   ;;
   status)
