@@ -9,13 +9,7 @@ elif [ -d /mnt/media/mmcblk0 ]; then
   mmcdir="/mnt/media/mmcblk0"
 fi
 
-if [ -f "${mmcdir}/config.cfg" ]; then
-  . "${mmcdir}/config.cfg"
-fi
-
-if [ "${DISABLE_HACK}" -eq 1 ]; then
-  echo "Hack disabled, do nothing"
-elif [ -f /mnt/data/ft/prikey.pem ] && [ -f /mnt/data/ft/rsa_decrypt ]; then
+if [ -f /mnt/data/ft/prikey.pem ] && [ -f /mnt/data/ft/rsa_decrypt ]; then
   echo "ft_modes != 0 already possible"
 else
   echo "Enable ft_modes != 0"

@@ -5,15 +5,6 @@
 ## license: GPLv3+, http://www.gnu.org/licenses/gpl-3.0.html                    ##
 ## author: Jan Sperling , 2017                                                  ##
 ##################################################################################
-
-## Bail out if disabled in configuration
-if [ "${DISABLE_HACK}" -eq 1 ]
-then
-    echo 0 > /tmp/ft_mode
-    vg_boot
-    exit
-fi
-
 (
 /mnt/data/imi/imi_init/S01logging $([ "${ENABLE_LOGGING:-0}" -eq 1 ] && echo restart || echo stop)
 echo 0 > /tmp/ft_mode
