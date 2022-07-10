@@ -9,8 +9,8 @@ MQTT_DISCOVERY_TOPIC=${MQTT_DISCOVERY_TOPIC:-homeassistant}
 MQTT_RETAIN=$([ "${MQTT_RETAIN:-1}" = "1" ] && echo "true" || echo "false")
 MQTT_DEVICE='{
   "identifiers": "'"$MQTT_ID"'",
-  "manufacturer": "Xiaomi",
-  "model": "chuangmi.camera.v5",
+  "manufacturer": "'"$(nvram get vendor)"'",
+  "model": "'"$(nvram get model)"'",
   "name": "'"$MQTT_DISCOVERY_NAME"'"
 }'
 MQTT_OPTIONS="\
