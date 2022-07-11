@@ -22,16 +22,9 @@ if [ -n "$WIFI_SSID" ]; then
   wifi "$WIFI_SSID" "$WIFI_PASSWORD"
 fi
 
-##################################################################################
-## Set root Password                                                            ##
-##################################################################################
-
-if [ -n "${ROOT_PASSWORD}" ]
-then
-    echo "Setting root password."
-    echo "root:${ROOT_PASSWORD}" | chpasswd
-else
-    echo "WARN: root password must be set for SSH and or Telnet access"
+if [ -n "$PASSWORD" ]; then
+  echo "Setting root password."
+  echo "root:$PASSWORD" | chpasswd
 fi
 
 ##################################################################################

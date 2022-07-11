@@ -15,7 +15,7 @@ this page contains a list of some options, a description and sometimes links to 
 | Configuration            | Options                        | Description |
 | ---                      | ---                            | ---         |
 | `HOSTNAME`               | The hostname string            | The hostname of the camera
-| `ROOT_PASSWORD`          | The root password string       | The root pass (used for SSH, telnet, samba and http)
+| `PASSWORD`          | The root password string       | The root pass (used for SSH, telnet, samba and http)
 
 ## Wifi Settings
 

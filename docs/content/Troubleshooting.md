@@ -25,7 +25,7 @@ To pack the log files together, I've created some instructions. You can find the
 
 ### Changing the root Password
 
-Do not use characters in the `ROOT_PASSWORD` or other passwords that are not allowed in shell environments without escaping.
+Do not use characters in the `PASSWORD` or other passwords that are not allowed in shell environments without escaping.
 Be careful with using backticks, exclamation marks (`!`), dollar sign ($), semicolon (`;`),  number sign (`#`) and double and single quotes in passwords and settings.
 
 Allowed chars in the web interface config editor are:

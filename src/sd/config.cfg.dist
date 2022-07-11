@@ -1,15 +1,9 @@
-## Disable the execution of the hack scripts (0/1)
-DISABLE_HACK="0"
-
 ############################################################
 ## System Settings                                        ##
 ############################################################
 
 ## The hostname of the webcam
 CAMERA_HOSTNAME="camera"
-
-## Password for root user, needed for SSH server and telnet (careful when using special chars, never use !;#)
-ROOT_PASSWORD="Chuangmi720pCam123"
 
 ############################################################
 ## Wifi Settings                                          ##
