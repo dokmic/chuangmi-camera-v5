@@ -15,7 +15,7 @@ To change the NTP server and timezone, edit the `config.cfg` to reflect the corr
 
 | Configuration            | Options                        | Description |
 | ---                      | ---                            | ---         |
-| `TIMEZONE`               | The timezone string            | The timezone to request ntp time for |
+| `TZ`               | The timezone string            | The timezone to request ntp time for |
 | `NTP_SERVER`             | The NTP server address string  | The ntp server to sync the time with |
 
 
@@ -25,7 +25,7 @@ To change the NTP server and timezone, edit the `config.cfg` to reflect the corr
 ############################################################
 
 ## Set timezone
-TIMEZONE="UTC"
+TZ="UTC"
 
 ## Prefered NTP server
 NTP_SERVER="pool.ntp.org"

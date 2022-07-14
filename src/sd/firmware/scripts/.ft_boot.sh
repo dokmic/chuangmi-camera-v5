@@ -27,22 +27,11 @@ if [ -n "$PASSWORD" ]; then
   echo "root:$PASSWORD" | chpasswd
 fi
 
-##################################################################################
-## Set time zone                                                                ##
-##################################################################################
-
-if [ -n "${TIMEZONE}" ]
-then
-    echo "Setting timezone to '$TIMEZONE'."
-
-    if [ -f "/usr/share/zoneinfo/uclibc/$TIMEZONE" ]
-    then
-        cp -f /usr/share/zoneinfo/uclibc/$TIMEZONE /etc/localtime
-    fi
-
-    rm /tmp/etc/TZ
-    echo "${TIMEZONE}" > /tmp/etc/TZ
-    export TZ="${TIMEZONE}"
+if [ -n "$TZ" ]; then
+  echo "Setting timezone to '$TZ'."
+  [ -f /usr/share/zoneinfo/uclibc/$TZ ] && cp -f /usr/share/zoneinfo/uclibc/$TZ /etc/localtime
+  rm /etc/TZ
+  echo $TZ >/etc/TZ
 fi
 
 ##################################################################################
