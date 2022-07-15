@@ -17,6 +17,12 @@ mount --rbind /tmp/restartd /mnt/data/restartd
 sed -i 's~^miio_client .*~miio_client "/mnt/data/ot_wifi_tool/miio_client -D" "/mnt/data/imi/imi_init/S93miio_client start" "/bin/echo '\''miio_client is running'\''"~' /mnt/data/restartd/restartd.conf
 echo "restartd \"/mnt/data/restartd/restartd\" \"/mnt/data/imi/imi_init/S99restartd restart\" \"/bin/echo 'restartd is running'\"" >> /mnt/data/restartd/restartd.conf
 
+HOSTNAME=${HOSTNAME:-$(nvram factory get mac | tr [:upper:] [:lower:] | tr -d :)}
+echo "Setting hostname to '$HOSTNAME'."
+hostname $HOSTNAME
+echo $HOSTNAME >/etc/hostname
+echo "127.0.0.1 localhost $HOSTNAME" >/etc/hosts
+
 if [ -n "$WIFI_SSID" ]; then
   echo "Configuring WiFi to '$WIFI_SSID'."
   wifi "$WIFI_SSID" "$WIFI_PASSWORD"
@@ -32,24 +38,6 @@ if [ -n "$TZ" ]; then
   [ -f /usr/share/zoneinfo/uclibc/$TZ ] && cp -f /usr/share/zoneinfo/uclibc/$TZ /etc/localtime
   rm /etc/TZ
   echo $TZ >/etc/TZ
-fi
-
-##################################################################################
-## Set hostname and format /etc/hosts                                           ##
-##################################################################################
-
-if [ -n "${CAMERA_HOSTNAME}" ]
-then
-    echo "Setting hostname to '$CAMERA_HOSTNAME'."
-    echo "${CAMERA_HOSTNAME}" > /etc/hostname
-    hostname "${CAMERA_HOSTNAME}"
-
-    echo -e "127.0.0.1 \tlocalhost\n127.0.1.1 \t$CAMERA_HOSTNAME\n\n" > /etc/hosts
-
-    if [ -f "$SD/firmware/etc/hosts" ]
-    then
-        cat $SD/firmware/etc/hosts >> /etc/hosts
-    fi
 fi
 
 [ "${ENABLE_CLOUD:-0}" -eq 0 ] && cloud --disable

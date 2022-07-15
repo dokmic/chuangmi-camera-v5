@@ -28,9 +28,9 @@ Before you start, make sure:
 
 - You have `docker,python3, pip3 and virtualenvwrapper` installed.
 - You have a running camera with a functional web interface using the default `admin` password in `config.cfg` (`HTTP_API_PASS="drgsrethsfdghs"`).
-- Set the hostname or ip address of your camera in `CAMERA_HOSTNAME` in your environment:
+- Set the hostname or ip address of your camera in `HOSTNAME` in your environment:
   ```
-  export CAMERA_HOSTNAME='camera.local'
+  export HOSTNAME='camera.local'
   ```
 
 ### Setup

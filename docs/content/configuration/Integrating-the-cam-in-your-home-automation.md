@@ -35,8 +35,8 @@ To configure the plugin, use the following json config in the platform category:
      {
         "name":"Camera 1",
         "videoConfig":{
-           "source":"-rtsp_transport tcp -re -i rtsp://USER:PASS@CAMERA_HOSTNAME:554/live/ch00_0",
-           "stillImageSource":"-rtsp_transport tcp -re -i rtsp://USER:PASS@CAMERA_HOSTNAME:554/live/ch00_0 -vframes 1",
+           "source":"-rtsp_transport tcp -re -i rtsp://USER:PASS@HOSTNAME:554/live/ch00_0",
+           "stillImageSource":"-rtsp_transport tcp -re -i rtsp://USER:PASS@HOSTNAME:554/live/ch00_0 -vframes 1",
            "maxStreams":2,
            "maxWidth":720,
            "maxHeight":480,
