@@ -14,7 +14,7 @@ If the telnet service is enabled it is listening on port 23.
 
 | Configuration            | Options                        | Description |
 | ---                      | ---                            | ---         |
-| `ENABLE_TELNETD`         | `1` to enable, `0` to disable. | Enable or disable the telnet daemon |
+| `ENABLE_TELNET`         | `1` to enable, `0` to disable. | Enable or disable the telnet daemon |
 
 
 ## Authentication issues
@@ -23,4 +23,4 @@ If boot issues appear due to syntax errors in scripts, the root password is ofte
 
 ## Enabling the telnet service
 
-The telnet service can be enabled at boot time by setting `ENABLE_TELNETD` to `1` in `config.cfg`.
+The telnet service can be enabled at boot time by setting `ENABLE_TELNET` to `1` in `config.cfg`.

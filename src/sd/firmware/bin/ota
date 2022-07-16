@@ -12,7 +12,7 @@ disable() {
 
 enable() {
   local patch='\
-    for service in '$SD'/firmware/init/S99*; do $service stop; done\
+    for service in '$SD'/firmware/init.d/S??*; do $service stop; done\
     sync\
     echo 3 >/proc/sys/vm/drop_caches\
   '

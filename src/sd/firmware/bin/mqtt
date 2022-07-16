@@ -1,6 +1,6 @@
 #!/bin/sh -l
 
-MQTT_ID=$(cat /sys/class/net/wlan0/address | tr -d ':')
+MQTT_ID=$(nvram factory get mac | tr [:upper:] [:lower:] | tr -d :)
 MQTT_NAME=${MQTT_NAME:-$MQTT_ID}
 MQTT_TOPIC=${MQTT_TOPIC:-miicam}/$MQTT_NAME
 MQTT_TOPIC_AVAILABILITY=$MQTT_TOPIC/availability
@@ -123,8 +123,8 @@ alias mqtt_sub="mosquitto_sub $MQTT_OPTIONS \
 "
 alias upper="tr [:lower:] [:upper:]"
 
-alias auto_night_mode="$SD/firmware/init/S99auto_night_mode"
-alias rtsp="$SD/firmware/init/S99rtspd"
+alias auto_night_mode="$SD/firmware/init.d/S99auto_night_mode"
+alias rtsp="$SD/firmware/init.d/S99rtspd"
 
 get_value() {
   local INPUT=$1
