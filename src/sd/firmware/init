@@ -1,6 +1,10 @@
 #!/bin/sh -l
 
 (
+  if [ -z "$WIFI_SSID" -a $(nvram get network_status) != cloud_connected ]; then
+    exit 0
+  fi
+
   /mnt/data/imi/imi_init/S01logging $([ "${ENABLE_LOGGING:-0}" -eq 1 ] && echo restart || echo stop)
   $SD/firmware/init.d/S51ntpd start
 
@@ -58,8 +62,8 @@
     night_mode $([ "$NIGHT_MODE" -eq 1 ] && echo --enable || echo --disable)
   fi
 
-  [ "${ENABLE_MQTT:-0}" -eq 1 ] && $SD/firmware/init.d/S99mqtt start
-  [ "${ENABLE_RTSP:-0}" -eq 1 ] && $SD/firmware/init.d/S99rtspd start
+  [ "${ENABLE_MQTT:-1}" -eq 1 ] && $SD/firmware/init.d/S99mqtt start
+  [ "${ENABLE_RTSP:-1}" -eq 1 ] && $SD/firmware/init.d/S99rtspd start
   if [ "${CEILING_MODE:-0}" -eq 1 ]; then
     flip_mode --enable
     mirror_mode --enable
