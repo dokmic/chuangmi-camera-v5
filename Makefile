@@ -8,7 +8,7 @@ SRC_DIR := $(CURDIR)/src
 
 export CFLAGS := -fPIC
 export CPPFLAGS := -I/usr/src/gm_lib/inc -I$(BUILD_DIR)/include -I$(SRC_DIR)/lib -L/usr/src/gm_lib/lib -L$(BUILD_DIR)/lib
-export LDFLAGS := -I$(SRC_DIR)/lib -I$(BUILD_DIR)/include -L$(BUILD_DIR)/lib -Wl,-rpath -Wl,/tmp/sd/firmware/lib -Wl,--enable-new-dtags
+export LDFLAGS := -I$(SRC_DIR)/lib -I$(BUILD_DIR)/include -L$(BUILD_DIR)/lib -Wl,--enable-new-dtags
 export LDSHAREDFLAGS := -I$(SRC_DIR)/lib -I$(BUILD_DIR)/include -L$(BUILD_DIR)/lib
 
 BIN := \

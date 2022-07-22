@@ -123,8 +123,8 @@ alias mqtt_sub="mosquitto_sub $MQTT_OPTIONS \
 "
 alias upper="tr [:lower:] [:upper:]"
 
-alias auto_night_mode="$SD/firmware/init.d/S99auto_night_mode"
-alias rtsp="$SD/firmware/init.d/S99rtspd"
+alias auto_night_mode="$FIRMWARE_PATH/init.d/S99auto_night_mode"
+alias rtsp="$FIRMWARE_PATH/init.d/S99rtspd"
 
 get_value() {
   local INPUT=$1
