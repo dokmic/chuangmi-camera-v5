@@ -1,0 +1,3 @@
+#!/bin/sh -l
+
+[ "${ENABLE_MQTT:-1}" -eq 1 ] && $FIRMWARE_PATH/etc/init.d/mqtt start

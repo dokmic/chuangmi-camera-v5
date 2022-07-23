@@ -1,0 +1,4 @@
+#!/bin/sh -l
+
+$FIRMWARE_PATH/etc/init.d/ntp start
+echo "ntpd \"ntpd\" \"$FIRMWARE_PATH/etc/init.d/ntp start\" \"/bin/echo 'ntpd is running'\"" >> /mnt/data/restartd/restartd.conf

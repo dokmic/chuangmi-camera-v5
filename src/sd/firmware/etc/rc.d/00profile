@@ -1,0 +1,7 @@
+#!/bin/sh
+
+cp -r /etc/profile.d /tmp && mount --bind /tmp/profile.d /etc/profile.d
+cat >/etc/profile.d/firmware.sh <<EOF
+export FIRMWARE_PATH=$FIRMWARE_PATH
+. $FIRMWARE_PATH/etc/profile
+EOF

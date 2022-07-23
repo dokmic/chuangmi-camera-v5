@@ -1,0 +1,7 @@
+#!/bin/sh -l
+
+if [ "${ENABLE_TELNET:-0}" -eq 1 ]; then
+  echo "telnetd \"/usr/sbin/telnetd\" \"/mnt/data/imi/imi_init/S50telnet start\" \"/bin/echo 'telnetd is running'\"" >> /mnt/data/restartd/restartd.conf
+else
+  /mnt/data/imi/imi_init/S50telnet stop
+fi

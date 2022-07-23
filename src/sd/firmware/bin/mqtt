@@ -6,7 +6,7 @@ MQTT_TOPIC=${MQTT_TOPIC:-miicam}/$MQTT_NAME
 MQTT_TOPIC_AVAILABILITY=$MQTT_TOPIC/availability
 MQTT_DISCOVERY_NAME=${MQTT_DISCOVERY_NAME:-$MQTT_NAME}
 MQTT_DISCOVERY_TOPIC=${MQTT_DISCOVERY_TOPIC:-homeassistant}
-MQTT_RETAIN=$([ "${MQTT_RETAIN:-1}" = "1" ] && echo "true" || echo "false")
+MQTT_RETAIN=$([ "${MQTT_RETAIN:-1}" -eq 1 ] && echo "true" || echo "false")
 MQTT_DEVICE='{
   "identifiers": "'"$MQTT_ID"'",
   "manufacturer": "'"$(nvram get vendor)"'",
@@ -123,8 +123,8 @@ alias mqtt_sub="mosquitto_sub $MQTT_OPTIONS \
 "
 alias upper="tr [:lower:] [:upper:]"
 
-alias auto_night_mode="$FIRMWARE_PATH/init.d/S99auto_night_mode"
-alias rtsp="$FIRMWARE_PATH/init.d/S99rtspd"
+alias auto_night_mode="$FIRMWARE_PATH/etc/init.d/auto_night_mode"
+alias rtsp="$FIRMWARE_PATH/etc/init.d/rtsp"
 
 get_value() {
   local INPUT=$1
@@ -262,7 +262,7 @@ while :; do
 
     case "$TOPIC" in
       "$MQTT_TOPIC_AVAILABILITY")
-        [ $VALUE = "OFFLINE" ] && update_availability online
+        [ $VALUE = OFFLINE ] && update_availability online
       ;;
 
       "$CEILING_MODE_TOPIC_SET")

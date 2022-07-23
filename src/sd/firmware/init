@@ -1,77 +1,8 @@
-#!/bin/sh -l
+#!/bin/sh
 
 (
-  cp -r /etc/profile.d /tmp && mount --bind /tmp/profile.d /etc/profile.d
-  cat >/etc/profile.d/firmware.sh <<EOF
-export FIRMWARE_PATH=$(pwd)
-. \$FIRMWARE_PATH/etc/profile
-EOF
-  . /etc/profile.d/firmware.sh
-
-  if [ -z "$WIFI_SSID" -a $(nvram get network_status) != cloud_connected ]; then
-    exit 0
-  fi
-
-  /mnt/data/imi/imi_init/S01logging $([ "${ENABLE_LOGGING:-0}" -eq 1 ] && echo restart || echo stop)
-  $FIRMWARE_PATH/init.d/S51ntpd start
-
-  echo 0 > /tmp/ft_mode
-
-  mkdir -p /tmp/restartd
-  touch /tmp/restartd/restartd
-  cp /mnt/data/restartd/restartd.conf /tmp/restartd
-  mount --bind /mnt/data/restartd/restartd /tmp/restartd/restartd
-  mount --rbind /tmp/restartd /mnt/data/restartd
-  sed -i 's~^miio_client .*~miio_client "/mnt/data/ot_wifi_tool/miio_client -D" "/mnt/data/imi/imi_init/S93miio_client start" "/bin/echo '\''miio_client is running'\''"~' /mnt/data/restartd/restartd.conf
-  echo "ntpd \"ntpd\" \"$FIRMWARE_PATH/init.d/S51ntpd start\" \"/bin/echo 'ntpd is running'\"" >> /mnt/data/restartd/restartd.conf
-
-  HOSTNAME=${HOSTNAME:-$(nvram factory get mac | tr [:upper:] [:lower:] | tr -d :)}
-  echo "Setting hostname to '$HOSTNAME'."
-  hostname $HOSTNAME
-  echo $HOSTNAME >/tmp/hostname && mount --bind /tmp/hostname /etc/hostname
-  echo "127.0.0.1 localhost $HOSTNAME" >/tmp/hosts && mount --bind /tmp/hosts /etc/hosts
-
-  if [ -n "$WIFI_SSID" ]; then
-    echo "Configuring WiFi to '$WIFI_SSID'."
-    wifi "$WIFI_SSID" "$WIFI_PASSWORD"
-  fi
-
-  if [ -n "$PASSWORD" ]; then
-    echo "Setting root password."
-    echo "root:$PASSWORD" | chpasswd
-  fi
-
-  if [ -n "$TZ" ]; then
-    echo "Setting timezone to '$TZ'."
-    [ -f /usr/share/zoneinfo/uclibc/$TZ ] && mount --bind /usr/share/zoneinfo/uclibc/$TZ /etc/localtime
-    echo $TZ >/tmp/TZ && mount --bind /tmp/TZ /etc/TZ
-  fi
-
-  [ "${ENABLE_CLOUD:-0}" -eq 0 ] && cloud --disable
-  ota $([ "${ENABLE_OTA:-0}" -eq 1 ] && echo --enable || echo --disable)
-
-  blue_led --enable
-  ir_cut --enable
-  yellow_led --disable
-  ir_led --disable
-
-  if [ "${ENABLE_TELNET:-0}" -eq 1 ]; then
-    echo "telnetd \"/usr/sbin/telnetd\" \"/mnt/data/imi/imi_init/S50telnet start\" \"/bin/echo 'telnetd is running'\"" >> /mnt/data/restartd/restartd.conf
-  else
-    /mnt/data/imi/imi_init/S50telnet stop
-  fi
-
-  if [ "${NIGHT_MODE:-AUTO}" = AUTO ]; then
-    $FIRMWARE_PATH/init.d/S99auto_night_mode start
-  else
-    $FIRMWARE_PATH/init.d/S99auto_night_mode stop
-    night_mode $([ "$NIGHT_MODE" -eq 1 ] && echo --enable || echo --disable)
-  fi
-
-  [ "${ENABLE_MQTT:-1}" -eq 1 ] && $FIRMWARE_PATH/init.d/S99mqtt start
-  [ "${ENABLE_RTSP:-1}" -eq 1 ] && $FIRMWARE_PATH/init.d/S99rtspd start
-  if [ "${CEILING_MODE:-0}" -eq 1 ]; then
-    flip_mode --enable
-    mirror_mode --enable
-  fi
+  export FIRMWARE_PATH=$(pwd)
+  for script in $FIRMWARE_PATH/etc/rc.d/*; do
+    $script
+  done
 ) | logger -t firmware

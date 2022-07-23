@@ -1,0 +1,6 @@
+#!/bin/sh -l
+
+blue_led --enable
+ir_cut --enable
+yellow_led --disable
+ir_led --disable
