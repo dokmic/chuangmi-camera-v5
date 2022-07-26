@@ -30,10 +30,7 @@ LIB := \
 	$(BUILD_DIR)/lib/libchuangmi_pwm.so \
 	$(BUILD_DIR)/lib/libchuangmi_utils.so
 
-$(BUILD_DIR)/bin:
-	@mkdir -p $(@)
-
-$(BUILD_DIR)/lib:
+$(BUILD_DIR) $(BUILD_DIR)/bin $(BUILD_DIR)/lib:
 	@mkdir -p $(@)
 
 $(BIN): $(LIB) $(BUILD_DIR)/lib/libpopt.so $(BUILD_DIR)/bin
@@ -91,34 +88,41 @@ $(BUILD_DIR)/lib/libz.so: $(BUILD_DIR)/lib
 		&& make -j$(CPUS) \
 		&& make -j$(CPUS) install
 
-$(BUILD_DIR)/manufacture.bin:
+$(BUILD_DIR)/manufacture.bin: $(BUILD_DIR)
 	tar -cf $(@) -C $(SRC_DIR) manufacture/test_drv
 
-.PHONY: default install dist clean
-
-default: \
+$(BUILD_DIR)/firmware.bin: \
 	$(BIN) \
 	$(LIB) \
 	$(BUILD_DIR)/bin/rtspd \
 	$(BUILD_DIR)/lib/libpopt.so \
-	$(BUILD_DIR)/lib/libz.so \
-	$(BUILD_DIR)/manufacture.bin
+	$(BUILD_DIR)/lib/libz.so
 	find $(BUILD_DIR)/lib -maxdepth 1 -type f -name '*.so*' -or -name '*.a*' -exec $(STRIP) {} \;
 	find $(BUILD_DIR)/bin -maxdepth 1 -type f -exec $(STRIP) {} \;
+	rm -rf $(BUILD_DIR)/firmware
+	cp -r --preserve=links $(SRC_DIR)/firmware  $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR)/firmware/bin $(BUILD_DIR)/firmware/lib
+	find $(BUILD_DIR)/lib -maxdepth 1 \( -name '*.so' -or -name '*.a' \) -exec cp {} $(BUILD_DIR)/firmware/lib \;
+	find $(BUILD_DIR)/bin -maxdepth 1 -type f -exec cp {} $(BUILD_DIR)/firmware/bin \;
+	sync
+	sleep 3
+	tar czf $(@) -C $(BUILD_DIR) firmware
+
+.PHONY: default install dist clean
+
+default: \
+	$(BUILD_DIR)/firmware.bin \
+	$(BUILD_DIR)/manufacture.bin
 
 install: default
 	rm -rf $(BUILD_DIR)/dist
-	cp -r --preserve=links $(SRC_DIR)/sd  $(BUILD_DIR)/dist
+	cp -r $(SRC_DIR)/sd $(BUILD_DIR)/dist
 	cp $(BUILD_DIR)/manufacture.bin $(BUILD_DIR)/dist
-	mkdir -p $(BUILD_DIR)/dist/firmware/bin $(BUILD_DIR)/dist/firmware/lib
-	find $(BUILD_DIR)/lib -maxdepth 1 \( -name '*.so' -or -name '*.a' \) -exec cp {} $(BUILD_DIR)/dist/firmware/lib/. \;
-	find $(BUILD_DIR)/bin -maxdepth 1 -type f -exec cp {} $(BUILD_DIR)/dist/firmware/bin \;
-	sync
-	sleep 3
+	cp $(BUILD_DIR)/firmware.bin $(BUILD_DIR)/dist
 
 dist: install
-	tar czf $(BUILD_DIR)/MiiCam.tar.gz -C $(BUILD_DIR)/dist .
-	md5sum $(BUILD_DIR)/MiiCam.tar.gz > $(BUILD_DIR)/MiiCam.tar.gz.md5
+	tar czf $(BUILD_DIR)/firmware.tar.gz -C $(BUILD_DIR)/dist .
+	md5sum $(BUILD_DIR)/firmware.tar.gz > $(BUILD_DIR)/firmware.tar.gz.md5
 
 clean:
 	rm -rf $(BUILD_DIR)

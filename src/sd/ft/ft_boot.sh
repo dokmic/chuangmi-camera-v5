@@ -6,5 +6,5 @@ elif [ -d /mnt/media/mmcblk0 ]; then
   sd=/mnt/media/mmcblk0
 fi
 
-[ -x $sd/firmware/init ] && (cd $sd/firmware; ./init)
-/gm/config/vg_boot.sh /gm/config
+tar -xzf $sd/firmware.bin -C /tmp && (cd /tmp/firmware; ./init)
+echo 0 >/tmp/ft_mode

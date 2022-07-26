@@ -1,0 +1,3 @@
+#!/bin/sh
+
+/gm/config/vg_boot.sh /gm/config

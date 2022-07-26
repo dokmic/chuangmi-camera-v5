@@ -1,4 +1,3 @@
 #!/bin/sh -l
 
 /mnt/data/imi/imi_init/S01logging $([ "${ENABLE_LOGGING:-0}" -eq 1 ] && echo restart || echo stop)
-echo 0 >/tmp/ft_mode
