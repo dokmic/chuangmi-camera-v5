@@ -1,3 +1,5 @@
 #!/bin/sh -l
 
-/mnt/data/imi/imi_init/S01logging $([ "${ENABLE_LOGGING:-0}" -eq 1 ] && echo restart || echo stop)
+[ "${ENABLE_LOGGING:-0}" -eq 0 ] && exit 0
+
+/mnt/data/imi/imi_init/_S01logging start

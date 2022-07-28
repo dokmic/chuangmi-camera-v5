@@ -11,14 +11,10 @@ disable() {
 }
 
 enable() {
-  local patch='\
-    for service in '$FIRMWARE_PATH'/etc/init.d/*; do $service stop; done\
-    sync\
-    echo 3 >/proc/sys/vm/drop_caches\
-  '
-
   if ! mount | grep -q $pre_ota; then
-    sed "/^\s*exit 0/i$patch" $pre_ota >/tmp/pre-ota.sh
+    local pre_ota_patch='for service in '$FIRMWARE_PATH'/etc/init.d/*; do $service stop; done'
+    sed -e '/^\s*exit 0/i\' -e "$pre_ota_patch" $pre_ota >/tmp/pre-ota.sh
+    chmod +x /tmp/pre-ota.sh
     mount --bind /tmp/pre-ota.sh $pre_ota
   fi
 

@@ -1,6 +1,3 @@
-LIBPOPT_URL := http://ftp.rpm.org/mirror/popt/popt-1.16.tar.gz
-ZLIB_URL := https://www.zlib.net/zlib-1.2.12.tar.gz
-
 CPUS := $(shell nproc --all)
 CURL := curl -qs --http1.1 -L --retry 10 --output
 BUILD_DIR := $(CURDIR)/build
@@ -62,6 +59,7 @@ $(BUILD_DIR)/bin/rtspd: $(BUILD_DIR)/bin
 $(LIB): $(BUILD_DIR)/lib/libchuangmi_utils.so $(BUILD_DIR)/lib
 	$(LDSHARED) $(CFLAGS) -o $(@) $(SRC_DIR)/lib/$(basename $(@F:lib%=%)).c
 
+$(BUILD_DIR)/lib/libpopt.so: LIBPOPT_URL := http://ftp.rpm.org/mirror/popt/popt-1.16.tar.gz
 $(BUILD_DIR)/lib/libpopt.so: LIBPOPT_ARCHIVE := $(BUILD_DIR)/$(notdir $(LIBPOPT_URL))
 $(BUILD_DIR)/lib/libpopt.so: LIBPOPT_DIR := $(basename $(basename $(LIBPOPT_ARCHIVE)))
 $(BUILD_DIR)/lib/libpopt.so: $(BUILD_DIR)/lib/libz.so $(BUILD_DIR)/lib
@@ -76,6 +74,7 @@ $(BUILD_DIR)/lib/libpopt.so: $(BUILD_DIR)/lib/libz.so $(BUILD_DIR)/lib
 		&& make -j$(CPUS) \
 		&& make -j$(CPUS) install
 
+$(BUILD_DIR)/lib/libz.so: ZLIB_URL := https://www.zlib.net/zlib-1.2.12.tar.gz
 $(BUILD_DIR)/lib/libz.so: ZLIB_ARCHIVE := $(BUILD_DIR)/$(notdir $(ZLIB_URL))
 $(BUILD_DIR)/lib/libz.so: ZLIB_DIR := $(basename $(basename $(ZLIB_ARCHIVE)))
 $(BUILD_DIR)/lib/libz.so: $(BUILD_DIR)/lib
@@ -88,8 +87,36 @@ $(BUILD_DIR)/lib/libz.so: $(BUILD_DIR)/lib
 		&& make -j$(CPUS) \
 		&& make -j$(CPUS) install
 
-$(BUILD_DIR)/manufacture.bin: $(BUILD_DIR)
-	tar -cf $(@) -C $(SRC_DIR) manufacture/test_drv
+$(SRC_DIR)/sd/openssl/lib: OPENSSL_URL := https://www.openssl.org/source/openssl-1.1.1q.tar.gz
+$(SRC_DIR)/sd/openssl/lib: OPENSSL_ARCHIVE := $(BUILD_DIR)/$(notdir $(OPENSSL_URL))
+$(SRC_DIR)/sd/openssl/lib: OPENSSL_DIR := $(basename $(basename $(OPENSSL_ARCHIVE)))
+$(SRC_DIR)/sd/openssl/lib: $(BUILD_DIR)
+	test -f $(OPENSSL_ARCHIVE) || $(CURL) $(OPENSSL_ARCHIVE) $(OPENSSL_URL)
+	test -d $(OPENSSL_DIR) || tar -xzf $(OPENSSL_ARCHIVE) -C $(BUILD_DIR)
+	cd $(OPENSSL_DIR) \
+		&& ./Configure \
+			no-async \
+			no-comp \
+			no-engine \
+			no-hw \
+			no-ssl2 \
+			no-ssl3 \
+			no-zlib \
+			linux-armv4 \
+			-DL_ENDIAN \
+			shared \
+			--prefix=$(BUILD_DIR)/openssl \
+		&& make -j$(CPUS) depend \
+		&& make -j$(CPUS)
+	mkdir -p $(@)
+	cp -f $(OPENSSL_DIR)/libssl.so.1.1 $(OPENSSL_DIR)/libcrypto.so.1.1 $(@)
+	$(STRIP) $(@)/*
+
+$(BUILD_DIR)/manufacture.dat: $(BUILD_DIR)
+	tar -cf $(BUILD_DIR)/manufacture.bin -C $(SRC_DIR) manufacture/test_drv
+	openssl req -batch -new -key $(CURDIR)/private-key.pem -out $(BUILD_DIR)/request.pem
+	openssl x509 -req -in $(BUILD_DIR)/request.pem -signkey $(CURDIR)/private-key.pem -out $(BUILD_DIR)/certificate.pem
+	openssl smime -encrypt -binary -in $(BUILD_DIR)/manufacture.bin -outform DEM -out $(@) $(BUILD_DIR)/certificate.pem
 
 $(BUILD_DIR)/firmware.bin: \
 	$(BIN) \
@@ -108,21 +135,29 @@ $(BUILD_DIR)/firmware.bin: \
 	sleep 3
 	tar czf $(@) -C $(BUILD_DIR) firmware
 
+$(BUILD_DIR)/secret.bin: $(BUILD_DIR)
+	(cd src/sd/ft && md5sum *) | sed -r 's~([^[:space:]]+)$$~/tmp/sd/ft/\1~' >$(BUILD_DIR)/secret
+	openssl rsautl -encrypt -inkey $(SRC_DIR)/manufacture/prikey.pem -in $(BUILD_DIR)/secret -out $(@)
+
 .PHONY: default install dist clean
 
 default: \
 	$(BUILD_DIR)/firmware.bin \
-	$(BUILD_DIR)/manufacture.bin
+	$(BUILD_DIR)/manufacture.dat \
+	$(BUILD_DIR)/secret.bin
 
 install: default
 	rm -rf $(BUILD_DIR)/dist
 	cp -r $(SRC_DIR)/sd $(BUILD_DIR)/dist
-	cp $(BUILD_DIR)/manufacture.bin $(BUILD_DIR)/dist
 	cp $(BUILD_DIR)/firmware.bin $(BUILD_DIR)/dist
+	cp $(BUILD_DIR)/manufacture.dat $(BUILD_DIR)/dist
+	cp $(BUILD_DIR)/secret.bin $(BUILD_DIR)/dist/ft
+	sync
+	sleep 3
 
 dist: install
-	tar czf $(BUILD_DIR)/firmware.tar.gz -C $(BUILD_DIR)/dist .
-	md5sum $(BUILD_DIR)/firmware.tar.gz > $(BUILD_DIR)/firmware.tar.gz.md5
+	tar czf $(BUILD_DIR)/firmware.tgz -C $(BUILD_DIR)/dist .
+	(cd $(BUILD_DIR) && md5sum firmware.tgz) >$(BUILD_DIR)/firmware.tgz.md5
 
 clean:
 	rm -rf $(BUILD_DIR)
