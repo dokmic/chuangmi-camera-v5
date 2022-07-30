@@ -113,7 +113,7 @@ $(SRC_DIR)/sd/openssl/lib: $(BUILD_DIR)
 	$(STRIP) $(@)/*
 
 $(BUILD_DIR)/manufacture.dat: $(BUILD_DIR)
-	tar -cf $(BUILD_DIR)/manufacture.bin -C $(SRC_DIR) manufacture/test_drv
+	tar -cf $(BUILD_DIR)/manufacture.bin -C $(SRC_DIR) manufacture
 	openssl req -batch -new -key $(CURDIR)/private-key.pem -out $(BUILD_DIR)/request.pem
 	openssl x509 -req -in $(BUILD_DIR)/request.pem -signkey $(CURDIR)/private-key.pem -out $(BUILD_DIR)/certificate.pem
 	openssl smime -encrypt -binary -in $(BUILD_DIR)/manufacture.bin -outform DEM -out $(@) $(BUILD_DIR)/certificate.pem
