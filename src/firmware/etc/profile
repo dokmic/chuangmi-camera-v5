@@ -3,12 +3,6 @@
 export PATH=$FIRMWARE_PATH/bin:$PATH
 export LD_LIBRARY_PATH=$FIRMWARE_PATH/lib:$LD_LIBRARY_PATH
 
-if [ -d /mnt/media/mmcblk0p1 ]; then
-  sd=/mnt/media/mmcblk0p1
-elif [ -d /mnt/media/mmcblk0 ]; then
-  sd=/mnt/media/mmcblk0
-fi
-
-set -o allexport
-[ -f $sd/config.cfg ] && source $sd/config.cfg
-set +o allexport
+set -a
+eval "$(config)"
+set +a

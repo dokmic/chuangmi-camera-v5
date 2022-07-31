@@ -2,5 +2,22 @@
 
 [ -z "$WIFI_SSID" ] && exit 0
 
+update() {
+  local parameter="$1"
+  local value="$2"
+
+  [ $(nvram get "$parameter") == "$value" ] && return 0
+
+  updated=1
+  nvram set "$parameter"="$value"
+}
+
 echo "Configuring WiFi to '$WIFI_SSID'."
-wifi "$WIFI_SSID" "$WIFI_PASSWORD"
+
+update miio_ssid "$WIFI_SSID"
+update miio_key_mgmt $([ -z "$WIFI_PASSWORD" ] && echo NONE || echo WPA-PSK)
+update miio_passwd "$WIFI_PASSWORD"
+update wifi_ready yes
+[ "$updated" == "1" ] && nvram commit
+
+pgrep wpa_supplicant >/dev/null && /mnt/data/imi/imi_init/S92wifi restart

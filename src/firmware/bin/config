@@ -1,0 +1,51 @@
+#!/bin/sh
+
+local key=firmware_config
+
+alias escape="sed \"s/'/'\\\"'\\\"'/g\""
+
+parse() {
+  env -i sh -ca 'eval "$(cat <&0)"; eval "$@" >/dev/null 2>&1; unset PWD; export | sed "s/export //"' /dev/null "$@" <&0
+}
+
+get_config() {
+  nvram get "$key" | base64 -d
+}
+
+set_config() {
+  local config=`parse "$@" <&0 | base64`
+
+  [ "$(nvram get $key)" == "$config" ] && exit 0
+  nvram set "$key=$config"
+  nvram commit
+}
+
+get_value() {
+  local value=`env -i sh -c "eval '$(get_config | escape)'; unset PWD; echo -n \"\\\$$1\""`
+  [ -z "$value" ] && return 1
+  echo "$value"
+}
+
+set_value() {
+  get_config | set_config "$1='$(echo "$2" | escape)'"
+}
+
+local command=$1
+shift
+
+case "$command" in
+  update)
+    set_config
+  ;;
+  get)
+    get_value "$@"
+  ;;
+  set)
+    set_value "$@"
+  ;;
+  *)
+    get_config
+  ;;
+esac
+
+exit $?

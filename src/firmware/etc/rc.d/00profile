@@ -2,6 +2,7 @@
 
 cp -r /etc/profile.d /tmp && mount --bind /tmp/profile.d /etc/profile.d
 cat >/etc/profile.d/firmware.sh <<EOF
-export FIRMWARE_PATH=$FIRMWARE_PATH
-. $FIRMWARE_PATH/etc/profile
+export FIRMWARE_PATH=$PWD
+export SD_PATH=$SD_PATH
+. $PWD/etc/profile
 EOF

@@ -1,6 +1,7 @@
 CPUS := $(shell nproc --all)
 CURL := curl -qs --http1.1 -L --retry 10 --output
 BUILD_DIR := $(CURDIR)/build
+FIRMWARE_DIR := $(CURDIR)/firmware
 SRC_DIR := $(CURDIR)/src
 
 export CFLAGS := -fPIC
@@ -87,10 +88,10 @@ $(BUILD_DIR)/lib/libz.so: $(BUILD_DIR)/lib
 		&& make -j$(CPUS) \
 		&& make -j$(CPUS) install
 
-$(SRC_DIR)/sd/openssl/lib: OPENSSL_URL := https://www.openssl.org/source/openssl-1.1.1q.tar.gz
-$(SRC_DIR)/sd/openssl/lib: OPENSSL_ARCHIVE := $(BUILD_DIR)/$(notdir $(OPENSSL_URL))
-$(SRC_DIR)/sd/openssl/lib: OPENSSL_DIR := $(basename $(basename $(OPENSSL_ARCHIVE)))
-$(SRC_DIR)/sd/openssl/lib: $(BUILD_DIR)
+$(FIRMWARE_DIR)/openssl/lib: OPENSSL_URL := https://www.openssl.org/source/openssl-1.1.1q.tar.gz
+$(FIRMWARE_DIR)/openssl/lib: OPENSSL_ARCHIVE := $(BUILD_DIR)/$(notdir $(OPENSSL_URL))
+$(FIRMWARE_DIR)/openssl/lib: OPENSSL_DIR := $(basename $(basename $(OPENSSL_ARCHIVE)))
+$(FIRMWARE_DIR)/openssl/lib: $(BUILD_DIR)
 	test -f $(OPENSSL_ARCHIVE) || $(CURL) $(OPENSSL_ARCHIVE) $(OPENSSL_URL)
 	test -d $(OPENSSL_DIR) || tar -xzf $(OPENSSL_ARCHIVE) -C $(BUILD_DIR)
 	cd $(OPENSSL_DIR) \
@@ -113,9 +114,9 @@ $(SRC_DIR)/sd/openssl/lib: $(BUILD_DIR)
 	$(STRIP) $(@)/*
 
 $(BUILD_DIR)/manufacture.dat: $(BUILD_DIR)
-	tar -cf $(BUILD_DIR)/manufacture.bin -C $(SRC_DIR) manufacture
-	openssl req -batch -new -key $(CURDIR)/private-key.pem -out $(BUILD_DIR)/request.pem
-	openssl x509 -req -in $(BUILD_DIR)/request.pem -signkey $(CURDIR)/private-key.pem -out $(BUILD_DIR)/certificate.pem
+	tar -cf $(BUILD_DIR)/manufacture.bin --transform 's|loader|test_drv|' -C $(SRC_DIR) manufacture
+	openssl req -batch -new -key $(FIRMWARE_DIR)/private-key.pem -out $(BUILD_DIR)/request.pem
+	openssl x509 -req -in $(BUILD_DIR)/request.pem -signkey $(FIRMWARE_DIR)/private-key.pem -out $(BUILD_DIR)/certificate.pem
 	openssl smime -encrypt -binary -in $(BUILD_DIR)/manufacture.bin -outform DEM -out $(@) $(BUILD_DIR)/certificate.pem
 
 $(BUILD_DIR)/firmware.bin: \
@@ -135,28 +136,16 @@ $(BUILD_DIR)/firmware.bin: \
 	sleep 3
 	tar czf $(@) -C $(BUILD_DIR) firmware
 
-$(BUILD_DIR)/secret.bin: $(BUILD_DIR)
-	(cd src/sd/ft && md5sum *) | sed -r 's~([^[:space:]]+)$$~/tmp/sd/ft/\1~' >$(BUILD_DIR)/secret
-	openssl rsautl -encrypt -inkey $(SRC_DIR)/manufacture/prikey.pem -in $(BUILD_DIR)/secret -out $(@)
-
-.PHONY: default install dist clean
+.PHONY: default dist clean
 
 default: \
 	$(BUILD_DIR)/firmware.bin \
-	$(BUILD_DIR)/manufacture.dat \
-	$(BUILD_DIR)/secret.bin
+	$(BUILD_DIR)/manufacture.dat
 
-install: default
-	rm -rf $(BUILD_DIR)/dist
-	cp -r $(SRC_DIR)/sd $(BUILD_DIR)/dist
-	cp $(BUILD_DIR)/firmware.bin $(BUILD_DIR)/dist
-	cp $(BUILD_DIR)/manufacture.dat $(BUILD_DIR)/dist
-	cp $(BUILD_DIR)/secret.bin $(BUILD_DIR)/dist/ft
-	sync
-	sleep 3
-
-dist: install
-	tar czf $(BUILD_DIR)/firmware.tgz -C $(BUILD_DIR)/dist .
+dist: default
+	tar czf $(BUILD_DIR)/firmware.tgz \
+		-C $(BUILD_DIR) firmware.bin manufacture.dat \
+		-C $(FIRMWARE_DIR) openssl tf_recovery.img
 	(cd $(BUILD_DIR) && md5sum firmware.tgz) >$(BUILD_DIR)/firmware.tgz.md5
 
 clean:

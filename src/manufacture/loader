@@ -1,0 +1,94 @@
+#!/bin/sh
+
+if [ -d /mnt/media/mmcblk0p1 ]; then
+  export SD_PATH=/mnt/media/mmcblk0p1
+elif [ -d /mnt/media/mmcblk0 ]; then
+  export SD_PATH=/mnt/media/mmcblk0
+fi
+
+local loader=/mnt/data/imi/imi_init/S50loader
+local firmware=/mnt/data/firmware.bin
+local firmware_bin=$SD_PATH/firmware.bin
+local manufacture_bin=$SD_PATH/manufacture.bin
+local manufacture_dat=$SD_PATH/manufacture.dat
+
+backup() {
+  cp -f $loader $firmware /tmp
+}
+
+install() {
+  cp -f $(realpath $0) $loader || return $?
+  [ -f $manufacture_bin ] && mv -f $manufacture_bin $manufacture_bin.bak
+  [ -f $manufacture_dat ] && mv -f $manufacture_dat $manufacture_dat.bak
+}
+
+launch() {
+  local path=$1
+  local entrypoint=`find $path -type f -perm +111 -maxdepth 1 | head -1`
+  [ -z "$entrypoint" ] && return 1
+  (cd $path; $entrypoint)
+  return $?
+}
+
+launch_firmware() {
+  [ ! -f $firmware ] && return 1
+
+  tar -xzf $firmware -C /tmp && launch /tmp/firmware
+  return $?
+}
+
+patch_ota() {
+  local pre_ota=/mnt/data/miio_ota/pre-ota.sh
+  local pre_ota_patch="$loader backup"
+  grep -q "$pre_ota_patch" $pre_ota || sed -e '\~^#!/bin/sh$~a\' -e "$pre_ota_patch" -i $pre_ota
+
+  local post_ota=/mnt/data/miio_ota/post-ota.sh
+  local post_ota_patch="/tmp/$(basename $loader) restore"
+  grep -q "$post_ota_patch" $post_ota || sed -e '\~^#!/bin/sh$~a\' -e "$post_ota_patch" -i $post_ota
+}
+
+restore() {
+  cp -f /tmp/$(basename $loader) $loader
+  [ -f /tmp/$(basename $firmware) ] && cp -f /tmp/$(basename $firmware) $firmware
+}
+
+start() {
+  [ -f $manufacture_dat ] && return 1
+
+  update_loader
+  update_firmware
+  patch_ota
+  launch_firmware || return $?
+}
+
+update_firmware() {
+  [ ! -f $firmware_bin ] && return 1
+
+  cp -f $firmware_bin $firmware && mv -f $firmware_bin $firmware_bin.bak
+  return $?
+}
+
+update_loader() {
+  [ ! -f $manufacture_bin ] && return 1
+
+  tar -xf $manufacture_bin -C /tmp && launch /tmp/manufacture
+  exit $?
+}
+
+case "$1" in
+  backup)
+    backup
+  ;;
+  restore)
+    restore
+  ;;
+  start)
+    start
+  ;;
+  *)
+    install
+    start
+  ;;
+esac
+
+exit $?

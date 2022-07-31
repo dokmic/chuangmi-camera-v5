@@ -1,0 +1,7 @@
+#!/bin/sh -l
+
+[ ! -f $SD_PATH/config.cfg ] && exit 0
+
+echo "Updating firmware config."
+cat $SD_PATH/config.cfg | config update
+mv -f $SD_PATH/config.cfg $SD_PATH/config.cfg.bak
