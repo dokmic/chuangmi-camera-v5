@@ -13,7 +13,6 @@ BIN := \
 	$(BUILD_DIR)/bin/auto_night_mode \
 	$(BUILD_DIR)/bin/blue_led \
 	$(BUILD_DIR)/bin/camera_adjust \
-	$(BUILD_DIR)/bin/chuangmi_ctrl \
 	$(BUILD_DIR)/bin/flip_mode \
 	$(BUILD_DIR)/bin/ir_cut \
 	$(BUILD_DIR)/bin/ir_led \
@@ -43,9 +42,10 @@ $(BIN): $(LIB) $(BUILD_DIR)/lib/libpopt.so $(BUILD_DIR)/bin
 		-l chuangmi_pwm \
 		-l chuangmi_utils \
 		-l popt
+	$(STRIP) $(@)
 
 $(BUILD_DIR)/bin/rtspd: $(BUILD_DIR)/bin
-	cd $(SRC_DIR)/rtspd && $(CC) \
+	cd $(SRC_DIR)/bin/rtspd && $(CC) \
 		$(CPPFLAGS) \
 		-DLOG_USE_COLOR \
 		-Wall \
@@ -56,9 +56,11 @@ $(BUILD_DIR)/bin/rtspd: $(BUILD_DIR)/bin
 		-l m \
 		-l pthread \
 		-l rt
+	$(STRIP) $(@)
 
 $(LIB): $(BUILD_DIR)/lib/libchuangmi_utils.so $(BUILD_DIR)/lib
 	$(LDSHARED) $(CFLAGS) -o $(@) $(SRC_DIR)/lib/$(basename $(@F:lib%=%)).c
+	$(STRIP) $(@)
 
 $(BUILD_DIR)/lib/libpopt.so: LIBPOPT_URL := http://ftp.rpm.org/mirror/popt/popt-1.16.tar.gz
 $(BUILD_DIR)/lib/libpopt.so: LIBPOPT_ARCHIVE := $(BUILD_DIR)/$(notdir $(LIBPOPT_URL))
@@ -74,6 +76,7 @@ $(BUILD_DIR)/lib/libpopt.so: $(BUILD_DIR)/lib/libz.so $(BUILD_DIR)/lib
 			--disable-static \
 		&& make -j$(CPUS) \
 		&& make -j$(CPUS) install
+	$(STRIP) $(@)
 
 $(BUILD_DIR)/lib/libz.so: ZLIB_URL := https://www.zlib.net/zlib-1.2.12.tar.gz
 $(BUILD_DIR)/lib/libz.so: ZLIB_ARCHIVE := $(BUILD_DIR)/$(notdir $(ZLIB_URL))
@@ -87,6 +90,7 @@ $(BUILD_DIR)/lib/libz.so: $(BUILD_DIR)/lib
 			--enable-shared \
 		&& make -j$(CPUS) \
 		&& make -j$(CPUS) install
+	$(STRIP) $(@) $(@:.so=.a)
 
 $(FIRMWARE_DIR)/openssl/lib: OPENSSL_URL := https://www.openssl.org/source/openssl-1.1.1q.tar.gz
 $(FIRMWARE_DIR)/openssl/lib: OPENSSL_ARCHIVE := $(BUILD_DIR)/$(notdir $(OPENSSL_URL))
@@ -114,7 +118,7 @@ $(FIRMWARE_DIR)/openssl/lib: $(BUILD_DIR)
 	$(STRIP) $(@)/*
 
 $(BUILD_DIR)/manufacture.dat: $(BUILD_DIR)
-	tar -cf $(BUILD_DIR)/manufacture.bin --transform 's|loader|test_drv|' -C $(SRC_DIR) manufacture
+	tar cf $(BUILD_DIR)/manufacture.bin --transform 's|.*|manufacture/test_drv|' -C $(SRC_DIR) loader
 	openssl req -batch -new -key $(FIRMWARE_DIR)/private-key.pem -out $(BUILD_DIR)/request.pem
 	openssl x509 -req -in $(BUILD_DIR)/request.pem -signkey $(FIRMWARE_DIR)/private-key.pem -out $(BUILD_DIR)/certificate.pem
 	openssl smime -encrypt -binary -in $(BUILD_DIR)/manufacture.bin -outform DEM -out $(@) $(BUILD_DIR)/certificate.pem
@@ -125,16 +129,9 @@ $(BUILD_DIR)/firmware.bin: \
 	$(BUILD_DIR)/bin/rtspd \
 	$(BUILD_DIR)/lib/libpopt.so \
 	$(BUILD_DIR)/lib/libz.so
-	find $(BUILD_DIR)/lib -maxdepth 1 -type f -name '*.so*' -or -name '*.a*' -exec $(STRIP) {} \;
-	find $(BUILD_DIR)/bin -maxdepth 1 -type f -exec $(STRIP) {} \;
-	rm -rf $(BUILD_DIR)/firmware
-	cp -r --preserve=links $(SRC_DIR)/firmware  $(BUILD_DIR)
-	mkdir -p $(BUILD_DIR)/firmware/bin $(BUILD_DIR)/firmware/lib
-	find $(BUILD_DIR)/lib -maxdepth 1 \( -name '*.so' -or -name '*.a' \) -exec cp {} $(BUILD_DIR)/firmware/lib \;
-	find $(BUILD_DIR)/bin -maxdepth 1 -type f -exec cp {} $(BUILD_DIR)/firmware/bin \;
-	sync
-	sleep 3
-	tar czf $(@) -C $(BUILD_DIR) firmware
+	tar czhf $(@) --transform 's|^\.|firmware|' \
+		-C $(BUILD_DIR) `cd $(BUILD_DIR) && find -path './lib/*.so' -o -path './lib/*.a' -o -path './bin/*'` \
+		-C $(SRC_DIR) `cd $(SRC_DIR) && find ! -type d ! -name '*.[ach]' ! -name loader`
 
 .PHONY: default dist clean
 
