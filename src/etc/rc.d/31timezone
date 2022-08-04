@@ -1,7 +1,8 @@
 #!/bin/sh -l
 
-[ -z "$TZ" ] && exit 0
+local tz=$(config get TZ)
+[ -z "$tz" ] && exit 0
 
-echo "Setting timezone to '$TZ'."
-[ -f /usr/share/zoneinfo/uclibc/$TZ ] && mount --bind /usr/share/zoneinfo/uclibc/$TZ /etc/localtime
-echo $TZ >/tmp/TZ && mount --bind /tmp/TZ /etc/TZ
+echo "Setting timezone to '$tz'."
+[ -f /usr/share/zoneinfo/uclibc/$tz ] && mount --bind /usr/share/zoneinfo/uclibc/$tz /etc/localtime
+echo $tz >/tmp/TZ && mount --bind /tmp/TZ /etc/TZ

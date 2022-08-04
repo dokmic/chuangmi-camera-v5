@@ -1,8 +1,10 @@
 #!/bin/sh -l
 
-if [ "${NIGHT_MODE:-AUTO}" = AUTO ]; then
+local night_mode=$(config get NIGHT_MODE || echo AUTO)
+
+if [ "$night_mode" = AUTO ]; then
   $FIRMWARE_PATH/etc/init.d/auto_night_mode start
 else
   $FIRMWARE_PATH/etc/init.d/auto_night_mode stop
-  night_mode $([ "$NIGHT_MODE" -eq 1 ] && echo --enable || echo --disable)
+  night_mode $([ "$night_mode" -eq 1 ] && echo --enable || echo --disable)
 fi

@@ -15,7 +15,7 @@ start() {
     --pidfile $pid_file \
     --quiet \
     --start \
-    -- -n -p "${NTP_SERVER:-pool.ntp.org}"
+    -- -n -p "$(config get NTP_SERVER || echo pool.ntp.org)"
 }
 
 stop() {

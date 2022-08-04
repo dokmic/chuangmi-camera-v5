@@ -1,8 +1,0 @@
-#!/bin/sh
-
-export PATH=$FIRMWARE_PATH/bin:$PATH
-export LD_LIBRARY_PATH=$FIRMWARE_PATH/lib:$LD_LIBRARY_PATH
-
-set -a
-eval "$(config)"
-set +a

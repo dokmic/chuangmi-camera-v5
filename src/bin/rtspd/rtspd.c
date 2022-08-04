@@ -202,6 +202,8 @@ struct CommandLineArguments {
     int bitrateMode;
     int encoderType;
     int motion;
+    char *user;
+    char *password;
 } cliArgs;
 
 
@@ -211,8 +213,6 @@ static char *rtsp_enc_type_str[] = {
     "MJPEG"
 };
 
-char *rtsp_password = NULL;
-char *rtsp_username = NULL;
 static int rtsp_use_auth = 0;
 
 static int set_cap_motion(int cap_vch, unsigned int id, unsigned int value)
@@ -356,7 +356,7 @@ static int open_live_streaming(int ch_num, int sub_num)
 
     // * Enable authentication for the stream if the username and password are set
     if (rtsp_use_auth == 1) {
-        stream_authorization(pb->sr, rtsp_username, rtsp_password);
+        stream_authorization(pb->sr, cliArgs.user, cliArgs.password);
     }
 
     strcpy(pb->name, livename);
@@ -1711,7 +1711,7 @@ char *get_local_ip(void)
 static void print_usage(void)
 {
     printf("Usage:\n");
-    printf(" ./rtspd [-bfwhm] [-j|-4]\n");
+    printf(" ./rtspd [-bfwhmup] [-j|-4]\n");
     printf(
         "\nAvailable options:\n"
         "-b [1-8192]    - Set the bitrate         (default: 8192)\n"
@@ -1719,6 +1719,8 @@ static void print_usage(void)
         "-w [1-1280]    - Set the image width     (default: 1280 pixels)\n"
         "-h [1-720]     - Set the image height    (default: 720 pixels)\n"
         "-m [1-4]       - Set the bitrate mode    (default: 1, CBR)\n"
+        "-u string      - Set the user name       (default: none)\n"
+        "-p string      - Set the user password   (default: none)\n"
         "-j (optional)  - Use MJPEG encoding      (default: off)\n"
         "-4 (optional)  - Use MPEG4 encoding      (default: off)\n\n"
 
@@ -1754,8 +1756,9 @@ int main(int argc, char *argv[])
     cliArgs.height      = 720;
     cliArgs.bitrateMode = GM_EVBR;
     cliArgs.encoderType = ENC_TYPE_H264;
-
     cliArgs.motion      = 0;
+    cliArgs.user        = NULL;
+    cliArgs.password    = NULL;
 
     if (argc > 1) {
         for (i = 1; i < argc; i++) {
@@ -1788,6 +1791,12 @@ int main(int argc, char *argv[])
                         break;
                     case '4':
                         cliArgs.encoderType = ENC_TYPE_MPEG4;
+                        break;
+                    case 'u':
+                        cliArgs.user = &argv[i][2];
+                        break;
+                    case 'p':
+                        cliArgs.password = &argv[i][2];
                         break;
                     default:
                         log_error("Unknown argument: %s", argv[i]);
@@ -1825,14 +1834,11 @@ int main(int argc, char *argv[])
 
     log_info("Starting the RTSP Daemon");
 
-    rtsp_password = getenv("RTSP_PASSWORD");
-    rtsp_username = getenv("RTSP_USER");
-
-    if (rtsp_username != NULL && strcmp(rtsp_username, "") != 0 && rtsp_password != NULL && strcmp(rtsp_password, "") != 0) {
+    if (cliArgs.user != NULL && strcmp(cliArgs.user, "") != 0 && cliArgs.password != NULL && strcmp(cliArgs.password, "") != 0) {
         rtsp_use_auth = 1;
         log_info("Enabling stream authentication.");
-        log_info("Stream username: %s", rtsp_username);
-        log_info("Stream password: %s", rtsp_password);
+        log_info("Stream username: %s", cliArgs.user);
+        log_info("Stream password: %s", cliArgs.password);
     }
 
     // * Initializing gmlib

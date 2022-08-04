@@ -1,5 +1,3 @@
 #!/bin/sh -l
 
-[ "${ENABLE_LOGGING:-0}" -eq 0 ] && exit 0
-
-/mnt/data/imi/imi_init/_S01logging start
+[ "$(config get LOGGING || echo 0)" -eq 1 ] && /mnt/data/imi/imi_init/_S01logging start

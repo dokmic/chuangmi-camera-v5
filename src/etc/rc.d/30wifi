@@ -1,6 +1,10 @@
 #!/bin/sh -l
 
-[ -z "$WIFI_SSID" ] && exit 0
+local ssid=$(config get WIFI_SSID)
+[ -z "$ssid" ] && exit 0
+
+local password=$(config get WIFI_PASSWORD)
+local key_management=$([ -z "$password" ] && echo NONE || echo WPA-PSK)
 
 update() {
   local parameter="$1"
@@ -12,11 +16,11 @@ update() {
   nvram set "$parameter"="$value"
 }
 
-echo "Configuring WiFi to '$WIFI_SSID'."
+echo "Configuring WiFi to '$ssid'."
 
-update miio_ssid "$WIFI_SSID"
-update miio_key_mgmt $([ -z "$WIFI_PASSWORD" ] && echo NONE || echo WPA-PSK)
-update miio_passwd "$WIFI_PASSWORD"
+update miio_ssid "$ssid"
+update miio_key_mgmt "$key_management"
+update miio_passwd "$password"
 update wifi_ready yes
 [ "$updated" == "1" ] && nvram commit
 

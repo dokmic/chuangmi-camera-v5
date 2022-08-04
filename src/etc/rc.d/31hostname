@@ -1,7 +1,7 @@
 #!/bin/sh -l
 
-HOSTNAME=${HOSTNAME:-$(nvram factory get mac | tr [:upper:] [:lower:] | tr -d :)}
-echo "Setting hostname to '$HOSTNAME'."
-hostname $HOSTNAME
-echo $HOSTNAME >/tmp/hostname && mount --bind /tmp/hostname /etc/hostname
-echo "127.0.0.1 localhost $HOSTNAME" >/tmp/hosts && mount --bind /tmp/hosts /etc/hosts
+local hostname=$(config get HOSTNAME || nvram factory get mac | tr [:upper:] [:lower:] | tr -d :)
+echo "Setting hostname to '$hostname'."
+hostname $hostname
+echo $hostname >/tmp/hostname && mount --bind /tmp/hostname /etc/hostname
+echo "127.0.0.1 localhost $hostname" >/tmp/hosts && mount --bind /tmp/hosts /etc/hosts

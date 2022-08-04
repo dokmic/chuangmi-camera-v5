@@ -7,8 +7,8 @@ this page contains a list of some options, a description and sometimes links to 
 
 | Configuration   | Options                        | Description |
 | ---             | ---                            | ---     |
-| `ENABLE_CLOUD`  | `1` to enable, `0` to disable. | Control all xiaomi functionality including the cloud streaming, audio, record on motion detection and firmware updates. |
-| `ENABLE_OTA`   | `1` to enable, `0` to disable. | Control firmware updates of the official firmware. |
+| `CLOUD`  | `1` to enable, `0` to disable. | Control all xiaomi functionality including the cloud streaming, audio, record on motion detection and firmware updates. |
+| `OTA`   | `1` to enable, `0` to disable. | Control firmware updates of the official firmware. |
 
 ## System Settings
 

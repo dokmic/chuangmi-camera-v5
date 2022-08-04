@@ -1,6 +1,6 @@
 #!/bin/sh -l
 
-[ "${CEILING_MODE:-0}" -ne 1 ] && exit 0
+[ "$(config get CEILING_MODE || echo 0)" -ne 1 ] && exit 0
 
 flip_mode --enable
 mirror_mode --enable

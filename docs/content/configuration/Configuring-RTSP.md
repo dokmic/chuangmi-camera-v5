@@ -5,7 +5,7 @@
 **WARNING: The RTSP daemon has authentication but without encryption! 
 Read the [Security Considerations](/Security-Considerations) for more information**
 
-By default, the rtspd is enabled. You can disable it by setting `ENABLE_RTSP` to `0` and stop the rtspd service
+By default, the rtspd is enabled. You can disable it by setting `RTSP` to `0` and stop the rtspd service
 on the commandline by executing the init script, or through the services page in the web interface.
 
 If enabled the RTSP server is listening on port `554`.
@@ -88,7 +88,7 @@ The options for the RTSP service are:
 
 | Configuration            | Options                        | Description |
 | ---                      | ---                            | ---         |
-| `ENABLE_RTSP`            | `1` to enable, `0` to disable. | Enable or disable the rtspd service |
+| `RTSP`                   | `1` to enable, `0` to disable. | Enable or disable the rtspd service |
 | `RTSP_USER`              | The username string to connect | Set to enable password authentication |
 | `RTSP_PASSWORD`          | The password string to connect | Set to enable password authentication |
 | `RTSP_WIDTH`             | An integer below `1280`        | Set the image width of the rtsp stream |

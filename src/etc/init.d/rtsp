@@ -7,6 +7,8 @@ status() {
 }
 
 start() {
+  eval "$(config | grep ^RTSP_)"
+
   status || start-stop-daemon \
     --background \
     --exec rtspd \
@@ -16,11 +18,13 @@ start() {
     --quiet \
     --start \
     -- \
-      -f${RTSP_FRAMERATE:-15} \
-      -w${RTSP_WIDTH:-1280} \
-      -h${RTSP_HEIGHT:-720} \
-      -b${RTSP_BITRATE:-8192} \
-      -m${RTSP_BITRATE_MODE:-4} \
+      ${RTSP_FRAMERATE:+-f$RTSP_FRAMERATE} \
+      ${RTSP_WIDTH:+-w$RTSP_WIDTH} \
+      ${RTSP_HEIGHT:+-h$RTSP_HEIGHT} \
+      ${RTSP_BITRATE:+-b$RTSP_BITRATE} \
+      ${RTSP_BITRATE_MODE:+-m$RTSP_BITRATE_MODE} \
+      ${RTSP_USER:+-u$RTSP_USER} \
+      ${RTSP_PASSWORD:+-p$RTSP_PASSWORD} \
       $([ "${RTSP_MOTION_DETECTION:-0}" -eq 1 ] && echo -d) \
       $([ "${RTSP_MJPEG:-0}" -eq 1 ] && echo -j) \
       $([ "${RTSP_MPEG4:-0}" -eq 1 ] && echo -4)

@@ -1,5 +1,6 @@
 #!/bin/sh -l
 
+eval "$(config | grep ^MQTT_)"
 MQTT_ID=$(nvram factory get mac | tr [:upper:] [:lower:] | tr -d :)
 MQTT_NAME=${MQTT_NAME:-$MQTT_ID}
 MQTT_TOPIC=${MQTT_TOPIC:-miicam}/$MQTT_NAME

@@ -6,7 +6,7 @@ I've created this article with some steps that can help you debug.
 
 !!! note
     Before you start debugging or reading any logs,
-    set `ENABLE_LOGGING` to `1` and `PURGE_LOGFILES_AT_BOOT` to `0` in `config.cfg`.
+    set `LOGGING` to `1` and `PURGE_LOGFILES_AT_BOOT` to `0` in `config.cfg`.
     This enables logging so hopefully all related errors are written to a log file in `/tmp/sd/log` and keeps the log files over reboots.
 
 ## General recommendations
