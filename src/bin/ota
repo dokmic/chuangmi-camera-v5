@@ -3,8 +3,9 @@
 local pre_ota=/mnt/data/miio_ota/pre-ota.sh
 
 disable() {
-  binary --disable /mnt/data/miio_ota/miio_ota miio_ota
-  (pgrep restartd && /mnt/data/imi/imi_init/S99restartd restart) >/dev/null
+  binary disable /mnt/data/miio_ota/miio_ota
+  restartctl disable miio_ota
+  restartctl reload
   mount | grep -q $pre_ota && umount $pre_ota
 
   echo "OTA is disabled."
@@ -19,18 +20,15 @@ enable() {
   fi
 
   # /mnt/data/imi/imi_init/S95miio_ota
-  binary --enable /mnt/data/miio_ota/miio_ota miio_ota
-
-  if pgrep restartd >/dev/null; then
-    /mnt/data/imi/imi_init/S99restartd restart >/dev/null
-    sleep 1
-  fi
+  binary enable /mnt/data/miio_ota/miio_ota
+  restartctl enable miio_ota
+  restartctl reload
 
   echo "OTA is enabled."
 }
 
 status() {
-  pgrep miio_ota >/dev/null && echo on || echo off
+  restartctl status miio_ota && echo on || echo off
 }
 
 case "$1" in

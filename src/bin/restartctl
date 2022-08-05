@@ -1,0 +1,121 @@
+#!/bin/sh
+
+local config=/mnt/data/restartd/restartd.conf
+
+create() {
+  local name=$1
+  [ -z "$name" ] && return 1
+  [ `sed -nr "/^#?$name[[:space:]]/p" $config | wc -l` -ne 0 ] && return 2
+  shift
+
+  eval set -- `getopt --quiet --longoptions=pattern:,then:,else: -- "$name" "$@"`
+  while :; do
+    case "$1" in
+      --pattern) local pattern=$2; shift 2;;
+      --then) local then=$2; shift 2;;
+      --else) local else=$2; shift 2;;
+      --) shift; break;;
+    esac
+  done
+
+  echo "$name \"${pattern:-$name}\" \"${then:-echo '$name is not running'}\" \"${else:-echo '$name is running'}\"" >>$config
+}
+
+delete() {
+  local name=$1
+  [ -z "$name" ] && return 1
+
+  sed -r "/^#?$name[[:space:]]/d" -i $config
+
+  return $?
+}
+
+disable() {
+  local name=$1
+  [ -z "$name" ] && return 1
+
+  sed -r "s/^$name[[:space:]]/#\0/" -i $config
+
+  return $?
+}
+
+enable() {
+  local name=$1
+  [ -z "$name" ] && return 1
+
+  sed -r "s/^#($name[[:space:]])/\1/" -i $config
+
+  return $?
+}
+
+reload() {
+  (pgrep restartd && /mnt/data/imi/imi_init/S99restartd restart) >/dev/null
+
+  return $?
+}
+
+status() {
+  local name=$1
+  [ -z "$name" ] && return 1
+  [ `sed -nr "/^#?$name[[:space:]]/p" $config | wc -l` -eq 0 ] && return 2
+  [ `sed -nr "/^$name[[:space:]]/p" $config | wc -l` -eq 0 ] && return 3
+
+  return 0
+}
+
+update() {
+  local name=$1
+  [ -z "$name" ] && return 1
+  shift
+
+  eval set -- `getopt --quiet --longoptions=pattern:,then:,else: -- "$name" "$@"`
+  while :; do
+    case "$1" in
+      --pattern) local pattern=$2; shift 2;;
+      --then) local then=$2; shift 2;;
+      --else) local else=$2; shift 2;;
+      --) shift; break;;
+    esac
+  done
+
+  local record=`sed -nr "/^#?$name[[:space:]]/p" $config | head -1 | sed -r 's/^(#[^[:space:]]+)/"\1"/'`
+  [ -z "$record" ] && return 2
+
+  eval set -- $record
+  local source_name=$1
+  local source_pattern=$2
+  local source_then=$3
+  local source_else=$4
+
+  sed \
+    -re "/^#?$name\s/c\\" \
+    -e "$source_name \"${pattern:-$source_pattern}\" \"${then:-$source_then}\" \"${else:-$source_else}\"" \
+    -i $config
+
+  return $?
+}
+
+local config_path=$(dirname $config)
+if ! mount | grep -q $config_path; then
+  local tmp_path=/tmp/restartd
+  mkdir -p $tmp_path
+  touch $tmp_path/restartd
+  cp $config $tmp_path
+  mount --bind $config_path/restartd $tmp_path/restartd
+  mount --rbind $tmp_path $config_path
+fi
+
+local command=$1
+shift
+
+case "$command" in
+  create) create "$@";;
+  delete) delete "$@";;
+  disable) disable "$@";;
+  enable) enable "$@";;
+  reload) reload "$@";;
+  status) status "$@";;
+  update) update "$@";;
+esac
+
+exit $?

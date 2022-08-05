@@ -1,8 +1,7 @@
 #!/bin/sh
 
 disable() {
-  BINARY="$1"
-  ALIAS="$2"
+  local binary="$1"
 
   if [ ! -x /tmp/disabled ]; then
     cat > /tmp/disabled <<  EOF
@@ -12,42 +11,31 @@ EOF
     chmod +x /tmp/disabled
   fi
 
-  local pid=$(pgrep -o "$BINARY" || fuser "$BINARY")
+  local pid=$(pgrep -o "$binary" || fuser "$binary")
   if [ -n "$pid" ]; then
     pkill -P $pid
     kill $pid
   fi
 
-  if ! ( mount | grep -q "$BINARY" ); then
-    mount --bind /tmp/disabled "$BINARY"
-  fi
-
-  if [ -n "$ALIAS" ]; then
-    sed -i "s/^$ALIAS /#\0/" /mnt/data/restartd/restartd.conf
+  if ! ( mount | grep -q "$binary" ); then
+    mount --bind /tmp/disabled "$binary"
   fi
 }
 
 enable() {
-  BINARY="$1"
-  ALIAS="$2"
+  local binary="$1"
 
-  if mount | grep -q "$BINARY"; then
-    umount "$BINARY"
-  fi
-
-  if [ -n "$ALIAS" ]; then
-    sed -i "s/^#\($ALIAS \)/\1/" /mnt/data/restartd/restartd.conf
+  if mount | grep -q "$binary"; then
+    umount "$binary"
   fi
 }
 
-COMMAND=$1
+local command=$1
 shift
 
-case "$COMMAND" in
-  --enable)
-    enable $@
-  ;;
-  --disable)
-    disable $@
-  ;;
+case "$command" in
+  enable) enable "$@";;
+  disable) disable "$@";;
 esac
+
+exit $?
