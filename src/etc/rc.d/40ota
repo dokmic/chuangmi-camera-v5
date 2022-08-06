@@ -1,3 +1,0 @@
-#!/bin/sh -l
-
-ota $([ "$(config get OTA || echo 0)" -eq 1 ] && echo --enable || echo --disable)

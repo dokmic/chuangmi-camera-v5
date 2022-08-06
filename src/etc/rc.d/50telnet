@@ -1,6 +1,0 @@
-#!/bin/sh -l
-
-[ "$(config get TELNET || echo 0)" -eq 0 ] && exit 0
-
-/mnt/data/imi/imi_init/_S50telnet start
-restartctl create telnetd --pattern="/usr/sbin/telnetd" --then="/mnt/data/imi/imi_init/_S50telnet start"

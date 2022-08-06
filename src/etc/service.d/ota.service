@@ -1,15 +1,4 @@
-#!/bin/sh -l
-
 local pre_ota=/mnt/data/miio_ota/pre-ota.sh
-
-disable() {
-  binary disable /mnt/data/miio_ota/miio_ota
-  restartctl disable miio_ota
-  restartctl reload
-  mount | grep -q $pre_ota && umount $pre_ota
-
-  echo "OTA is disabled."
-}
 
 enable() {
   if ! mount | grep -q $pre_ota; then
@@ -27,18 +16,15 @@ enable() {
   echo "OTA is enabled."
 }
 
-status() {
-  restartctl status miio_ota && echo on || echo off
+disable() {
+  binary disable /mnt/data/miio_ota/miio_ota
+  restartctl disable miio_ota
+  restartctl reload
+  mount | grep -q $pre_ota && umount $pre_ota
+
+  echo "OTA is disabled."
 }
 
-case "$1" in
-  --disable)
-    disable
-  ;;
-  --enable)
-    enable
-  ;;
-  --status)
-    status
-  ;;
-esac
+status() {
+  restartctl status miio_ota || return $?
+}

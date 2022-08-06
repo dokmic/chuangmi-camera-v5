@@ -1,0 +1,15 @@
+enable() {
+  night_mode --enable
+
+  echo "Night mode is enabled."
+}
+
+disable() {
+  night_mode --disable
+
+  echo "Night mode is disabled."
+}
+
+status() {
+  [ $(night_mode --status) != on ] && return 1
+}

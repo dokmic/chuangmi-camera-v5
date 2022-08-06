@@ -124,9 +124,6 @@ alias mqtt_sub="mosquitto_sub $MQTT_OPTIONS \
 "
 alias upper="tr [:lower:] [:upper:]"
 
-alias auto_night_mode="$FIRMWARE_PATH/etc/init.d/auto_night_mode"
-alias rtsp="$FIRMWARE_PATH/etc/init.d/rtsp"
-
 get_value() {
   local INPUT=$1
   local TOPIC=$(echo "$INPUT" | cut -d " " -f 1)
@@ -146,7 +143,7 @@ set_ceiling_mode() {
 }
 
 set_cloud() {
-  cloud $([ "$1" = ON ] && echo --enable || echo --disable)
+  service cloud $([ "$1" = ON ] && echo enable || echo disable)
 }
 
 set_indicator() {
@@ -155,19 +152,19 @@ set_indicator() {
 
 set_night_mode() {
   if [ "$1" = AUTO ]; then
-    auto_night_mode start
+    service auto-night-mode enable
   else
-    auto_night_mode stop
+    service auto-night-mode disable
     night_mode $([ "$1" = ON ] && echo --enable || echo --disable)
   fi
 }
 
 set_ota() {
-  ota $([ "$1" = ON ] && echo --enable || echo --disable)
+  service ota $([ "$1" = ON ] && echo enable || echo disable)
 }
 
 set_rtsp() {
-  rtsp $([ "$1" = ON ] && echo start || echo stop)
+  service rtsp $([ "$1" = ON ] && echo enable || echo disable)
 }
 
 update_availability() {
@@ -195,7 +192,7 @@ update_ceiling_mode() {
 }
 
 update_cloud() {
-  mqtt_pub --topic $CLOUD_TOPIC --message $(cloud --status | upper)
+  mqtt_pub --topic $CLOUD_TOPIC --message $(service cloud status && echo ON || echo OFF)
 }
 
 update_indicator() {
@@ -207,7 +204,7 @@ update_motion() {
 }
 
 update_night_mode() {
-  if auto_night_mode status; then
+  if service auto-night-mode status; then
     STATE=AUTO
   else
     STATE=$(night_mode --status | upper)
@@ -217,11 +214,11 @@ update_night_mode() {
 }
 
 update_ota() {
-  mqtt_pub --topic $OTA_TOPIC --message $(ota --status | upper)
+  mqtt_pub --topic $OTA_TOPIC --message $(service ota status && echo ON || echo OFF)
 }
 
 update_rtsp() {
-  mqtt_pub --topic $RTSP_TOPIC --message $(rtsp status && echo "ON" || echo "OFF")
+  mqtt_pub --topic $RTSP_TOPIC --message $(service rtsp status && echo ON || echo OFF)
 }
 
 stop() {

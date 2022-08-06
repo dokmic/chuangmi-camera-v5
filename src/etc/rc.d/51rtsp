@@ -1,3 +1,0 @@
-#!/bin/sh -l
-
-[ "$(config get RTSP || echo 1)" -eq 1 ] && $FIRMWARE_PATH/etc/init.d/rtsp start

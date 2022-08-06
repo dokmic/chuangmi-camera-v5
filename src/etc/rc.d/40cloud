@@ -1,3 +1,0 @@
-#!/bin/sh -l
-
-cloud $([ "$(config get CLOUD || echo 0)" -eq 1 ] && echo --enable || echo --disable)

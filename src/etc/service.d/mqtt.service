@@ -1,0 +1,18 @@
+enable() {
+  restartctl create mqtt --then="$FIRMWARE_PATH/etc/init.d/mqtt start"
+  restartctl reload
+
+  echo "MQTT is enabled."
+}
+
+disable() {
+  restartctl delete mqtt
+  restartctl reload
+  $FIRMWARE_PATH/etc/init.d/mqtt stop
+
+  echo "MQTT is disabled."
+}
+
+status() {
+  restartctl status mqtt || return $?
+}
