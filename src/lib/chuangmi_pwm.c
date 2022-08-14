@@ -156,36 +156,3 @@ int ir_led_status(void)
         return -1;
     }
 }
-
-
-/*
- * Print the status of the pwm pins
- */
-int ir_led_info(void)
-{
-    if (pwm_is_initialized() < 0)
-        return -1;
-
-    ioctl(pwm_fd, PWM_IOCTL_GET_INFO, &pwm[0]);
-    printf("PWM %d information:\n", pwm[0].id);
-    printf("  Clock Source: %d\n", pwm[0].clksrc);
-    printf("  Frequency: %d\n", pwm[0].freq);
-    printf("  Step: %d\n", pwm[0].duty_steps);
-    printf("  Duty: %d\n", pwm[0].duty_ratio);
-
-    return 0;
-}
-
-
-/*
- * Print the status of the pwm pins in json
- */
-int ir_led_info_json(void)
-{
-    if (pwm_is_initialized() < 0)
-        return -1;
-
-    ioctl(pwm_fd, PWM_IOCTL_GET_INFO, &pwm[0]);
-    printf("{\"id\":%d,\"source\":%d,\"frequency\":%d,\"step\":%d,\"duty\":%d}", pwm[0].id, pwm[0].clksrc, pwm[0].freq, pwm[0].duty_steps, pwm[0].duty_ratio);
-    return 0;
-}

@@ -12,9 +12,7 @@ struct CommandLineArguments
     unsigned int enable;
     unsigned int disable;
     unsigned int status;
-    unsigned int info;
-    unsigned int json;
-} cli = {0, 0, 0, 0, 0};
+} cli = {0, 0, 0};
 
 
 int main(int argc, char *argv[])
@@ -24,8 +22,6 @@ int main(int argc, char *argv[])
         {"enable",  'e', POPT_ARG_NONE, &cli.enable,  0, "Enable the night mode",      "Enable"},
         {"disable", 'd', POPT_ARG_NONE, &cli.disable, 0, "Disable the night mode",     "Disable"},
         {"status",  's', POPT_ARG_NONE, &cli.status,  0, "Retrieve the status",       "Status"},
-        {"info",    'i', POPT_ARG_NONE, &cli.info,    0, "Retrieve the night mode info",   "Nightmode Info"},
-        {"json",    'j', POPT_ARG_NONE, &cli.json,    0, "Retrieve the info in json", "Status Json"},
         POPT_AUTOHELP
         {NULL}
     };
@@ -47,12 +43,12 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    if (!cli.enable && !cli.disable && !cli.status && !cli.json && !cli.info) {
+    if (!cli.enable && !cli.disable && !cli.status) {
         poptPrintUsage(pc, stderr, 0);
         exit(1);
     }
 
-    if ((cli.enable + cli.disable + cli.status + cli.json + cli.info > 1)) {
+    if ((cli.enable + cli.disable + cli.status > 1)) {
         poptPrintUsage(pc, stderr, 0);
         exit(1);
     }
@@ -69,10 +65,6 @@ int main(int argc, char *argv[])
         success = nightmode_off();
     else if (cli.status)
         success = nightmode_status();
-    else if (cli.info)
-        success = nightmode_info();
-    else if (cli.json)
-        success = nightmode_info_json();
 
     isp328_end();
     return success;

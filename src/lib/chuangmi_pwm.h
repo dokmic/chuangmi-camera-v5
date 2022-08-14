@@ -22,10 +22,6 @@
 
 #define PWM_DEVICE_NAME "/dev/ftpwmtmr010"
 
-#define REPLY_WRONG_ARG_NUM  "Error: Too many or not enough arguments!\n"
-#define REPLY_INVALID_ARG    "Error: Invalid arguments!\n"
-#define REPLY_DEV_INIT_FAIL  "Error: Initialization failed!\n"
-
 
 enum pwm_set_mode {
     PWM_ONESHOT,
@@ -50,16 +46,10 @@ typedef struct pwm_info {
 
 
 int  pwm_init(void);
-int  pwm_is_initialized(void);
 int  pwm_end(void);
-void pwm_set(unsigned int val);
 
-int ir_led_set(unsigned int val);
 int ir_led_on(void);
 int ir_led_off(void);
 int ir_led_status(void);
-
-int ir_led_info(void);
-int ir_led_info_json(void);
 
 #endif

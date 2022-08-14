@@ -12,10 +12,8 @@ struct CommandLineArguments
 {
     unsigned int enable;
     unsigned int disable;
-    unsigned int blink;
     unsigned int status;
-    unsigned int json;
-} cli = {0, 0, 0, 0, 0};
+} cli = {0, 0, 0};
 
 
 int main(int argc, char *argv[])
@@ -24,9 +22,7 @@ int main(int argc, char *argv[])
     struct poptOption po[] = {
         {"enable",  'e', POPT_ARG_NONE, &cli.enable,  0, "Enable the blue led",             "Enable"},
         {"disable", 'd', POPT_ARG_NONE, &cli.disable, 0, "Disable the blue led",            "Disable"},
-        {"blink",   'b', POPT_ARG_NONE, &cli.blink,   0, "Turn the blue led to blink",      "Blink"},
         {"status",  's', POPT_ARG_NONE, &cli.status,  0, "Retrieve the status of the led",  "Led Status"},
-        {"json",    'j', POPT_ARG_NONE, &cli.json,    0, "Retrieve the status in json",     "Status Json"},
         POPT_AUTOHELP
         {NULL}
     };
@@ -48,7 +44,7 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    if ((cli.enable + cli.disable + cli.blink + cli.status + cli.json > 1)) {
+    if ((cli.enable + cli.disable + cli.status > 1)) {
         poptPrintUsage(pc, stderr, 0);
         exit(0);
     }
@@ -61,14 +57,8 @@ int main(int argc, char *argv[])
     else if (cli.disable)
         success = blue_led_off();
 
-    else if (cli.blink)
-        success = blue_led_blink_on();
-
     else if (cli.status)
         success = blue_led_status();
-
-    else if (cli.json)
-        success = blue_led_status_json();
 
     else {
         poptPrintUsage(pc, stderr, 0);

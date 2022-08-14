@@ -14,41 +14,6 @@
 
 #include "chuangmi_utils.h"
 
-int read_int(const char *filename)
-{
-    int fd;
-    fd = open(filename, O_RDONLY);
-    if (fd == -1) {
-        fprintf(stderr, "Failed to open %s for reading!\n", filename);
-        return -1;
-    }
-
-    char value_str[6];
-    if (read(fd, value_str, 3) == -1) {
-        fprintf(stderr, "Failed to read value from %s!\n", filename);
-        return -1;
-    }
-
-    close(fd);
-    return atoi(value_str);
-}
-
-int write_file(const char *file_path, char *content)
-{
-    FILE *fd;
-
-    fd = fopen(file_path, "w");
-    if (!fd) {
-        fprintf(stderr, "Error: Failed to open: %s\n", file_path);
-        return -1;
-    }
-
-    fprintf(fd, content);
-    fclose(fd);
-
-    return 0;
-}
-
 int gpio_export(int pin)
 {
     char buffer[GPIO_BUFFER_MAX];

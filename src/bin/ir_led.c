@@ -12,10 +12,7 @@ struct CommandLineArguments
 {
     unsigned int enable;
     unsigned int disable;
-    unsigned int status;
-    unsigned int info;
-    unsigned int json;
-} cli = {0, 0, 0, 0, 0};
+} cli = {0, 0};
 
 
 int main(int argc, char *argv[])
@@ -24,9 +21,6 @@ int main(int argc, char *argv[])
     struct poptOption po[] = {
         {"enable",  'e', POPT_ARG_NONE, &cli.enable,  0, "Enable the IR led",         "Enable"},
         {"disable", 'd', POPT_ARG_NONE, &cli.disable, 0, "Disable the IR led",        "Disable"},
-        {"status",  's', POPT_ARG_NONE, &cli.status,  0, "Retrieve the status",       "Led Status"},
-        {"info",    'i',  POPT_ARG_NONE, &cli.info,   0, "Retrieve PWM info",         "Info"},
-        {"json",    'j', POPT_ARG_NONE, &cli.json,    0, "Retrieve the info in json", "Status Json"},
         POPT_AUTOHELP
         {NULL}
     };
@@ -48,12 +42,12 @@ int main(int argc, char *argv[])
         return 1;
     }
 
-    if (!cli.enable && !cli.disable && !cli.status && !cli.json && !cli.info) {
+    if (!cli.enable && !cli.disable) {
         poptPrintUsage(pc, stderr, 0);
         return EXIT_FAILURE;
     }
 
-    if ((cli.enable + cli.disable + cli.status + cli.json + cli.info > 1)) {
+    if ((cli.enable + cli.disable > 1)) {
         poptPrintUsage(pc, stderr, 0);
         return EXIT_FAILURE;
     }
@@ -68,12 +62,6 @@ int main(int argc, char *argv[])
         success = ir_led_on();
     else if (cli.disable)
         success = ir_led_off();
-    else if (cli.status)
-        success = ir_led_status();
-    else if (cli.info)
-        success = ir_led_info();
-    else if (cli.json)
-        success = ir_led_info_json();
 
     pwm_end();
     return success;

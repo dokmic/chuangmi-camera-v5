@@ -64,7 +64,6 @@ int ircut_end(void)
     return 0;
 }
 
-
 /*
  *  Show if ircut is on or off
  */
@@ -85,32 +84,6 @@ int ircut_status(void)
 
     return 0;
 }
-
-
-/*
- *  Show if ircut is on or off in json
- */
-int ircut_status_json(void)
-{
-    int pin_14_status = gpio_read(GPIO_PIN_14);
-    int pin_15_status = gpio_read(GPIO_PIN_15);
-
-    if (pin_14_status == 1 && pin_15_status == 0) {
-        fprintf(stdout, "{\"ir_cut\":1,\"pin14\":%d,\"pin15\":%d}", pin_14_status, pin_15_status);
-    }
-
-    else if (pin_14_status == 0 && pin_15_status == 1) {
-        fprintf(stdout, "{\"ir_cut\":0,\"pin14\":%d,\"pin15\":%d}", pin_14_status, pin_15_status);
-    }
-
-    else {
-        fprintf(stdout, "{\"error\":1,\"pin14\":%d,\"pin15\":%d}", pin_14_status, pin_15_status);
-        return -1;
-    }
-
-    return 0;
-}
-
 
 /*
  * Turn on IR Cut
