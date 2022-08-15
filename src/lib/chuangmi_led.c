@@ -10,7 +10,6 @@
 #include <string.h>
 #include <unistd.h>
 
-#include "chuangmi_utils.h"
 #include "chuangmi_led.h"
 
 int read_int(const char *filename)

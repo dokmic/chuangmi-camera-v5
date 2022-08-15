@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <popt.h>
 
-#include "chuangmi_ircut.h"
+#include "gpio.h"
 
 struct CommandLineArguments
 {
@@ -50,21 +50,16 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    if (ircut_init() < 0) {
-        fprintf(stderr, "Error: IR Cut GPIO initialization failed\n");
-        return EXIT_FAILURE;
-    }
-
     int success = EXIT_SUCCESS;
 
     if (cli.enable)
-        success = ircut_on();
+        success = ir_cut_set(1);
     else if (cli.disable)
-        success = ircut_off();
+        success = ir_cut_set(0);
     else {
         poptPrintUsage(pc, stderr, 0);
         exit(1);
     }
 
-    return success;
+    return !success;
 }

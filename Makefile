@@ -20,11 +20,10 @@ BIN := \
 	$(BUILD_DIR)/bin/rtspd
 
 LIB := \
-	$(BUILD_DIR)/lib/libchuangmi_ircut.so \
 	$(BUILD_DIR)/lib/libchuangmi_isp328.so \
 	$(BUILD_DIR)/lib/libchuangmi_led.so \
 	$(BUILD_DIR)/lib/libchuangmi_pwm.so \
-	$(BUILD_DIR)/lib/libchuangmi_utils.so \
+	$(BUILD_DIR)/lib/libgpio.so \
 	$(BUILD_DIR)/lib/libpopt.so
 
 $(BUILD_DIR) $(BUILD_DIR)/bin $(BUILD_DIR)/lib:
@@ -36,11 +35,10 @@ $(BUILD_DIR)/bin/%: $(LIB) $(SRC_DIR)/bin/%.c | $(BUILD_DIR)/bin
 		-Wall \
 		-o $(@) \
 		$(@F).c \
-		-l chuangmi_ircut \
 		-l chuangmi_isp328 \
 		-l chuangmi_led \
 		-l chuangmi_pwm \
-		-l chuangmi_utils \
+		-l gpio \
 		-l popt
 	$(STRIP) $(@)
 
@@ -58,7 +56,7 @@ $(BUILD_DIR)/bin/rtspd: $(SRC_DIR)/bin/rtspd/* | $(BUILD_DIR)/bin
 		-l rt
 	$(STRIP) $(@)
 
-$(BUILD_DIR)/lib/lib%.so: $(BUILD_DIR)/lib/libchuangmi_utils.so $(SRC_DIR)/lib/%.* | $(BUILD_DIR)/lib
+$(BUILD_DIR)/lib/lib%.so: $(SRC_DIR)/lib/%.* | $(BUILD_DIR)/lib
 	$(LDSHARED) $(CFLAGS) -o $(@) $(SRC_DIR)/lib/$(basename $(@F:lib%=%)).c
 	$(STRIP) $(@)
 
