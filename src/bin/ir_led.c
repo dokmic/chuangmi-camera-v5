@@ -4,8 +4,7 @@
 #include <unistd.h>
 #include <popt.h>
 
-
-#include "chuangmi_pwm.h"
+#include "pwm.h"
 
 
 struct CommandLineArguments
@@ -52,18 +51,12 @@ int main(int argc, char *argv[])
         return EXIT_FAILURE;
     }
 
-    if (pwm_init() < 0) {
-        fprintf(stderr, "Error: PWM initialization failed\n");
-        return EXIT_FAILURE;
-    }
-
     int success;
     if (cli.enable)
-        success = ir_led_on();
+        success = !ir_led_set(1);
     else if (cli.disable)
-        success = ir_led_off();
+        success = !ir_led_set(0);
 
-    pwm_end();
     return success;
 }
 
