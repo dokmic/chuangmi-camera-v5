@@ -21,7 +21,7 @@ BIN := \
 
 LIB := \
 	$(BUILD_DIR)/lib/libchuangmi_isp328.so \
-	$(BUILD_DIR)/lib/libchuangmi_led.so \
+	$(BUILD_DIR)/lib/libled.so \
 	$(BUILD_DIR)/lib/libpwm.so \
 	$(BUILD_DIR)/lib/libgpio.so \
 	$(BUILD_DIR)/lib/libpopt.so
@@ -36,7 +36,7 @@ $(BUILD_DIR)/bin/%: $(LIB) $(SRC_DIR)/bin/%.c | $(BUILD_DIR)/bin
 		-o $(@) \
 		$(@F).c \
 		-l chuangmi_isp328 \
-		-l chuangmi_led \
+		-l led \
 		-l pwm \
 		-l gpio \
 		-l popt

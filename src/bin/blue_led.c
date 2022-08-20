@@ -5,7 +5,7 @@
 #include <popt.h>
 
 
-#include "chuangmi_led.h"
+#include "led.h"
 
 
 struct CommandLineArguments
@@ -49,21 +49,17 @@ int main(int argc, char *argv[])
         exit(0);
     }
 
-    int success = 0;
-
     if (cli.enable)
-        success = blue_led_on();
+        return !blue_led_set(1);
 
     else if (cli.disable)
-        success = blue_led_off();
+        return !blue_led_set(0);
 
     else if (cli.status)
-        success = blue_led_status();
+        return !blue_led_get();
 
     else {
         poptPrintUsage(pc, stderr, 0);
-        exit(0);
+        return 0;
     }
-
-    return success;
 }
