@@ -11,5 +11,5 @@ disable() {
 }
 
 status() {
-  [ $(night_mode --status) != on ] && return 1
+  night_mode --status || return $?
 }

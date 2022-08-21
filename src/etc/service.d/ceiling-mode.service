@@ -13,5 +13,5 @@ disable() {
 }
 
 status() {
-  [ $(flip_mode --status) != on -o $(mirror_mode --status) != on ] && return 1
+  flip_mode --status && mirror_mode --status || return $?
 }

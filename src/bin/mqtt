@@ -182,7 +182,7 @@ update_discovery() {
 }
 
 update_ceiling_mode() {
-  if [ $(flip_mode --status) = on -a $(mirror_mode --status) = on ]; then
+  if flip_mode --status && mirror_mode --status; then
     STATE=ON
   else
     STATE=OFF
@@ -196,7 +196,7 @@ update_cloud() {
 }
 
 update_indicator() {
-  mqtt_pub --topic $INDICATOR_TOPIC --message $(blue_led --status | upper)
+  mqtt_pub --topic $INDICATOR_TOPIC --message $(blue_led --status && echo ON || echo OFF)
 }
 
 update_motion() {
@@ -207,7 +207,7 @@ update_night_mode() {
   if service auto-night-mode status; then
     STATE=AUTO
   else
-    STATE=$(night_mode --status | upper)
+    STATE=$(night_mode --status && echo ON || echo OFF)
   fi
 
   mqtt_pub --topic $NIGHT_MODE_TOPIC --message $STATE

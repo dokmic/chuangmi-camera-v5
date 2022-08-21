@@ -5,7 +5,7 @@
 #include <signal.h>
 #include <popt.h>
 
-#include "chuangmi_isp328.h"
+#include "isp328.h"
 
 struct CommandLineArguments
 {
@@ -54,8 +54,6 @@ void signal_handler(int sig)
 {
     if (cli.verbose == 1)
         fprintf(stderr, "Exiting auto_night_mode: CTRL+C pressed, or exit requested\n");
-
-    isp328_end();
 
     exit(0);
 }
@@ -107,11 +105,6 @@ int main(int argc, char *argv[])
     if (cli.delay < 3)
         cli.delay = 3;
 
-    if (isp328_init() < 0) {
-        fprintf(stderr, "Error: ISP328 initialization failed");
-        return -1;
-    }
-
     // * Catch all signals
     signal(SIGINT,  signal_handler);
     signal(SIGHUP,  signal_handler);
@@ -121,24 +114,28 @@ int main(int argc, char *argv[])
         fprintf(stderr, "Auto nightmode started\n");
 
     while(1) {
-        if (nightmode_update_values() < 0) {
+        unsigned int light_info = light_info_get();
+        if (!light_info) {
             fprintf(stderr, "Failed to retrieve EV and IR values!\n");
             sleep(5);
         }
 
-        if (state.ev_value != light_info.ev || state.ir_value != light_info.ir) {
+        int ev = light_info >> 16;
+        int ir = light_info & 0xffff;
+
+        if (state.ev_value != ev || state.ir_value != ir) {
             if (cli.verbose == 1)
-                fprintf(stderr, "New measurements: ev=%d ir=%d\n", light_info.ev, light_info.ir);
+                fprintf(stderr, "New measurements: ev=%d ir=%d\n", ev, ir);
 
-            state.ev_value = light_info.ev;
-            state.ir_value = light_info.ir;
+            state.ev_value = ev;
+            state.ir_value = ir;
 
-            int nightmode = nightmode_is_on();
+            int nightmode = night_mode_get();
 
-            if (light_info.ev < cli.ev_on && light_info.ir > cli.ir_on && nightmode == 0) {
+            if (ev < cli.ev_on && ir > cli.ir_on && nightmode == 0) {
                 enable_darkness_mode();
             }
-            else if (light_info.ev > cli.ev_off && light_info.ir < cli.ir_off && nightmode == 1) {
+            else if (ev > cli.ev_off && ir < cli.ir_off && nightmode == 1) {
                 disable_darkness_mode();
             }
         }

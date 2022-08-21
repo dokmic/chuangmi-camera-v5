@@ -4,7 +4,7 @@
 #include <unistd.h>
 #include <popt.h>
 
-#include "chuangmi_isp328.h"
+#include "isp328.h"
 
 
 struct CommandLineArguments
@@ -53,19 +53,13 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    if (isp328_init() < 0) {
-        fprintf(stderr, "Error: ISP328 initialization failed\n");
-        return EXIT_FAILURE;
-    }
-
     int success;
     if (cli.enable)
-        success = nightmode_on();
+        success = night_mode_set(1);
     else if (cli.disable)
-        success = nightmode_off();
+        success = night_mode_set(0);
     else if (cli.status)
-        success = nightmode_status();
+        success = night_mode_get();
 
-    isp328_end();
-    return success;
+    return !success;
 }

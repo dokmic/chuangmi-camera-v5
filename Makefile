@@ -20,7 +20,7 @@ BIN := \
 	$(BUILD_DIR)/bin/rtspd
 
 LIB := \
-	$(BUILD_DIR)/lib/libchuangmi_isp328.so \
+	$(BUILD_DIR)/lib/libisp328.so \
 	$(BUILD_DIR)/lib/libled.so \
 	$(BUILD_DIR)/lib/libpwm.so \
 	$(BUILD_DIR)/lib/libgpio.so \
@@ -35,7 +35,7 @@ $(BUILD_DIR)/bin/%: $(LIB) $(SRC_DIR)/bin/%.c | $(BUILD_DIR)/bin
 		-Wall \
 		-o $(@) \
 		$(@F).c \
-		-l chuangmi_isp328 \
+		-l isp328 \
 		-l led \
 		-l pwm \
 		-l gpio \

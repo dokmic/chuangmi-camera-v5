@@ -5,7 +5,7 @@
 #include <popt.h>
 
 
-#include "chuangmi_isp328.h"
+#include "isp328.h"
 
 
 struct CommandLineArguments
@@ -54,19 +54,13 @@ int main(int argc, char *argv[])
         exit(1);
     }
 
-    if (isp328_init() < 0) {
-        fprintf(stderr, "Error: IR Cut GPIO initialization failed\n");
-        return EXIT_FAILURE;
-    }
-
     int success;
     if (cli.enable)
-        success = mirrormode_on();
+        success = mirror_mode_set(1);
     else if (cli.disable)
-        success = mirrormode_off();
+        success = mirror_mode_set(0);
     else if (cli.status)
-        success = mirrormode_status();
+        success = mirror_mode_get();
 
-    isp328_end();
-    return success;
+    return !success;
 }
