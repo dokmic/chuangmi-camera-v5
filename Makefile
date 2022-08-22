@@ -12,10 +12,9 @@ export LDSHAREDFLAGS := -I$(SRC_DIR)/lib -I$(BUILD_DIR)/include -L$(BUILD_DIR)/l
 BIN := \
 	$(BUILD_DIR)/bin/auto_night_mode \
 	$(BUILD_DIR)/bin/blue_led \
-	$(BUILD_DIR)/bin/flip_mode \
+	$(BUILD_DIR)/bin/ceiling-mode \
 	$(BUILD_DIR)/bin/ir_cut \
 	$(BUILD_DIR)/bin/ir_led \
-	$(BUILD_DIR)/bin/mirror_mode \
 	$(BUILD_DIR)/bin/night_mode \
 	$(BUILD_DIR)/bin/rtspd
 

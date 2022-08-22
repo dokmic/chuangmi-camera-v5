@@ -138,8 +138,7 @@ get_topic() {
 }
 
 set_ceiling_mode() {
-  flip_mode $([ "$1" = ON ] && echo --enable || echo --disable)
-  mirror_mode $([ "$1" = ON ] && echo --enable || echo --disable)
+  ceiling-mode $([ "$1" = ON ] && echo --enable || echo --disable)
 }
 
 set_cloud() {
@@ -182,13 +181,7 @@ update_discovery() {
 }
 
 update_ceiling_mode() {
-  if flip_mode --status && mirror_mode --status; then
-    STATE=ON
-  else
-    STATE=OFF
-  fi
-
-  mqtt_pub --topic $CEILING_MODE_TOPIC --message $STATE
+  mqtt_pub --topic $CEILING_MODE_TOPIC --message $(ceiling-mode --status && echo ON || echo OFF)
 }
 
 update_cloud() {

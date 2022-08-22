@@ -1,17 +1,15 @@
 enable() {
-  flip_mode --enable
-  mirror_mode --enable
+  ceiling-mode --enable
 
   echo "Ceiling mode is enabled."
 }
 
 disable() {
-  flip_mode --disable
-  mirror_mode --disable
+  ceiling-mode --disable
 
   echo "Ceiling mode is disabled."
 }
 
 status() {
-  flip_mode --status && mirror_mode --status || return $?
+  ceiling-mode --status || return $?
 }
