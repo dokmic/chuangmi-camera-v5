@@ -146,7 +146,7 @@ set_cloud() {
 }
 
 set_indicator() {
-  blue_led $([ "$1" = ON ] && echo --enable || echo --disable)
+  indicator $([ "$1" = ON ] && echo --enable || echo --disable)
 }
 
 set_night_mode() {
@@ -189,7 +189,7 @@ update_cloud() {
 }
 
 update_indicator() {
-  mqtt_pub --topic $INDICATOR_TOPIC --message $(blue_led --status && echo ON || echo OFF)
+  mqtt_pub --topic $INDICATOR_TOPIC --message $(indicator --status && echo ON || echo OFF)
 }
 
 update_motion() {
