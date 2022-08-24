@@ -1,21 +1,28 @@
 #!/bin/sh -l
 
-local pid_file=/var/run/auto_night_mode.pid
+local pid_file=/var/run/night-mode.pid
 
 status() {
   [ -f $pid_file ] && kill -0 $(cat $pid_file) >/dev/null 2>&1 || return 1
 }
 
 start() {
+  eval "$(config | grep ^NIGHT_MODE_)"
+
   status || start-stop-daemon \
     --background \
-    --exec auto_night_mode \
+    --exec night-mode \
     --make-pidfile \
     --oknodo \
     --pidfile $pid_file \
     --quiet \
     --start \
-    -- $(config get NIGHT_MODE_AUTO_ARGS || echo '--ev-on 30 --ir-on 90 --ev-off 1000 --ir-off 100 --delay 5 --set-ircut --set-irled')
+    -- \
+      ${NIGHT_MODE_DELAY:+--delay=$NIGHT_MODE_DELAY} \
+      ${NIGHT_MODE_EV_ON:+--ev-on=$NIGHT_MODE_EV_ON} \
+      ${NIGHT_MODE_EV_OFF:+--ev-on=$NIGHT_MODE_EV_OFF} \
+      ${NIGHT_MODE_IR_ON:+--ev-on=$NIGHT_MODE_IR_ON} \
+      ${NIGHT_MODE_IR_OFF:+--ev-on=$NIGHT_MODE_IR_OFF}
 }
 
 stop() {

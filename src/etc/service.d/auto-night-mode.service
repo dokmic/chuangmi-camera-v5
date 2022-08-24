@@ -1,18 +1,18 @@
 enable() {
-  restartctl create auto_night_mode --then="$FIRMWARE_PATH/etc/init.d/auto_night_mode start"
+  restartctl create night-mode --then="$FIRMWARE_PATH/etc/init.d/night-mode start"
   restartctl reload
 
   echo "Automatic night mode is enabled."
 }
 
 disable() {
-  restartctl delete auto_night_mode
+  restartctl delete night-mode
   restartctl reload
-  $FIRMWARE_PATH/etc/init.d/auto_night_mode stop
+  $FIRMWARE_PATH/etc/init.d/night-mode stop
 
   echo "Automatic night mode is disabled."
 }
 
 status() {
-  restartctl status auto_night_mode || return $?
+  restartctl status night-mode || return $?
 }

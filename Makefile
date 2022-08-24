@@ -5,25 +5,21 @@ FIRMWARE_DIR := $(CURDIR)/firmware
 SRC_DIR := $(CURDIR)/src
 
 export CFLAGS := -fPIC
-export CPPFLAGS := -I/usr/src/gm_lib/inc -I$(BUILD_DIR)/include -I$(SRC_DIR)/lib -L/usr/src/gm_lib/lib -L$(BUILD_DIR)/lib
-export LDFLAGS := -I$(SRC_DIR)/lib -I$(BUILD_DIR)/include -L$(BUILD_DIR)/lib -Wl,--enable-new-dtags
-export LDSHAREDFLAGS := -I$(SRC_DIR)/lib -I$(BUILD_DIR)/include -L$(BUILD_DIR)/lib
+export CPPFLAGS := -I/usr/src/gm_lib/inc -I$(SRC_DIR)/lib -L/usr/src/gm_lib/lib -L$(BUILD_DIR)/lib
+export LDFLAGS := -I$(SRC_DIR)/lib -L$(BUILD_DIR)/lib -Wl,--enable-new-dtags
+export LDSHAREDFLAGS := -I$(SRC_DIR)/lib -L$(BUILD_DIR)/lib
 
 BIN := \
-	$(BUILD_DIR)/bin/auto_night_mode \
 	$(BUILD_DIR)/bin/ceiling-mode \
 	$(BUILD_DIR)/bin/indicator \
-	$(BUILD_DIR)/bin/ir_cut \
-	$(BUILD_DIR)/bin/ir_led \
-	$(BUILD_DIR)/bin/night_mode \
+	$(BUILD_DIR)/bin/night-mode \
 	$(BUILD_DIR)/bin/rtspd
 
 LIB := \
 	$(BUILD_DIR)/lib/libisp328.so \
 	$(BUILD_DIR)/lib/libled.so \
 	$(BUILD_DIR)/lib/libpwm.so \
-	$(BUILD_DIR)/lib/libgpio.so \
-	$(BUILD_DIR)/lib/libpopt.so
+	$(BUILD_DIR)/lib/libgpio.so
 
 $(BUILD_DIR) $(BUILD_DIR)/bin $(BUILD_DIR)/lib:
 	@mkdir -p $(@)
@@ -37,8 +33,7 @@ $(BUILD_DIR)/bin/%: $(LIB) $(SRC_DIR)/bin/%.c | $(BUILD_DIR)/bin
 		-l isp328 \
 		-l led \
 		-l pwm \
-		-l gpio \
-		-l popt
+		-l gpio
 	$(STRIP) $(@)
 
 $(BUILD_DIR)/bin/rtspd: $(SRC_DIR)/bin/rtspd/* | $(BUILD_DIR)/bin
@@ -58,38 +53,6 @@ $(BUILD_DIR)/bin/rtspd: $(SRC_DIR)/bin/rtspd/* | $(BUILD_DIR)/bin
 $(BUILD_DIR)/lib/lib%.so: $(SRC_DIR)/lib/%.* | $(BUILD_DIR)/lib
 	$(LDSHARED) $(CFLAGS) -o $(@) $(SRC_DIR)/lib/$(basename $(@F:lib%=%)).c
 	$(STRIP) $(@)
-
-$(BUILD_DIR)/lib/libpopt.so: LIBPOPT_URL := http://ftp.rpm.org/mirror/popt/popt-1.16.tar.gz
-$(BUILD_DIR)/lib/libpopt.so: LIBPOPT_ARCHIVE := $(BUILD_DIR)/$(notdir $(LIBPOPT_URL))
-$(BUILD_DIR)/lib/libpopt.so: LIBPOPT_DIR := $(basename $(basename $(LIBPOPT_ARCHIVE)))
-$(BUILD_DIR)/lib/libpopt.so: $(BUILD_DIR)/lib/libz.so | $(BUILD_DIR)/lib
-	test -f $(LIBPOPT_ARCHIVE) || $(CURL) $(LIBPOPT_ARCHIVE) $(LIBPOPT_URL)
-	test -d $(LIBPOPT_DIR) || tar -xzf $(LIBPOPT_ARCHIVE) -C $(BUILD_DIR)
-	cd $(LIBPOPT_DIR) \
-		&& ./configure \
-			--host=$(TARGET) \
-			--prefix=$(BUILD_DIR) \
-			--enable-shared \
-			--disable-static \
-		&& make -j$(CPUS) \
-		&& make -j$(CPUS) install
-	$(STRIP) $(@)
-	rm -rf $(LIBPOPT_ARCHIVE) $(LIBPOPT_DIR)
-
-$(BUILD_DIR)/lib/libz.so: ZLIB_URL := https://www.zlib.net/zlib-1.2.12.tar.gz
-$(BUILD_DIR)/lib/libz.so: ZLIB_ARCHIVE := $(BUILD_DIR)/$(notdir $(ZLIB_URL))
-$(BUILD_DIR)/lib/libz.so: ZLIB_DIR := $(basename $(basename $(ZLIB_ARCHIVE)))
-$(BUILD_DIR)/lib/libz.so: | $(BUILD_DIR)/lib
-	test -f $(ZLIB_ARCHIVE) || $(CURL) $(ZLIB_ARCHIVE) $(ZLIB_URL)
-	test -d $(ZLIB_DIR) || tar -xzf $(ZLIB_ARCHIVE) -C $(BUILD_DIR)
-	cd $(ZLIB_DIR) \
-		&& ./configure \
-			--prefix=$(BUILD_DIR) \
-			--enable-shared \
-		&& make -j$(CPUS) \
-		&& make -j$(CPUS) install
-	$(STRIP) $(@) $(@:.so=.a)
-	rm -rf $(ZLIB_ARCHIVE) $(ZLIB_DIR)
 
 $(FIRMWARE_DIR)/openssl/lib: OPENSSL_URL := https://www.openssl.org/source/openssl-1.1.1q.tar.gz
 $(FIRMWARE_DIR)/openssl/lib: OPENSSL_ARCHIVE := $(BUILD_DIR)/$(notdir $(OPENSSL_URL))
@@ -128,8 +91,8 @@ $(BUILD_DIR)/firmware.bin: \
 	$(BIN) \
 	$(LIB) \
 	$(shell find $(SRC_DIR) ! -name '*.[ach]' ! -name loader)
-	tar czhf $(@) --transform 's|^\.|firmware|' \
-		-C $(BUILD_DIR) `cd $(BUILD_DIR) && find -path './lib/*.so' -o -path './lib/*.a' -o -path './bin/*'` \
+	tar czf $(@) --transform 's|^\.|firmware|' \
+		-C $(BUILD_DIR) `cd $(BUILD_DIR) && find -path './bin/*' -o  -path './lib/*'` \
 		-C $(SRC_DIR) `cd $(SRC_DIR) && find ! -type d ! -name '*.[ach]' ! -name loader`
 
 .PHONY: default dist clean
@@ -138,7 +101,9 @@ default: \
 	$(BUILD_DIR)/firmware.bin \
 	$(BUILD_DIR)/manufacture.dat
 
-dist: default
+dist: \
+	default \
+	$(FIRMWARE_DIR)/openssl/lib
 	tar czf $(BUILD_DIR)/firmware.tgz \
 		-C $(BUILD_DIR) firmware.bin manufacture.dat \
 		-C $(FIRMWARE_DIR) openssl tf_recovery.img

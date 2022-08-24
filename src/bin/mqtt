@@ -154,7 +154,7 @@ set_night_mode() {
     service auto-night-mode enable
   else
     service auto-night-mode disable
-    night_mode $([ "$1" = ON ] && echo --enable || echo --disable)
+    night-mode $([ "$1" = ON ] && echo --enable || echo --disable)
   fi
 }
 
@@ -200,7 +200,7 @@ update_night_mode() {
   if service auto-night-mode status; then
     STATE=AUTO
   else
-    STATE=$(night_mode --status && echo ON || echo OFF)
+    STATE=$(night-mode --status && echo ON || echo OFF)
   fi
 
   mqtt_pub --topic $NIGHT_MODE_TOPIC --message $STATE
