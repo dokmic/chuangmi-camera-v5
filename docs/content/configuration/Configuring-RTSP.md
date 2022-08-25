@@ -96,6 +96,5 @@ The options for the RTSP service are:
 | `RTSP_FRAMERATE`         | An integer below `15`          | Set the max fps of the rtsp stream |
 | `RTSP_BITRATE`           | An integer below `8192`        | Set the max bitrate of the rtsp stream |
 | `RTSP_BITRATE_MODE`      | An integer between `0` and `4` | Set the bitrate mode of the rtsp stream |
-| `RTSP_MOTION_DETECTION`  | `1` to enable, `0` to disable  | Enable motion detection |
 | `RTSP_MJPEG`             | `1` to enable, `0` to disable  | Enable MJPEG encoding |
 | `RTSP_MPEG4`             | `1` to enable, `0` to disable  | Enable MPEG4 encoding |

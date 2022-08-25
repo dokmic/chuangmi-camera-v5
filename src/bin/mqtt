@@ -62,17 +62,6 @@ INDICATOR_CONFIG='{
   "unique_id": "'"$MQTT_ID-indicator"'"
 }'
 
-MOTION_TOPIC=$MQTT_TOPIC/motion
-MOTION_TOPIC_DISCOVERY=$MQTT_DISCOVERY_TOPIC/binary_sensor/$MQTT_ID/motion/config
-MOTION_CONFIG='{
-  "name": "'"$MQTT_DISCOVERY_NAME Motion"'",
-  "availability_topic": "'"$MQTT_TOPIC_AVAILABILITY"'",
-  "device": '"$MQTT_DEVICE"',
-  "device_class": "motion",
-  "state_topic": "'"$MOTION_TOPIC"'",
-  "unique_id": "'"$MQTT_ID-motion"'"
-}'
-
 NIGHT_MODE_TOPIC=$MQTT_TOPIC/night-mode
 NIGHT_MODE_TOPIC_DISCOVERY=$MQTT_DISCOVERY_TOPIC/select/$MQTT_ID/night-mode/config
 NIGHT_MODE_TOPIC_SET=$NIGHT_MODE_TOPIC/set
@@ -174,7 +163,6 @@ update_discovery() {
   mqtt_pub --topic $CEILING_MODE_TOPIC_DISCOVERY --message "$CEILING_MODE_CONFIG"
   mqtt_pub --topic $CLOUD_TOPIC_DISCOVERY --message "$CLOUD_CONFIG"
   mqtt_pub --topic $INDICATOR_TOPIC_DISCOVERY --message "$INDICATOR_CONFIG"
-  mqtt_pub --topic $MOTION_TOPIC_DISCOVERY --message "$MOTION_CONFIG"
   mqtt_pub --topic $NIGHT_MODE_TOPIC_DISCOVERY --message "$NIGHT_MODE_CONFIG"
   mqtt_pub --topic $OTA_TOPIC_DISCOVERY --message "$OTA_CONFIG"
   mqtt_pub --topic $RTSP_TOPIC_DISCOVERY --message "$RTSP_CONFIG"
@@ -190,10 +178,6 @@ update_cloud() {
 
 update_indicator() {
   mqtt_pub --topic $INDICATOR_TOPIC --message $(indicator --status && echo ON || echo OFF)
-}
-
-update_motion() {
-  mqtt_pub --topic $MOTION_TOPIC --message $(echo "$1" | upper)
 }
 
 update_night_mode() {
@@ -225,14 +209,11 @@ stop() {
 
 printf mqtt >/proc/$$/comm
 trap stop HUP INT QUIT ABRT TERM
-trap "update_motion on" USR1
-trap "update_motion off" USR2
 
 update_discovery
 update_ceiling_mode
 update_cloud
 update_indicator
-update_motion off
 update_night_mode
 update_ota
 update_rtsp

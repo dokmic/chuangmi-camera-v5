@@ -25,7 +25,6 @@ start() {
       ${RTSP_BITRATE_MODE:+-m$RTSP_BITRATE_MODE} \
       ${RTSP_USER:+-u$RTSP_USER} \
       ${RTSP_PASSWORD:+-p$RTSP_PASSWORD} \
-      $([ "${RTSP_MOTION_DETECTION:-0}" -eq 1 ] && echo -d) \
       $([ "${RTSP_MJPEG:-0}" -eq 1 ] && echo -j) \
       $([ "${RTSP_MPEG4:-0}" -eq 1 ] && echo -4)
 }

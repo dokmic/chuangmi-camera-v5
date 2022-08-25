@@ -4,11 +4,6 @@ BUILD_DIR := $(CURDIR)/build
 FIRMWARE_DIR := $(CURDIR)/firmware
 SRC_DIR := $(CURDIR)/src
 
-export CFLAGS := -fPIC
-export CPPFLAGS := -I/usr/src/gm_lib/inc -I$(SRC_DIR)/lib -L/usr/src/gm_lib/lib -L$(BUILD_DIR)/lib
-export LDFLAGS := -I$(SRC_DIR)/lib -L$(BUILD_DIR)/lib -Wl,--enable-new-dtags
-export LDSHAREDFLAGS := -I$(SRC_DIR)/lib -L$(BUILD_DIR)/lib
-
 BIN := \
 	$(BUILD_DIR)/bin/ceiling-mode \
 	$(BUILD_DIR)/bin/indicator \
@@ -25,25 +20,29 @@ $(BUILD_DIR) $(BUILD_DIR)/bin $(BUILD_DIR)/lib:
 	@mkdir -p $(@)
 
 $(BUILD_DIR)/bin/%: $(LIB) $(SRC_DIR)/bin/%.c | $(BUILD_DIR)/bin
-	cd $(SRC_DIR)/bin && $(CC) \
-		$(CPPFLAGS) \
+	$(CC) \
+		-L$(BUILD_DIR)/lib \
+		-I$(SRC_DIR)/lib \
 		-Wall \
 		-o $(@) \
-		$(@F).c \
+		$(SRC_DIR)/bin/$(@F).c \
 		-l isp328 \
 		-l led \
 		-l pwm \
 		-l gpio
 	$(STRIP) $(@)
 
-$(BUILD_DIR)/bin/rtspd: $(SRC_DIR)/bin/rtspd/* | $(BUILD_DIR)/bin
-	cd $(SRC_DIR)/bin/rtspd && $(CC) \
-		$(CPPFLAGS) \
+$(BUILD_DIR)/bin/rtspd: SDK_DIR := /usr/src/gm_graph
+$(BUILD_DIR)/bin/rtspd: $(SRC_DIR)/bin/rtspd.c | $(BUILD_DIR)/bin
+	$(CC) \
+		-L$(SDK_DIR)/gm_lib/lib \
+		-I$(SDK_DIR)/gm_lib/inc \
+		-I$(SDK_DIR)/product/GM8136_1MP/samples \
 		-DLOG_USE_COLOR \
 		-Wall \
 		-o $(@) \
-		$(@F).c \
-		librtsp.a \
+		$(SRC_DIR)/bin/$(@F).c \
+		$(SDK_DIR)/product/GM8136_1MP/samples/librtsp.a \
 		-l gm \
 		-l m \
 		-l pthread \
@@ -51,7 +50,7 @@ $(BUILD_DIR)/bin/rtspd: $(SRC_DIR)/bin/rtspd/* | $(BUILD_DIR)/bin
 	$(STRIP) $(@)
 
 $(BUILD_DIR)/lib/lib%.so: $(SRC_DIR)/lib/%.* | $(BUILD_DIR)/lib
-	$(LDSHARED) $(CFLAGS) -o $(@) $(SRC_DIR)/lib/$(basename $(@F:lib%=%)).c
+	$(LDSHARED) -fPIC -o $(@) $(SRC_DIR)/lib/$(basename $(@F:lib%=%)).c
 	$(STRIP) $(@)
 
 $(FIRMWARE_DIR)/openssl/lib: OPENSSL_URL := https://www.openssl.org/source/openssl-1.1.1q.tar.gz
@@ -90,10 +89,10 @@ $(BUILD_DIR)/manufacture.dat: $(SRC_DIR)/loader | $(BUILD_DIR)
 $(BUILD_DIR)/firmware.bin: \
 	$(BIN) \
 	$(LIB) \
-	$(shell find $(SRC_DIR) ! -name '*.[ach]' ! -name loader)
+	$(shell find $(SRC_DIR) ! -name '*.[ch]' ! -name loader)
 	tar czf $(@) --transform 's|^\.|firmware|' \
 		-C $(BUILD_DIR) `cd $(BUILD_DIR) && find -path './bin/*' -o  -path './lib/*'` \
-		-C $(SRC_DIR) `cd $(SRC_DIR) && find ! -type d ! -name '*.[ach]' ! -name loader`
+		-C $(SRC_DIR) `cd $(SRC_DIR) && find ! -type d ! -name '*.[ch]' ! -name loader`
 
 .PHONY: default dist clean
 

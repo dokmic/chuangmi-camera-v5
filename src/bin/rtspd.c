@@ -10,27 +10,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <pthread.h>
-#include <ctype.h>
 #include <string.h>
 #include <signal.h>
-#include <time.h>
 #include <unistd.h>
-#include <errno.h>
-#include <libgen.h>
-#include <arpa/inet.h>
 #include <sys/time.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/stat.h>
-#include <sys/ioctl.h>
 #include <netinet/in.h>
-#include <net/if.h>
-#include <dirent.h>
 #include <syslog.h>
 
 #include "gmlib.h"
 #include "librtsp.h"
-#include "algorithm/capture_motion_detection.c"
 
 #define DVR_ENC_EBST_ENABLE      0x55887799
 #define DVR_ENC_EBST_DISABLE     0
@@ -56,16 +44,10 @@
 
 #define ERR_GOTO(x, y)           do { ret = x; goto y; } while(0)
 #define MUTEX_FAILED(x)          (x == ERR_MUTEX)
-#define VIDEO_FRAME_NUMBER       VQ_LEN+1
 
 #define NONE_BS_EVENT            0
 #define START_BS_EVENT           1
 #define STOP_BS_EVENT            2
-
-#define MD_DATA_LEN              (720 * 576 / 4)
-
-#define MOTION_ON_SCRIPT         "kill -USR1 $(pidof -s mqtt)"
-#define MOTION_OFF_SCRIPT        "kill -USR2 $(pidof -s mqtt)"
 
 #define CHECK_CHANNUM_AND_SUBNUM(ch_num, sub_num)    \
     do {    \
@@ -80,15 +62,11 @@
 #define log_error(...) syslog(LOG_ERR, __VA_ARGS__)
 #define log_fatal(...) syslog(LOG_CRIT, __VA_ARGS__)
 
-struct mdt_alg_t mdt_alg = {mb_cell_en: NULL};
-struct mdt_result_t mdt_result[ENC_TRACK_NUM];
-
 typedef struct {
     void *obj;
     gm_cap_attr_t cap_attr;
     gm_3dnr_attr_t dnr_attr;
 } gm_cap_info_t;
-
 
 typedef struct {
     void *obj;
@@ -99,7 +77,6 @@ typedef struct {
         gm_mjpege_attr_t mjpege_attr;
     } codec;
 } gm_enc_info_t;
-
 
 typedef struct {
     gm_cap_info_t cap;
@@ -168,7 +145,6 @@ typedef struct st_av {
 
 pthread_t enqueue_thread_id   = 0;
 pthread_t encode_thread_id    = 0;
-pthread_t motion_thread_id    = 0;
 
 unsigned int sys_tick         = 0;
 struct timeval sys_sec        = {-1, -1};
@@ -178,8 +154,6 @@ char *ipptr                   = NULL;
 static int rtspd_sysinit      = 0;
 static int rtspd_set_event    = 0;
 static int rtspd_avail_ch     = 0;
-
-static int motion_detected    = 0;
 
 pthread_mutex_t stream_queue_mutex;
 av_t enc[CAP_CH_NUM];
@@ -192,8 +166,6 @@ void *encode_object;
 void *sub_enc_object;             // * Create encoder object (scaler)
 void *sub_bindfd;                 // * Create encoder object (scaler) bind
 
-struct timeval last_motion;
-
 struct CommandLineArguments {
     int framerate;
     int height;
@@ -201,11 +173,9 @@ struct CommandLineArguments {
     int bitrate;
     int bitrateMode;
     int encoderType;
-    int motion;
     char *user;
     char *password;
 } cliArgs;
-
 
 static char *rtsp_enc_type_str[] = {
     "H264 ",
@@ -214,85 +184,6 @@ static char *rtsp_enc_type_str[] = {
 };
 
 static int rtsp_use_auth = 0;
-
-static int set_cap_motion(int cap_vch, unsigned int id, unsigned int value)
-{
-    int ret = 0;
-    gm_cap_motion_t cap_motion;
-
-    cap_motion.id = id; //alpha
-    cap_motion.value = value;
-
-    ret = gm_set_cap_motion(cap_vch, &cap_motion);
-    if (ret < 0) {
-        log_error("Failed to run gm_set_cap_motion");
-        return -1;
-    }
-    return 0;
-}
-
-
-static int set_interesting_area(int ch)
-{
-    int ret = 0;
-    int mb_w_num, mb_h_num;
-    int h, w;
-    gm_enc_t *param;
-
-    mdt_alg.u_width       = gm_system.cap[ch].dim.width;
-    mdt_alg.u_height      = gm_system.cap[ch].dim.height;
-    mdt_alg.u_mb_width    = 32;
-    mdt_alg.u_mb_height   = 32;
-    mdt_alg.training_time = 15;
-    mdt_alg.frame_count   = 0;
-    mdt_alg.sensitive_th  = 80;
-    mdt_alg.alarm_th      = 17;  // mb_h_num * mb_w_num * (5/100)
-
-    mb_w_num              = (mdt_alg.u_width + (mdt_alg.u_mb_width - 1)) / mdt_alg.u_mb_width;
-    mb_h_num              = (mdt_alg.u_height + (mdt_alg.u_mb_height - 1)) / mdt_alg.u_mb_height;
-    mdt_alg.mb_w_num      = mb_w_num;
-    mdt_alg.mb_h_num      = mb_h_num;
-
-    mdt_alg.mb_cell_en = (unsigned char *)malloc(sizeof(unsigned char) * mb_w_num * mb_h_num);
-    if (mdt_alg.mb_cell_en == NULL) {
-        log_error("Failed to allocate mb_cell_en");
-        ret = -1;
-        goto err_ext;
-    }
-
-    memset(mdt_alg.mb_cell_en, 0, (sizeof(unsigned char) * mb_w_num * mb_h_num));
-
-    // * Set Area
-    for (h = 0; h < mb_h_num; h++) {
-        for (w = 0; w < mb_w_num; w++) {
-            mdt_alg.mb_cell_en[(h * mb_w_num + w)] = 1;
-        }
-    }
-
-    set_cap_motion(ch, 0, 32);      // * Alpha
-    set_cap_motion(ch, 1, 7371);    // * TBG
-    set_cap_motion(ch, 2, 7);       // * Init val
-    set_cap_motion(ch, 3, 9);       // * TB
-    set_cap_motion(ch, 4, 11);      // * Sigma
-    set_cap_motion(ch, 5, 15);      // * Prune
-    set_cap_motion(ch, 7, 0x9ffb0); // * Alpha accuracy
-    set_cap_motion(ch, 8, 9);       // * TG
-    set_cap_motion(ch, 10, 0x7fe0); // * One min alpha
-
-    param = &enc_param[0][0];
-    ret = motion_detection_update(param->bindfd[0], &mdt_alg);
-
-    if (ret != 0) {
-        log_error("Failed to execute motion_detection_update");
-        ret = -1;
-        goto err_ext;
-    }
-
-err_ext:
-    if (mdt_alg.mb_cell_en)
-        free(mdt_alg.mb_cell_en);
-    return ret;
-}
 
 static int do_queue_alloc(int type)
 {
@@ -304,13 +195,11 @@ static int do_queue_alloc(int type)
     return rc;
 }
 
-
 static unsigned int get_tick_gm(unsigned int tv_ms)
 {
     sys_tick = tv_ms*(RTP_HZ / 1000);
     return sys_tick;
 }
-
 
 static int convert_gmss_media_type(int type)
 {
@@ -333,7 +222,6 @@ static int convert_gmss_media_type(int type)
     }
     return media_type;
 }
-
 
 static int open_live_streaming(int ch_num, int sub_num)
 {
@@ -363,7 +251,6 @@ static int open_live_streaming(int ch_num, int sub_num)
 
     return 0;
 }
-
 
 #define TIMEVAL_DIFF(start, end) (((end.tv_sec)-(start.tv_sec))*1000000+((end.tv_usec)-(start.tv_usec)))
 static int write_rtp_frame_ext(int ch_num, int sub_num, void *data, int data_len, unsigned int tv_ms)
@@ -422,7 +309,6 @@ exit_free_as_buf:
     return 1;
 }
 
-
 static int close_live_streaming(int ch_num, int sub_num)
 {
     avbs_t *b;
@@ -451,7 +337,6 @@ err_exit:
     return ret;
 }
 
-
 int open_bs(int ch_num, int sub_num)
 {
     avbs_t *b;
@@ -478,7 +363,6 @@ int open_bs(int ch_num, int sub_num)
     return 0;
 }
 
-
 int close_bs(int ch_num, int sub_num)
 {
     av_t *e;
@@ -503,7 +387,6 @@ int close_bs(int ch_num, int sub_num)
     return 0;
 }
 
-
 static int bs_check_event(void)
 {
     int ch_num, sub_num, ret = 0;
@@ -521,7 +404,6 @@ static int bs_check_event(void)
 
     return ret;
 }
-
 
 void bs_new_event(void)
 {
@@ -566,7 +448,6 @@ void bs_new_event(void)
     }
 }
 
-
 int env_set_bs_new_event(int ch_num, int sub_num, int event)
 {
     avbs_t *b;
@@ -605,7 +486,6 @@ err_exit:
     return ret;
 }
 
-
 int set_poll_event(void)
 {
     int ch_num, sub_num, ret = -1;
@@ -627,7 +507,6 @@ int set_poll_event(void)
 
     return ret;
 }
-
 
 void get_enc_res(gm_enc_info_t *enc, int *enc_type, int *width, int *height)
 {
@@ -665,7 +544,6 @@ void get_enc_res(gm_enc_info_t *enc, int *enc_type, int *width, int *height)
     if (height)
         *height = h;
 }
-
 
 #define PRINT_INTERVAL_MS 5000
 static unsigned int frame_counts[CAP_CH_NUM][RTSP_NUM_PER_CAP] = {{0}};
@@ -713,7 +591,7 @@ static void print_enc_average(int ch_num, int sub_num, int bs_len, struct timeva
                 get_enc_res(gm_enc, &enc_type, &w, &h);
                 sprintf(res_str, "%dx%d", w, h);
 
-                log_info("path=/live/ch%02d_%d cap=%d_%d size=%s enc=%s fps=%d.%d kbps=%d motion=%d",
+                log_info("path=/live/ch%02d_%d cap=%d_%d size=%s enc=%s fps=%d.%d kbps=%d",
                         i,
                         j,
                         pb->video.cap_ch,
@@ -722,8 +600,7 @@ static void print_enc_average(int ch_num, int sub_num, int bs_len, struct timeva
                         rtsp_enc_type_str[enc_type],
                         (frame_counts[i][j] * 1000 / total_ms),
                         (frame_counts[i][j] * 100000 / total_ms) % 100,
-                        (rec_bs_len[i][j] * 8 / 1024) * 1000 / total_ms,
-                        motion_detected
+                        (rec_bs_len[i][j] * 8 / 1024) * 1000 / total_ms
                 );
 
                 frame_counts[i][j] = 0;
@@ -736,7 +613,6 @@ static void print_enc_average(int ch_num, int sub_num, int bs_len, struct timeva
     last_timeval.tv_sec = cur_timeval->tv_sec;
     last_timeval.tv_usec = cur_timeval->tv_usec;
 }
-
 
 #define POLL_WAIT_TIME 15000
 static unsigned int poll_wait_time = 0;
@@ -753,7 +629,6 @@ static void env_release_resources(void)
         pthread_mutex_destroy(&e->ubs_mutex);
     }
 }
-
 
 static int frm_cb(int type, int qno, gm_ss_entity *entity)
 {
@@ -776,7 +651,6 @@ static int frm_cb(int type, int qno, gm_ss_entity *entity)
     return 0;
 }
 
-
 priv_avbs_t *find_file_sr(char *name, int srno)
 {
     int ch_num, sub_num, hit=0;
@@ -798,7 +672,6 @@ priv_avbs_t *find_file_sr(char *name, int srno)
 
     return (hit ? pb : NULL);
 }
-
 
 static int cmd_cb(char *name, int sno, int cmd, void *p)
 {
@@ -861,117 +734,6 @@ cmd_cb_err:
     return ret;
 }
 
-static void *motion_thread(void *arg)
-{
-    int ch;
-    int ret;
-
-    gm_enc_t *param;
-    param = &enc_param[0][0];
-
-    gm_multi_cap_md_t *cap_md = NULL;
-    cap_md = (gm_multi_cap_md_t *) malloc(sizeof(gm_multi_cap_md_t) * 1);
-    if (cap_md == NULL) {
-        log_fatal("Failed to allocate capture motion info!");
-        goto thread_exit;
-    }
-
-    memset((void *) cap_md, 0, (sizeof(gm_multi_cap_md_t) * 1));
-
-    cap_md[0].bindfd = param->bindfd[0];
-    cap_md[0].cap_md_info.md_buf_len = CAP_MOTION_SIZE;
-    cap_md[0].cap_md_info.md_buf = (char *) malloc(CAP_MOTION_SIZE);
-
-    if (cap_md[0].cap_md_info.md_buf == NULL) {
-        log_fatal("Failed to allocate capture motion buffer!");
-        goto thread_exit;
-    }
-
-    int training_detected = 0;
-
-    while (rtspd_sysinit) {
-        ret = gm_recv_multi_cap_md(cap_md, 1);
-
-        if (ret < 0) {                  // * -1: Error, 0: Success
-            log_error("Failed to retrieve motion data (gm_recv_multi_cap_md)");
-            continue;
-        }
-
-        ret = motion_detection_handling(cap_md, &mdt_result[0], 1);
-        if (ret < 0) {                  // * -1: Error, 0: Success
-            log_fatal("Failed to handle motion data (motion_detection_handling)");
-            goto thread_exit;
-        }
-
-        for (ch = 0; ch < 1; ch++) {
-            if (mdt_result[ch].result == MOTION_PARSING_ERROR)
-                log_error("Failed parsing motion data.");
-
-            else if (mdt_result[ch].result == MOTION_INIT_ERROR)
-                log_error("Motion init error.");
-
-            else if (mdt_result[ch].result == MOTION_ALGO_ERROR)
-                log_error("Motion algorithm failed.");
-
-            else if (mdt_result[ch].result == MOTION_DATA_ERROR)
-                log_error("Motion data retrieval failed.");
-
-            // * Motion Training
-            else if (mdt_result[ch].result == MOTION_IS_TRAINING) {
-                if (training_detected == 0) {
-                    training_detected = 1;
-                    log_info("Motion detection training running.");
-                }
-            }
-
-            // * Motion ON
-            else if (mdt_result[ch].result == MOTION_DETECTED) {
-                if (motion_detected == 0) {
-                    gettimeofday(&last_motion, NULL);
-                    motion_detected = 1;
-
-                    log_info("Motion ON - executing motion on script");
-                    system(MOTION_ON_SCRIPT);
-                }
-            }
-
-            // * Motion OFF
-            else if (mdt_result[ch].result == NO_MOTION) {
-                if (motion_detected == 1) {
-                    motion_detected = 0;
-
-                    log_info("Motion OFF - executing motion off script");
-                    system(MOTION_OFF_SCRIPT);
-                }
-            }
-
-            else {
-                log_error("Undefined Motion Event");
-            }
-        }
-        usleep(200000);   // * Use a two second period to detect motion
-    }
-
-thread_exit:
-
-    if (cap_md) {
-        for (ch = 0 ; ch < 1; ch++) {
-            if (cap_md[ch].cap_md_info.md_buf)
-                free(cap_md[ch].cap_md_info.md_buf);
-        }
-    }
-
-    if (cap_md)
-        free(cap_md);
-
-    motion_detection_end();
-    pthread_exit(NULL);
-    motion_thread_id = (pthread_t)NULL;
-
-    return 0;
-}
-
-
 void *enqueue_thread(void *ptr)
 {
     while (rtspd_sysinit) {
@@ -989,7 +751,6 @@ void *enqueue_thread(void *ptr)
 
     return NULL;
 }
-
 
 void gm_update_bs_info(void)
 {
@@ -1011,7 +772,6 @@ void gm_update_bs_info(void)
         }
     }
 }
-
 
 int env_init(void)
 {
@@ -1067,7 +827,6 @@ int env_init(void)
     return ret;
 }
 
-
 static unsigned chipid;
 void gm_enc_init(int cap_ch, int cap_path, int rec_track, int enc_type, int mode, int framerate, int bitrate, int width, int height)
 {
@@ -1086,7 +845,7 @@ void gm_enc_init(int cap_ch, int cap_path, int rec_track, int enc_type, int mode
 
         // * GM813x capture path 0(liveview), 1(substream), 2(substream), 3(mainstream)
         cap_attr.path = cap_path;
-        cap_attr.enable_mv_data = 1;
+        cap_attr.enable_mv_data = 0;
         gm_set_attr(param->cap.obj, &cap_attr);                // * Set capture attribute
 
         // * Enable 3dnr if resolution > capture dim / 2
@@ -1150,21 +909,6 @@ void gm_enc_init(int cap_ch, int cap_path, int rec_track, int enc_type, int mode
     // * Bind channel recording
     param->bindfd[rec_track] = gm_bind(enc_groupfd, param->cap.obj, param->enc[rec_track].obj);
 
-    // * Set motion detection
-    if (cliArgs.motion == 1) {
-
-        // * Enable motion detection
-        motion_detection_init();
-
-        // * Set area for motion detection
-        int ret = 0;
-        ret = set_interesting_area(rec_track);
-
-        if (ret != 0) {
-            log_error("Failed running set_interesting_area!");
-        }
-    }
-
     // * Enable Scaler Encoder if downscaling is required (only for H264)
     if (enc_type == ENC_TYPE_H264 && (width < 1280 || height < 720)) {
         h264e_attr.ratectl.bitrate      = bitrate;
@@ -1177,7 +921,6 @@ void gm_enc_init(int cap_ch, int cap_path, int rec_track, int enc_type, int mode
 
     rtspd_avail_ch++;
 }
-
 
 int gm_get_chipinfo(void)
 {
@@ -1204,7 +947,6 @@ int gm_get_chipinfo(void)
 
     return chipid;
 }
-
 
 static int gm_get_max_bandwidth(char *list)
 {
@@ -1244,7 +986,6 @@ static int gm_get_max_bandwidth(char *list)
     return bandwidth;
 }
 
-
 int gm_get_bandwidth_info(void)
 {
     FILE *fp;
@@ -1281,7 +1022,6 @@ int gm_get_bandwidth_info(void)
         return 0;
 }
 
-
 void gm_graph_init(void)
 {
     int cap_fps;
@@ -1313,7 +1053,6 @@ void gm_graph_init(void)
     gm_enc_init(0, 0, 0, cliArgs.encoderType, cliArgs.bitrateMode, cliArgs.framerate, cliArgs.bitrate, cliArgs.width, cliArgs.height);
     gm_apply(enc_groupfd); // * Activate settings
 }
-
 
 void gm_graph_release(void)
 {
@@ -1349,7 +1088,6 @@ void gm_graph_release(void)
     gm_delete_groupfd(enc_groupfd);
     gm_release();
 }
-
 
 void *encode_thread(void *ptr)
 {
@@ -1523,7 +1261,6 @@ void *encode_thread(void *ptr)
     return NULL;
 }
 
-
 void update_video_sdp(int cap_ch, int cap_path, int rec_track)
 {
     char *bitstream_data = NULL;
@@ -1607,7 +1344,6 @@ void update_video_sdp(int cap_ch, int cap_path, int rec_track)
         free(bitstream_data);
 }
 
-
 static int rtspd_start(int port)
 {
     int ret, ch_num, stream;
@@ -1637,16 +1373,6 @@ static int rtspd_start(int port)
         pthread_attr_destroy(&attr);
     }
 
-    // * Motion Thread
-    if (cliArgs.motion == 1) {
-        if (motion_thread_id == (pthread_t)NULL) {
-            pthread_attr_init(&attr);
-            pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_DETACHED);
-            ret = pthread_create(&motion_thread_id, &attr, &motion_thread, NULL);
-            pthread_attr_destroy(&attr);
-        }
-    }
-
     // * Enqueue Thread
     if (enqueue_thread_id == (pthread_t)NULL) {
         pthread_attr_init(&attr);
@@ -1667,46 +1393,11 @@ static int rtspd_start(int port)
     return 0;
 }
 
-
-int is_bs_all_disable(void)
-{
-    av_t *e;
-    int ch_num, sub_num;
-
-    for (ch_num=0; ch_num < CAP_CH_NUM; ch_num++) {
-        e = &enc[ch_num];
-        for(sub_num=0; sub_num < RTSP_NUM_PER_CAP; sub_num++) {
-            if (e->bs[sub_num].enabled == DVR_ENC_EBST_ENABLE)
-                return 0;
-        }
-    }
-    return 1;
-}
-
-
 static void rtspd_stop(void)
 {
     pthread_mutex_destroy(&stream_queue_mutex);
     rtspd_sysinit = 0;
-
-    if (cliArgs.motion == 1)
-        motion_detection_end();
 }
-
-
-char *get_local_ip(void)
-{
-    int fd;
-    struct ifreq ifr;
-
-    fd = socket(AF_INET, SOCK_DGRAM, 0);
-    ifr.ifr_addr.sa_family = AF_INET;
-    strncpy(ifr.ifr_name, "wlan0", IFNAMSIZ-1);
-    ioctl(fd, SIOCGIFADDR, &ifr);
-    close(fd);
-    return inet_ntoa(((struct sockaddr_in *)&ifr.ifr_addr)->sin_addr);
-}
-
 
 static void print_usage(void)
 {
@@ -1722,14 +1413,11 @@ static void print_usage(void)
         "-u string      - Set the user name       (default: none)\n"
         "-p string      - Set the user password   (default: none)\n"
         "-j (optional)  - Use MJPEG encoding      (default: off)\n"
-        "-4 (optional)  - Use MPEG4 encoding      (default: off)\n\n"
-
-        "-d (optional)  - Enable motion detection (default: off)\n"
+        "-4 (optional)  - Use MPEG4 encoding      (default: off)\n"
     );
 
 	exit(EXIT_FAILURE);
 }
-
 
 void signal_handler(int sig)
 {
@@ -1741,7 +1429,6 @@ void signal_handler(int sig)
 
     exit(EXIT_SUCCESS);
 }
-
 
 int main(int argc, char *argv[])
 {
@@ -1756,7 +1443,6 @@ int main(int argc, char *argv[])
     cliArgs.height      = 720;
     cliArgs.bitrateMode = GM_EVBR;
     cliArgs.encoderType = ENC_TYPE_H264;
-    cliArgs.motion      = 0;
     cliArgs.user        = NULL;
     cliArgs.password    = NULL;
 
@@ -1768,9 +1454,6 @@ int main(int argc, char *argv[])
                 return 1;
             } else {
                 switch (argv[i][1]) {
-                    case 'd':
-                        cliArgs.motion      = 1;    // * Enable motion detection
-                        break;
                     case 'b':
                         cliArgs.bitrate     = atoi(&argv[i][2]);
                         break;
@@ -1873,4 +1556,3 @@ int main(int argc, char *argv[])
 
     return 0;
 }
-
