@@ -1,5 +1,3 @@
-CPUS := $(shell nproc --all)
-CURL := curl -qs --http1.1 -L --retry 10 --output
 BUILD_DIR := $(CURDIR)/build
 FIRMWARE_DIR := $(CURDIR)/firmware
 SRC_DIR := $(CURDIR)/src
@@ -32,22 +30,23 @@ $(BUILD_DIR)/bin/%: $(LIB) $(SRC_DIR)/bin/%.c | $(BUILD_DIR)/bin
 		-l gpio
 	$(STRIP) $(@)
 
-$(BUILD_DIR)/bin/rtspd: SDK_DIR := /usr/src/gm_graph
 $(BUILD_DIR)/bin/rtspd: $(SRC_DIR)/bin/rtspd.c | $(BUILD_DIR)/bin
+	tar -xzf $(CURDIR)/sdk/gm_lib_2015-01-09-IPCAM.tgz -C $(BUILD_DIR)
 	$(CC) \
-		-L$(SDK_DIR)/gm_lib/lib \
-		-I$(SDK_DIR)/gm_lib/inc \
-		-I$(SDK_DIR)/product/GM8136_1MP/samples \
+		-L$(BUILD_DIR)/gm_graph/gm_lib/lib \
+		-I$(BUILD_DIR)/gm_graph/gm_lib/inc \
+		-I$(BUILD_DIR)/gm_graph/product/GM8136_1MP/samples \
 		-DLOG_USE_COLOR \
 		-Wall \
 		-o $(@) \
 		$(SRC_DIR)/bin/$(@F).c \
-		$(SDK_DIR)/product/GM8136_1MP/samples/librtsp.a \
+		$(BUILD_DIR)/gm_graph/product/GM8136_1MP/samples/librtsp.a \
 		-l gm \
 		-l m \
 		-l pthread \
 		-l rt
 	$(STRIP) $(@)
+	rm -rf $(BUILD_DIR)/gm_graph
 
 $(BUILD_DIR)/lib/lib%.so: $(SRC_DIR)/lib/%.* | $(BUILD_DIR)/lib
 	$(LDSHARED) -fPIC -o $(@) $(SRC_DIR)/lib/$(basename $(@F:lib%=%)).c
@@ -57,7 +56,7 @@ $(FIRMWARE_DIR)/openssl/lib: OPENSSL_URL := https://www.openssl.org/source/opens
 $(FIRMWARE_DIR)/openssl/lib: OPENSSL_ARCHIVE := $(BUILD_DIR)/$(notdir $(OPENSSL_URL))
 $(FIRMWARE_DIR)/openssl/lib: OPENSSL_DIR := $(basename $(basename $(OPENSSL_ARCHIVE)))
 $(FIRMWARE_DIR)/openssl/lib: | $(BUILD_DIR)
-	test -f $(OPENSSL_ARCHIVE) || $(CURL) $(OPENSSL_ARCHIVE) $(OPENSSL_URL)
+	test -f $(OPENSSL_ARCHIVE) || curl -s --output $(OPENSSL_ARCHIVE) $(OPENSSL_URL)
 	test -d $(OPENSSL_DIR) || tar -xzf $(OPENSSL_ARCHIVE) -C $(BUILD_DIR)
 	cd $(OPENSSL_DIR) \
 		&& ./Configure \
@@ -72,19 +71,12 @@ $(FIRMWARE_DIR)/openssl/lib: | $(BUILD_DIR)
 			-DL_ENDIAN \
 			shared \
 			--prefix=$(BUILD_DIR)/openssl \
-		&& make -j$(CPUS) depend \
-		&& make -j$(CPUS)
+		&& make depend \
+		&& make
 	mkdir -p $(@)
 	cp -f $(OPENSSL_DIR)/libssl.so.1.1 $(OPENSSL_DIR)/libcrypto.so.1.1 $(@)
 	$(STRIP) $(@)/*
 	rm -rf $(OPENSSL_ARCHIVE) $(OPENSSL_DIR)
-
-$(BUILD_DIR)/manufacture.dat: $(SRC_DIR)/loader | $(BUILD_DIR)
-	tar cf $(BUILD_DIR)/manufacture.bin --transform 's|.*|manufacture/test_drv|' -C $(SRC_DIR) loader
-	openssl req -batch -new -key $(FIRMWARE_DIR)/private-key.pem -out $(BUILD_DIR)/request.pem
-	openssl x509 -req -in $(BUILD_DIR)/request.pem -signkey $(FIRMWARE_DIR)/private-key.pem -out $(BUILD_DIR)/certificate.pem
-	openssl smime -encrypt -binary -in $(BUILD_DIR)/manufacture.bin -outform DEM -out $(@) $(BUILD_DIR)/certificate.pem
-	rm $(BUILD_DIR)/request.pem $(BUILD_DIR)/certificate.pem
 
 $(BUILD_DIR)/firmware.bin: \
 	$(BIN) \
@@ -93,6 +85,15 @@ $(BUILD_DIR)/firmware.bin: \
 	tar czf $(@) --transform 's|^\.|firmware|' \
 		-C $(BUILD_DIR) `cd $(BUILD_DIR) && find -path './bin/*' -o  -path './lib/*'` \
 		-C $(SRC_DIR) `cd $(SRC_DIR) && find ! -type d ! -name '*.[ch]' ! -name loader`
+
+$(BUILD_DIR)/manufacture.bin: $(SRC_DIR)/loader | $(BUILD_DIR)
+	tar cf $(@) --transform 's|.*|manufacture/test_drv|' -C $(SRC_DIR) loader
+
+$(BUILD_DIR)/manufacture.dat: $(BUILD_DIR)/manufacture.bin
+	openssl req -batch -new -key $(FIRMWARE_DIR)/private-key.pem -out $(BUILD_DIR)/request.pem
+	openssl x509 -req -in $(BUILD_DIR)/request.pem -signkey $(FIRMWARE_DIR)/private-key.pem -out $(BUILD_DIR)/certificate.pem
+	openssl smime -encrypt -binary -in $(BUILD_DIR)/manufacture.bin -outform DEM -out $(@) $(BUILD_DIR)/certificate.pem
+	rm $(BUILD_DIR)/request.pem $(BUILD_DIR)/certificate.pem
 
 .PHONY: default dist clean
 

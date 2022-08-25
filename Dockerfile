@@ -28,11 +28,10 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/* \
   && rm -f /etc/dpkg/dpkg.cfg.d/02apt-speedup
 
-COPY sdk/toolchain_gnueabi-4.4.0_ARMv5TE.tgz sdk/gm_lib_2015-01-09-IPCAM.tgz /tmp/
+COPY sdk/toolchain_gnueabi-4.4.0_ARMv5TE.tgz /tmp/
 RUN mkdir -p /usr/src/arm-linux-3.3 \
   && tar -xzf /tmp/toolchain_gnueabi-4.4.0_ARMv5TE.tgz -C /usr/src/arm-linux-3.3 \
-  && tar -xzf /tmp/gm_lib_2015-01-09-IPCAM.tgz -C /usr/src \
-  && rm /tmp/toolchain_gnueabi-4.4.0_ARMv5TE.tgz /tmp/gm_lib_2015-01-09-IPCAM.tgz
+  && rm /tmp/toolchain_gnueabi-4.4.0_ARMv5TE.tgz
 
 WORKDIR /app
 VOLUME [ "/app" ]
