@@ -2,11 +2,32 @@
 
 local pid_file=/var/run/mqtt.pid
 
+enable() {
+  restartctl create mqtt --then="$(which service) mqtt start"
+  restartctl reload
+
+  echo "MQTT is enabled."
+}
+
+disable() {
+  restartctl delete mqtt
+  restartctl reload
+  service mqtt stop
+
+  echo "MQTT is disabled."
+}
+
+state() {
+  restartctl status mqtt || return $?
+}
+
 status() {
   [ -f $pid_file ] && kill -0 $(cat $pid_file) >/dev/null 2>&1 || return 1
 }
 
 start() {
+  echo "Starting MQTT service."
+
   status || start-stop-daemon \
     --background \
     --exec mqtt \
@@ -18,6 +39,8 @@ start() {
 }
 
 stop() {
+  echo "Stopping MQTT service."
+
   status && start-stop-daemon \
     --oknodo \
     --pidfile $pid_file \
@@ -26,17 +49,12 @@ stop() {
 }
 
 case "$1" in
-  start)
-    echo "Starting MQTT service."
-    start
-  ;;
-  stop)
-    echo "Stopping MQTT service."
-    stop
-  ;;
-  status)
-    status
-  ;;
+  enable) enable;;
+  disable) disable;;
+  state) state;;
+  status) status;;
+  start) start;;
+  stop) stop;;
 esac
 
 exit $?

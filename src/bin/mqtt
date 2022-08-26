@@ -140,9 +140,9 @@ set_indicator() {
 
 set_night_mode() {
   if [ "$1" = AUTO ]; then
-    service auto-night-mode enable
+    service night-mode enable
   else
-    service auto-night-mode disable
+    service night-mode disable
     night-mode $([ "$1" = ON ] && echo --enable || echo --disable)
   fi
 }
@@ -173,7 +173,7 @@ update_ceiling_mode() {
 }
 
 update_cloud() {
-  mqtt_pub --topic $CLOUD_TOPIC --message $(service cloud status && echo ON || echo OFF)
+  mqtt_pub --topic $CLOUD_TOPIC --message $(service cloud state && echo ON || echo OFF)
 }
 
 update_indicator() {
@@ -181,7 +181,7 @@ update_indicator() {
 }
 
 update_night_mode() {
-  if service auto-night-mode status; then
+  if service night-mode state; then
     STATE=AUTO
   else
     STATE=$(night-mode --status && echo ON || echo OFF)
@@ -191,11 +191,11 @@ update_night_mode() {
 }
 
 update_ota() {
-  mqtt_pub --topic $OTA_TOPIC --message $(service ota status && echo ON || echo OFF)
+  mqtt_pub --topic $OTA_TOPIC --message $(service ota state && echo ON || echo OFF)
 }
 
 update_rtsp() {
-  mqtt_pub --topic $RTSP_TOPIC --message $(service rtsp status && echo ON || echo OFF)
+  mqtt_pub --topic $RTSP_TOPIC --message $(service rtsp state && echo ON || echo OFF)
 }
 
 stop() {

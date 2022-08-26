@@ -2,13 +2,33 @@
 
 local pid_file=/var/run/night-mode.pid
 
+enable() {
+  restartctl create night-mode --then="$(which service) night-mode start"
+  restartctl reload
+
+  echo "Automatic night mode is enabled."
+}
+
+disable() {
+  restartctl delete night-mode
+  restartctl reload
+  service night-mode stop
+
+  echo "Automatic night mode is disabled."
+}
+
+state() {
+  restartctl status night-mode || return $?
+}
+
 status() {
   [ -f $pid_file ] && kill -0 $(cat $pid_file) >/dev/null 2>&1 || return 1
 }
 
 start() {
-  eval "$(config | grep ^NIGHT_MODE_)"
+  echo "Starting automatic night mode."
 
+  eval "$(config | grep ^NIGHT_MODE_)"
   status || start-stop-daemon \
     --background \
     --exec night-mode \
@@ -26,6 +46,8 @@ start() {
 }
 
 stop() {
+  echo "Stopping automatic night mode."
+
   status && start-stop-daemon \
     --oknodo \
     --pidfile $pid_file \
@@ -34,17 +56,12 @@ stop() {
 }
 
 case "$1" in
-  start)
-    echo "Starting automatic night mode."
-    start
-  ;;
-  stop)
-    echo "Stopping automatic night mode."
-    stop
-  ;;
-  status)
-    status
-  ;;
+  enable) enable;;
+  disable) disable;;
+  state) state;;
+  status) status;;
+  start) start;;
+  stop) stop;;
 esac
 
 exit $?

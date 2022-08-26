@@ -1,13 +1,9 @@
 #!/bin/sh -l
 
-local night_mode="$(config get NIGHT_MODE || echo AUTO)"
-
 service ntp enable
-service auto-night-mode $([ "$night_mode" = AUTO ] && echo enable || echo disable)
-service ceiling-mode $([ "$(config get CEILING_MODE || echo 0)" -eq 1 ] && echo enable || echo disable)
 service cloud $([ "$(config get CLOUD || echo 0)" -eq 1 ] && echo enable || echo disable)
 service mqtt $([ "$(config get MQTT || echo 1)" -eq 1 ] && echo enable || echo disable)
-[ "$night_mode" != AUTO ] && service night-mode $([ "$night_mode" -eq 1 ] && echo enable || echo disable)
+service night-mode $([ "$(config get NIGHT_MODE || echo AUTO)" = AUTO ] && echo enable || echo disable)
 service ota $([ "$(config get OTA || echo 0)" -eq 1 ] && echo enable || echo disable)
 service rtsp $([ "$(config get RTSP || echo 1)" -eq 1 ] && echo enable || echo disable)
 service telnet $([ "$(config get TELNET || echo 0)" -eq 1 ] && echo enable || echo disable)

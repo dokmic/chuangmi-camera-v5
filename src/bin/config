@@ -34,18 +34,10 @@ local command=$1
 shift
 
 case "$command" in
-  update)
-    set_config
-  ;;
-  get)
-    get_value "$@"
-  ;;
-  set)
-    set_value "$@"
-  ;;
-  *)
-    get_config
-  ;;
+  update) set_config;;
+  get) get_value "$@";;
+  set) set_value "$@";;
+  *) get_config;;
 esac
 
 exit $?

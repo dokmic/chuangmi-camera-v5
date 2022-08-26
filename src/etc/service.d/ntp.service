@@ -1,6 +1,0 @@
-enable() {
-  restartctl create ntpd --then="$FIRMWARE_PATH/etc/init.d/ntp start"
-  restartctl reload
-
-  echo "NTP client is enabled."
-}

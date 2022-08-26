@@ -1,12 +1,7 @@
 #!/bin/sh -l
 
-local service=$1
+local service=$FIRMWARE_PATH/etc/init.d/$1
 local command=$2
-local path=$FIRMWARE_PATH/etc/service.d/$service.service
 shift 2
 
-[ ! -f "$path" ] && exit 1
-. "$path"
-[ "$(type "$command")" != "$command is a shell function" ] && exit 2
-
-$command "$@" || exit $?
+[ -x "$service" ] && "$service" "$command" "$@" || exit $?

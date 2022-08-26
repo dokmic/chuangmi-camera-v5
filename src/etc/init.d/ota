@@ -1,3 +1,5 @@
+#!/bin/sh -l
+
 local pre_ota=/mnt/data/miio_ota/pre-ota.sh
 
 enable() {
@@ -25,6 +27,14 @@ disable() {
   echo "OTA is disabled."
 }
 
-status() {
+state() {
   restartctl status miio_ota || return $?
 }
+
+case "$1" in
+  enable) enable;;
+  disable) disable;;
+  state) state;;
+esac
+
+exit $?

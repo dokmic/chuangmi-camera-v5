@@ -1,3 +1,5 @@
+#!/bin/sh -l
+
 enable() {
   # /mnt/data/imi/imi_init/S60miio_avstreamer
   binary enable /mnt/data/miio_av/miio_avstreamer
@@ -61,6 +63,14 @@ disable() {
   echo "Cloud services are disabled."
 }
 
-status() {
+state() {
   restartctl status miio_avstreamer || return $?
 }
+
+case "$1" in
+  enable) enable;;
+  disable) disable;;
+  state) state;;
+esac
+
+exit $?

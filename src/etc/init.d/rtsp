@@ -2,13 +2,33 @@
 
 local pid_file=/var/run/rtspd.pid
 
+enable() {
+  restartctl create rtspd --then="$(which service) rtsp start"
+  restartctl reload
+
+  echo "RTSP is enabled."
+}
+
+disable() {
+  restartctl delete rtspd
+  restartctl reload
+  service rtsp stop
+
+  echo "RTSP is disabled."
+}
+
+state() {
+  restartctl status rtspd || return $?
+}
+
 status() {
   [ -f $pid_file ] && kill -0 $(cat $pid_file) >/dev/null 2>&1 || return 1
 }
 
 start() {
-  eval "$(config | grep ^RTSP_)"
+  echo "Starting RTSP server."
 
+  eval "$(config | grep ^RTSP_)"
   status || start-stop-daemon \
     --background \
     --exec rtspd \
@@ -30,6 +50,8 @@ start() {
 }
 
 stop() {
+  echo "Stopping RTSP server."
+
   status && start-stop-daemon \
     --oknodo \
     --pidfile $pid_file \
@@ -38,17 +60,12 @@ stop() {
 }
 
 case "$1" in
-  start)
-    echo "Starting RTSP server."
-    start
-  ;;
-  stop)
-    echo "Stopping RTSP server."
-    stop
-  ;;
-  status)
-    status
-  ;;
+  enable) enable;;
+  disable) disable;;
+  state) state;;
+  status) status;;
+  start) start;;
+  stop) stop;;
 esac
 
 exit $?

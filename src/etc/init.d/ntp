@@ -2,11 +2,32 @@
 
 local pid_file=/var/run/ntpd.pid
 
+enable() {
+  restartctl create ntpd --then="$(which service) ntp start"
+  restartctl reload
+
+  echo "NTP client is enabled."
+}
+
+disable() {
+  restartctl delete ntpd
+  restartctl reload
+  service ntp stop
+
+  echo "Automatic night mode is disabled."
+}
+
+state() {
+  restartctl status ntpd || return $?
+}
+
 status() {
   [ -f $pid_file ] && kill -0 $(cat $pid_file) >/dev/null 2>&1 || return 1
 }
 
 start() {
+  echo "Starting NTP client."
+
   status || start-stop-daemon \
     --background \
     --exec ntpd \
@@ -19,6 +40,8 @@ start() {
 }
 
 stop() {
+  echo "Stopping NTP client."
+
   status && start-stop-daemon \
     --oknodo \
     --pidfile $pid_file \
@@ -27,17 +50,12 @@ stop() {
 }
 
 case "$1" in
-  start)
-    echo "Starting NTP client."
-    start
-  ;;
-  stop)
-    echo "Stopping NTP client."
-    stop
-  ;;
-  status)
-    status
-  ;;
+  enable) enable;;
+  disable) disable;;
+  state) state;;
+  status) status;;
+  start) start;;
+  stop) stop;;
 esac
 
 exit $?
