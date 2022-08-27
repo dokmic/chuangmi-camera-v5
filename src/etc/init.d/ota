@@ -19,9 +19,10 @@ enable() {
 }
 
 disable() {
-  binary disable /mnt/data/miio_ota/miio_ota
+  # /mnt/data/imi/imi_init/S95miio_ota
   restartctl disable miio_ota
   restartctl reload
+  binary disable /mnt/data/miio_ota/miio_ota
   mount | grep -q $pre_ota && umount $pre_ota
 
   echo "OTA is disabled."

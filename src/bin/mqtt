@@ -102,6 +102,19 @@ RTSP_CONFIG='{
   "unique_id": "'"$MQTT_ID-rtsp"'"
 }'
 
+STREAMER_TOPIC=$MQTT_TOPIC/streamer
+STREAMER_TOPIC_DISCOVERY=$MQTT_DISCOVERY_TOPIC/switch/$MQTT_ID/streamer/config
+STREAMER_TOPIC_SET=$STREAMER_TOPIC/set
+STREAMER_CONFIG='{
+  "name": "'"$MQTT_DISCOVERY_NAME Streamer"'",
+  "availability_topic": "'"$MQTT_TOPIC_AVAILABILITY"'",
+  "command_topic": "'"$STREAMER_TOPIC_SET"'",
+  "device": '"$MQTT_DEVICE"',
+  "retain": '"$MQTT_RETAIN"',
+  "state_topic": "'"$STREAMER_TOPIC"'",
+  "unique_id": "'"$MQTT_ID-streamer"'"
+}'
+
 alias mqtt_pub="mosquitto_pub $MQTT_OPTIONS --id $MQTT_ID.pub --retain"
 alias mqtt_sub="mosquitto_sub $MQTT_OPTIONS \
   --id $MQTT_ID.sub \
@@ -155,6 +168,10 @@ set_rtsp() {
   service rtsp $([ "$1" = ON ] && echo enable || echo disable)
 }
 
+set_streamer() {
+  service streamer $([ "$1" = ON ] && echo enable || echo disable)
+}
+
 update_availability() {
   mqtt_pub --topic $MQTT_TOPIC_AVAILABILITY --message $1
 }
@@ -166,6 +183,7 @@ update_discovery() {
   mqtt_pub --topic $NIGHT_MODE_TOPIC_DISCOVERY --message "$NIGHT_MODE_CONFIG"
   mqtt_pub --topic $OTA_TOPIC_DISCOVERY --message "$OTA_CONFIG"
   mqtt_pub --topic $RTSP_TOPIC_DISCOVERY --message "$RTSP_CONFIG"
+  mqtt_pub --topic $STREAMER_TOPIC_DISCOVERY --message "$STREAMER_CONFIG"
 }
 
 update_ceiling_mode() {
@@ -198,6 +216,10 @@ update_rtsp() {
   mqtt_pub --topic $RTSP_TOPIC --message $(service rtsp state && echo ON || echo OFF)
 }
 
+update_streamer() {
+  mqtt_pub --topic $STREAMER_TOPIC --message $(service streamer state && echo ON || echo OFF)
+}
+
 stop() {
   for pid in $(pgrep -P $$); do
     pkill -P $pid
@@ -217,6 +239,7 @@ update_indicator
 update_night_mode
 update_ota
 update_rtsp
+update_streamer
 
 killall mosquitto_sub 2>/dev/null
 
@@ -265,6 +288,11 @@ while :; do
       "$RTSP_TOPIC_SET")
         set_rtsp $VALUE
         update_rtsp
+      ;;
+
+      "$STREAMER_TOPIC_SET")
+        set_streamer $VALUE
+        update_streamer
       ;;
     esac
   done

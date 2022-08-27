@@ -6,4 +6,5 @@ service mqtt $([ "$(config get MQTT || echo 1)" -eq 1 ] && echo enable || echo d
 service night-mode $([ "$(config get NIGHT_MODE || echo AUTO)" = AUTO ] && echo enable || echo disable)
 service ota $([ "$(config get OTA || echo 0)" -eq 1 ] && echo enable || echo disable)
 service rtsp $([ "$(config get RTSP || echo 1)" -eq 1 ] && echo enable || echo disable)
+service streamer $([ "$(config get STREAMER || echo 0)" -eq 1 ] && echo enable || echo disable)
 service telnet $([ "$(config get TELNET || echo 0)" -eq 1 ] && echo enable || echo disable)

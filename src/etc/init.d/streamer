@@ -1,0 +1,31 @@
+#!/bin/sh -l
+
+enable() {
+  # /mnt/data/imi/imi_init/S60miio_avstreamer
+  binary enable /mnt/data/miio_av/miio_avstreamer
+  restartctl enable miio_avstreamer
+  restartctl reload
+
+  echo "Streamer is enabled."
+}
+
+disable() {
+  # /mnt/data/imi/imi_init/S60miio_avstreamer
+  restartctl disable miio_avstreamer
+  restartctl reload
+  binary disable /mnt/data/miio_av/miio_avstreamer
+
+  echo "Streamer is disabled."
+}
+
+state() {
+  restartctl status miio_avstreamer || return $?
+}
+
+case "$1" in
+  enable) enable;;
+  disable) disable;;
+  state) state;;
+esac
+
+exit $?
