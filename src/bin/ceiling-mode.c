@@ -15,9 +15,9 @@ int main(int argc, char *argv[])
         char command = getopt_long(argc, argv, "", options, &index);
 
         switch (command) {
-            case 'd': return !(flip_mode_set(0) && mirror_mode_set(0));
-            case 'e': return !(flip_mode_set(1) && mirror_mode_set(1));
-            case 's': return !(flip_mode_get() && mirror_mode_get());
+            case 'd': return !(set_flip_mode(0) && set_mirror_mode(0));
+            case 'e': return !(set_flip_mode(1) && set_mirror_mode(1));
+            case 's': return !(get_flip_mode() && get_mirror_mode());
             default: return 1;
         }
     }

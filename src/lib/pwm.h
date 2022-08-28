@@ -6,7 +6,7 @@
 #include <sys/ioctl.h>
 #include <syslog.h>
 
-int ir_led_get(void);
-int ir_led_set(int state);
+int get_ir_led(void);
+int set_ir_led(int state);
 
 #endif

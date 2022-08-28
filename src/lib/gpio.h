@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <syslog.h>
 
-int ir_cut_get(void);
-int ir_cut_set(int state);
+int get_ir_cut(void);
+int set_ir_cut(int state);
 
 #endif

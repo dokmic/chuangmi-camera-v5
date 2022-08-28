@@ -3,7 +3,7 @@
 #define BLUE_LED_BRIGHTNESS "/sys/class/leds/BLUE/brightness"
 #define BLUE_LED_DELAY_ON "/sys/class/leds/BLUE/delay_on"
 
-int blue_led_get(void)
+int get_blue_led(void)
 {
     int fd = open(BLUE_LED_BRIGHTNESS, O_RDONLY);
     if (fd == -1) {
@@ -30,7 +30,7 @@ int blue_led_get(void)
     return 1;
 }
 
-int blue_led_set(int state)
+int set_blue_led(int state)
 {
     FILE *fd = fopen(BLUE_LED_BRIGHTNESS, "w");
     if (!fd) {

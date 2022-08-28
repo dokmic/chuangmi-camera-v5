@@ -35,15 +35,15 @@ static struct {
 
 void darkness_mode_set(int state)
 {
-    night_mode_set(state);
-    ir_cut_set(state);
-    ir_led_set(state);
+    set_night_mode(state);
+    set_ir_cut(state);
+    set_ir_led(state);
 }
 
 void night_mode_auto(void)
 {
     while (1) {
-        unsigned int light_info = light_info_get();
+        unsigned int light_info = get_light_info();
         if (!light_info) {
             syslog(LOG_ERR, "Failed to get EV and IR");
             sleep(arguments.delay);
@@ -61,7 +61,7 @@ void night_mode_auto(void)
         state.ir = ir;
         syslog(LOG_DEBUG, "EV=%d; IR=%d", ev ,ir);
 
-        int night_mode = night_mode_get();
+        int night_mode = get_night_mode();
 
         if (ev < arguments.ev_on && ir > arguments.ir_on && !night_mode) {
             darkness_mode_set(1);
@@ -88,9 +88,9 @@ int main(int argc, char *argv[])
         }
 
         switch (command) {
-            case 'd': return !night_mode_set(0);
-            case 'e': return !night_mode_set(1);
-            case 's': return !night_mode_get();
+            case 'd': return !set_night_mode(0);
+            case 'e': return !set_night_mode(1);
+            case 's': return !get_night_mode();
             case 'h':
                 arguments.delay = atoi(optarg);
                 break;

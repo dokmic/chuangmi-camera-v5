@@ -16,12 +16,12 @@
 
 static int isp328_fd = -1;
 
-void isp328_destroy(void)
+void destroy_isp328(void)
 {
     close(isp328_fd);
 }
 
-int isp328_initialize(void)
+int initialize_isp328(void)
 {
     if (isp328_fd != -1 && fcntl(isp328_fd, F_GETFD) != -1) {
         return 1;
@@ -39,14 +39,14 @@ int isp328_initialize(void)
         return 0;
     }
 
-    atexit(isp328_destroy);
+    atexit(destroy_isp328);
 
     return 1;
 }
 
-int flip_mode_get(void)
+int get_flip_mode(void)
 {
-    if (!isp328_initialize()) {
+    if (!initialize_isp328()) {
         return 0;
     }
 
@@ -60,9 +60,9 @@ int flip_mode_get(void)
     return state;
 }
 
-int flip_mode_set(int state)
+int set_flip_mode(int state)
 {
-    if (!isp328_initialize()) {
+    if (!initialize_isp328()) {
         return 0;
     }
 
@@ -72,9 +72,9 @@ int flip_mode_set(int state)
     return 1;
 }
 
-int mirror_mode_get(void)
+int get_mirror_mode(void)
 {
-    if (!isp328_initialize()) {
+    if (!initialize_isp328()) {
         return 0;
     }
 
@@ -88,9 +88,9 @@ int mirror_mode_get(void)
     return state;
 }
 
-int mirror_mode_set(int state)
+int set_mirror_mode(int state)
 {
-    if (!isp328_initialize()) {
+    if (!initialize_isp328()) {
         return 0;
     }
 
@@ -100,9 +100,9 @@ int mirror_mode_set(int state)
     return 1;
 }
 
-int night_mode_get(void)
+int get_night_mode(void)
 {
-    if (!isp328_initialize()) {
+    if (!initialize_isp328()) {
         return 0;
     }
 
@@ -116,9 +116,9 @@ int night_mode_get(void)
     return state;
 }
 
-int night_mode_set(int state)
+int set_night_mode(int state)
 {
-    if (!isp328_initialize()) {
+    if (!initialize_isp328()) {
         return 0;
     }
 
@@ -128,9 +128,9 @@ int night_mode_set(int state)
     return 1;
 }
 
-unsigned int light_info_get(void)
+unsigned int get_light_info(void)
 {
-    if (!isp328_initialize()) {
+    if (!initialize_isp328()) {
         return 0;
     }
 

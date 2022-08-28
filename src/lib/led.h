@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <syslog.h>
 
-int blue_led_get(void);
-int blue_led_set(int state);
+int get_blue_led(void);
+int set_blue_led(int state);
 
 #endif

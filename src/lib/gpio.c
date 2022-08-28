@@ -18,7 +18,7 @@
 #define GPIO_PIN_IRCUT_ON 15
 #define GPIO_PIN_IRCUT_OFF 14
 
-int gpio_export(int pin)
+int export_gpio(int pin)
 {
     int fd = open(GPIO_EXPORT, O_WRONLY);
     if (fd == -1) {
@@ -35,7 +35,7 @@ int gpio_export(int pin)
     return 1;
 }
 
-int gpio_unexport(int pin)
+int unexport_gpio(int pin)
 {
     int fd = open(GPIO_UNEXPORT, O_WRONLY);
     if (fd == -1) {
@@ -52,7 +52,7 @@ int gpio_unexport(int pin)
     return 1;
 }
 
-int gpio_direction(int pin, int direction)
+int set_gpio_direction(int pin, int direction)
 {
     static const char s_directions_str[]  = "in\0out";
 
@@ -77,7 +77,7 @@ int gpio_direction(int pin, int direction)
     return 1;
 }
 
-int gpio_is_active(int pin)
+int is_gpio_active(int pin)
 {
     char path[GPIO_VALUE_MAX];
     snprintf(path, GPIO_VALUE_MAX, GPIO_VALUE, pin);
@@ -85,7 +85,7 @@ int gpio_is_active(int pin)
     return !access(path, F_OK);
 }
 
-int gpio_read(int pin)
+int read_gpio(int pin)
 {
     char path[GPIO_VALUE_MAX];
     snprintf(path, GPIO_VALUE_MAX, GPIO_VALUE, pin);
@@ -109,7 +109,7 @@ int gpio_read(int pin)
     return atoi(value);
 }
 
-int gpio_write(int pin, int value)
+int write_gpio(int pin, int value)
 {
     char path[GPIO_VALUE_MAX];
     snprintf(path, GPIO_VALUE_MAX, GPIO_VALUE, pin);
@@ -132,15 +132,15 @@ int gpio_write(int pin, int value)
     return 1;
 }
 
-int ir_cut_initialize(void)
+int initialize_ir_cut(void)
 {
-    if (!(gpio_is_active(GPIO_PIN_IRCUT_ON) || gpio_export(GPIO_PIN_IRCUT_ON) && gpio_direction(GPIO_PIN_IRCUT_ON, OUT))) {
+    if (!(is_gpio_active(GPIO_PIN_IRCUT_ON) || export_gpio(GPIO_PIN_IRCUT_ON) && set_gpio_direction(GPIO_PIN_IRCUT_ON, OUT))) {
         syslog(LOG_ERR, "Failed to initialize GPIO%d", GPIO_PIN_IRCUT_ON);
 
         return 0;
     }
 
-    if (!(gpio_is_active(GPIO_PIN_IRCUT_OFF) || gpio_export(GPIO_PIN_IRCUT_OFF) && gpio_direction(GPIO_PIN_IRCUT_OFF, OUT))) {
+    if (!(is_gpio_active(GPIO_PIN_IRCUT_OFF) || export_gpio(GPIO_PIN_IRCUT_OFF) && set_gpio_direction(GPIO_PIN_IRCUT_OFF, OUT))) {
         syslog(LOG_ERR, "Failed to initialize GPIO%d", GPIO_PIN_IRCUT_OFF);
 
         return 0;
@@ -149,23 +149,23 @@ int ir_cut_initialize(void)
     return 1;
 }
 
-int ir_cut_get(void)
+int get_ir_cut(void)
 {
-    if (!ir_cut_initialize()) {
+    if (!initialize_ir_cut()) {
         return 0;
     }
 
-    int state_on = gpio_read(GPIO_PIN_IRCUT_ON);
-    int state_off = gpio_read(GPIO_PIN_IRCUT_OFF);
+    int state_on = read_gpio(GPIO_PIN_IRCUT_ON);
+    int state_off = read_gpio(GPIO_PIN_IRCUT_OFF);
 
     return state_on == 1 && state_off == 0;
 }
 
-int ir_cut_set(int state)
+int set_ir_cut(int state)
 {
-    if (!ir_cut_initialize()) {
+    if (!initialize_ir_cut()) {
         return 0;
     }
 
-    return gpio_write(GPIO_PIN_IRCUT_ON, !!state) && gpio_write(GPIO_PIN_IRCUT_OFF, !state);
+    return write_gpio(GPIO_PIN_IRCUT_ON, !!state) && write_gpio(GPIO_PIN_IRCUT_OFF, !state);
 }

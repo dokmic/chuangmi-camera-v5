@@ -5,15 +5,15 @@
 #include <sys/ioctl.h>
 #include <syslog.h>
 
-int flip_mode_get(void);
-int flip_mode_set(int state);
+int get_flip_mode(void);
+int set_flip_mode(int state);
 
-int mirror_mode_get(void);
-int mirror_mode_set(int state);
+int get_mirror_mode(void);
+int set_mirror_mode(int state);
 
-int night_mode_get(void);
-int night_mode_set(int state);
+int get_night_mode(void);
+int set_night_mode(int state);
 
-unsigned int light_info_get(void);
+unsigned int get_light_info(void);
 
 #endif

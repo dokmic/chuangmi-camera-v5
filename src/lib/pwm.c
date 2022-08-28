@@ -44,12 +44,12 @@ typedef struct pwm_info {
 static int pwm_fd = -1;
 static pwm_info_t pwm[2];
 
-void pwm_destroy(void)
+void destroy_pwm(void)
 {
     close(pwm_fd);
 }
 
-int pwm_initialize(void)
+int initialize_pwm(void)
 {
     system("modprobe ftpwmtmr010");
 
@@ -86,14 +86,14 @@ int pwm_initialize(void)
     ioctl(pwm_fd, PWM_IOCTL_UPDATE, &pwm[1].id);
     ioctl(pwm_fd, PWM_IOCTL_START, &pwm[1].id);
 
-    atexit(pwm_destroy);
+    atexit(destroy_pwm);
 
     return 1;
 }
 
-int ir_led_get(void)
+int get_ir_led(void)
 {
-    if (!pwm_initialize()) {
+    if (!initialize_pwm()) {
         return 0;
     }
 
@@ -102,9 +102,9 @@ int ir_led_get(void)
     return pwm[0].duty_ratio > 0;
 }
 
-int ir_led_set(int value)
+int set_ir_led(int value)
 {
-    if (!pwm_initialize()) {
+    if (!initialize_pwm()) {
         return 0;
     }
 

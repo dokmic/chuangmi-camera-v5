@@ -15,9 +15,9 @@ int main(int argc, char *argv[])
         char command = getopt_long(argc, argv, "", options, &index);
 
         switch (command) {
-            case 'd': return !blue_led_set(0);
-            case 'e': return !blue_led_set(1);
-            case 's': return !blue_led_get();
+            case 'd': return !set_blue_led(0);
+            case 'e': return !set_blue_led(1);
+            case 's': return !get_blue_led();
             default: return 1;
         }
     }
