@@ -3,7 +3,7 @@
 local pid_file=/var/run/mqtt.pid
 
 enable() {
-  restartctl create mqtt --then="$(which service) mqtt start"
+  restartctl create mqtt --pattern="$(which mqtt)" --then="$(which service) mqtt start"
   restartctl reload
 
   echo "MQTT is enabled."

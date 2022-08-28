@@ -1,229 +1,122 @@
 #!/bin/sh -l
 
 eval "$(config | grep ^MQTT_)"
-MQTT_ID=$(nvram factory get mac | tr [:upper:] [:lower:] | tr -d :)
-MQTT_NAME=${MQTT_NAME:-$MQTT_ID}
-MQTT_TOPIC=${MQTT_TOPIC:-miicam}/$MQTT_NAME
-MQTT_TOPIC_AVAILABILITY=$MQTT_TOPIC/availability
-MQTT_DISCOVERY_NAME=${MQTT_DISCOVERY_NAME:-$MQTT_NAME}
-MQTT_DISCOVERY_TOPIC=${MQTT_DISCOVERY_TOPIC:-homeassistant}
-MQTT_RETAIN=$([ "${MQTT_RETAIN:-1}" -eq 1 ] && echo "true" || echo "false")
-MQTT_DEVICE='{
-  "identifiers": "'"$MQTT_ID"'",
-  "manufacturer": "'"$(nvram get vendor)"'",
-  "model": "'"$(nvram get model)"'",
-  "name": "'"$MQTT_DISCOVERY_NAME"'"
-}'
-MQTT_OPTIONS="\
+local MQTT_ID=$(nvram factory get mac | tr [:upper:] [:lower:] | tr -d :)
+local MQTT_DISCOVERY_NAME=${MQTT_DISCOVERY_NAME:-${MQTT_NAME:-Camera $MQTT_ID}}
+local MQTT_DISCOVERY_TOPIC=${MQTT_DISCOVERY_TOPIC:-homeassistant}
+local MQTT_NAME=${MQTT_NAME:-$MQTT_ID}
+local MQTT_TOPIC=${MQTT_TOPIC:-$(nvram get vendor)}/$MQTT_NAME
+local MQTT_TOPIC_AVAILABILITY=$MQTT_TOPIC/availability
+
+local entities=$FIRMWARE_PATH/etc/mqtt.d
+local options="\
   --host $MQTT_HOST \
-  --port $MQTT_PORT \
+  ${MQTT_PORT:+--port $MQTT_PORT} \
+  ${MQTT_USER:+--username $MQTT_USER} \
+  ${MQTT_PASSWORD:+--pw $MQTT_PASSWORD} \
 "
 
-if [ "$MQTT_USER" != "" ] && [ "$MQTT_PASS" != "" ]; then
-  MQTT_OPTIONS="$MQTT_OPTIONS --username $MQTT_USER --pw $MQTT_PASS"
-fi
-
-CEILING_MODE_TOPIC=$MQTT_TOPIC/ceiling-mode
-CEILING_MODE_TOPIC_DISCOVERY=$MQTT_DISCOVERY_TOPIC/switch/$MQTT_ID/ceiling-mode/config
-CEILING_MODE_TOPIC_SET=$CEILING_MODE_TOPIC/set
-CEILING_MODE_CONFIG='{
-  "name": "'"$MQTT_DISCOVERY_NAME Ceiling Mode"'",
-  "availability_topic": "'"$MQTT_TOPIC_AVAILABILITY"'",
-  "command_topic": "'"$CEILING_MODE_TOPIC_SET"'",
-  "device": '"$MQTT_DEVICE"',
-  "retain": '"$MQTT_RETAIN"',
-  "state_topic": "'"$CEILING_MODE_TOPIC"'",
-  "unique_id": "'"$MQTT_ID-ceiling-mode"'"
-}'
-
-CLOUD_TOPIC=$MQTT_TOPIC/cloud
-CLOUD_TOPIC_DISCOVERY=$MQTT_DISCOVERY_TOPIC/switch/$MQTT_ID/cloud/config
-CLOUD_TOPIC_SET=$CLOUD_TOPIC/set
-CLOUD_CONFIG='{
-  "name": "'"$MQTT_DISCOVERY_NAME Cloud"'",
-  "availability_topic": "'"$MQTT_TOPIC_AVAILABILITY"'",
-  "command_topic": "'"$CLOUD_TOPIC_SET"'",
-  "device": '"$MQTT_DEVICE"',
-  "retain": '"$MQTT_RETAIN"',
-  "state_topic": "'"$CLOUD_TOPIC"'",
-  "unique_id": "'"$MQTT_ID-cloud"'"
-}'
-
-INDICATOR_TOPIC=$MQTT_TOPIC/indicator
-INDICATOR_TOPIC_DISCOVERY=$MQTT_DISCOVERY_TOPIC/switch/$MQTT_ID/indicator/config
-INDICATOR_TOPIC_SET=$INDICATOR_TOPIC/set
-INDICATOR_CONFIG='{
-  "name": "'"$MQTT_DISCOVERY_NAME Indicator"'",
-  "availability_topic": "'"$MQTT_TOPIC_AVAILABILITY"'",
-  "command_topic": "'"$INDICATOR_TOPIC_SET"'",
-  "device": '"$MQTT_DEVICE"',
-  "retain": '"$MQTT_RETAIN"',
-  "state_topic": "'"$INDICATOR_TOPIC"'",
-  "unique_id": "'"$MQTT_ID-indicator"'"
-}'
-
-NIGHT_MODE_TOPIC=$MQTT_TOPIC/night-mode
-NIGHT_MODE_TOPIC_DISCOVERY=$MQTT_DISCOVERY_TOPIC/select/$MQTT_ID/night-mode/config
-NIGHT_MODE_TOPIC_SET=$NIGHT_MODE_TOPIC/set
-NIGHT_MODE_CONFIG='{
-  "name": "'"$MQTT_DISCOVERY_NAME Night Mode"'",
-  "availability_topic": "'"$MQTT_TOPIC_AVAILABILITY"'",
-  "command_topic": "'"$NIGHT_MODE_TOPIC_SET"'",
-  "device": '"$MQTT_DEVICE"',
-  "options": ["AUTO", "ON", "OFF"],
-  "retain": '"$MQTT_RETAIN"',
-  "state_topic": "'"$NIGHT_MODE_TOPIC"'",
-  "unique_id": "'"$MQTT_ID-night-mode"'"
-}'
-
-OTA_TOPIC=$MQTT_TOPIC/ota
-OTA_TOPIC_DISCOVERY=$MQTT_DISCOVERY_TOPIC/switch/$MQTT_ID/ota/config
-OTA_TOPIC_SET=$OTA_TOPIC/set
-OTA_CONFIG='{
-  "name": "'"$MQTT_DISCOVERY_NAME OTA"'",
-  "availability_topic": "'"$MQTT_TOPIC_AVAILABILITY"'",
-  "command_topic": "'"$OTA_TOPIC_SET"'",
-  "device": '"$MQTT_DEVICE"',
-  "retain": '"$MQTT_RETAIN"',
-  "state_topic": "'"$OTA_TOPIC"'",
-  "unique_id": "'"$MQTT_ID-ota"'"
-}'
-
-RTSP_TOPIC=$MQTT_TOPIC/rtsp
-RTSP_TOPIC_DISCOVERY=$MQTT_DISCOVERY_TOPIC/switch/$MQTT_ID/rtsp/config
-RTSP_TOPIC_SET=$RTSP_TOPIC/set
-RTSP_CONFIG='{
-  "name": "'"$MQTT_DISCOVERY_NAME RTSP"'",
-  "availability_topic": "'"$MQTT_TOPIC_AVAILABILITY"'",
-  "command_topic": "'"$RTSP_TOPIC_SET"'",
-  "device": '"$MQTT_DEVICE"',
-  "retain": '"$MQTT_RETAIN"',
-  "state_topic": "'"$RTSP_TOPIC"'",
-  "unique_id": "'"$MQTT_ID-rtsp"'"
-}'
-
-STREAMER_TOPIC=$MQTT_TOPIC/streamer
-STREAMER_TOPIC_DISCOVERY=$MQTT_DISCOVERY_TOPIC/switch/$MQTT_ID/streamer/config
-STREAMER_TOPIC_SET=$STREAMER_TOPIC/set
-STREAMER_CONFIG='{
-  "name": "'"$MQTT_DISCOVERY_NAME Streamer"'",
-  "availability_topic": "'"$MQTT_TOPIC_AVAILABILITY"'",
-  "command_topic": "'"$STREAMER_TOPIC_SET"'",
-  "device": '"$MQTT_DEVICE"',
-  "retain": '"$MQTT_RETAIN"',
-  "state_topic": "'"$STREAMER_TOPIC"'",
-  "unique_id": "'"$MQTT_ID-streamer"'"
-}'
-
-alias mqtt_pub="mosquitto_pub $MQTT_OPTIONS --id $MQTT_ID.pub --retain"
-alias mqtt_sub="mosquitto_sub $MQTT_OPTIONS \
-  --id $MQTT_ID.sub \
+alias get_state_topic="printf '$MQTT_TOPIC/%s'"
+alias get_command_topic="printf '$MQTT_TOPIC/%s/set'"
+alias publish="mosquitto_pub $options \
+  --id $MQTT_ID.publish \
+  --retain \
+"
+alias subscribe="mosquitto_sub $options \
+  --id $MQTT_ID.subscribe \
   --keepalive 10 \
   --verbose \
   --will-topic $MQTT_TOPIC_AVAILABILITY \
   --will-payload offline \
   --will-retain \
 "
-alias upper="tr [:lower:] [:upper:]"
 
-get_value() {
-  local INPUT=$1
-  local TOPIC=$(echo "$INPUT" | cut -d " " -f 1)
+process_message() {
+  local topic=$(echo "$1" | cut -d " " -f 1)
+  local value=$(echo "$1" | cut -d " " -f 2- | tr [:lower:] [:upper:])
+  local id=$(echo "$topic" | sed -r 's~.*/([^/]+)/set$~\1~')
+  local entity=$entities/$id
 
-  echo "$INPUT" | sed -e "s#$TOPIC##g"
+  [ ! -f "$entity" ] && return 1
+
+  source $entity
+  set_state $value
+  publish --topic "$(get_state_topic $id)" --message "$(get_state)"
 }
 
-get_topic() {
-  local INPUT=$1
-
-  echo $INPUT | cut -d " " -f 1
+publish_availability() {
+  publish --topic $MQTT_TOPIC_AVAILABILITY --message online
 }
 
-set_ceiling_mode() {
-  ceiling-mode $([ "$1" = ON ] && echo --enable || echo --disable)
+publish_discoverability() {
+  local device='{
+    "identifiers": "'"$MQTT_ID"'",
+    "manufacturer": "'"$(nvram get vendor)"'",
+    "model": "'"$(nvram get model)"'",
+    "name": "'"$MQTT_DISCOVERY_NAME"'"
+  }'
+
+  for entity in $entities/*; do
+    source $entity
+
+    local id=$(basename $entity)
+    local topic=$MQTT_DISCOVERY_TOPIC/$TYPE/$MQTT_ID/$id/config
+    local config='{
+      '"${CONFIG:+$CONFIG,}"'
+      "name": "'"$MQTT_DISCOVERY_NAME $NAME"'",
+      "availability_topic": "'"$MQTT_TOPIC_AVAILABILITY"'",
+      "command_topic": "'"$(get_command_topic $id)"'",
+      "device": '"$device"',
+      "state_topic": "'"$(get_state_topic $id)"'",
+      "unique_id": "'"$MQTT_ID-$id"'"
+    }'
+
+    publish --topic "$topic" --message "$config"
+  done
 }
 
-set_cloud() {
-  service cloud $([ "$1" = ON ] && echo enable || echo disable)
+publish_state() {
+  for entity in $entities/*; do
+    source $entity
+
+    local id=$(basename $entity)
+    local topic=$(get_state_topic $id)
+    local state=$(get_state)
+
+    publish --topic "$topic" --message "$state"
+  done
 }
 
-set_indicator() {
-  indicator $([ "$1" = ON ] && echo --enable || echo --disable)
+worker_command() {
+  while :; do
+    if [ -z "$READY" ]; then
+      printf mqtt.command >/proc/$(sh -c 'echo $PPID')/comm
+      READY=1
+    fi
+
+    subscribe --topic "$MQTT_TOPIC/+/set" | while read -r message; do
+      echo "Incoming message: $message"
+      process_message "$message"
+    done
+  done
 }
 
-set_night_mode() {
-  if [ "$1" = AUTO ]; then
-    service night-mode enable
-  else
-    service night-mode disable
-    night-mode $([ "$1" = ON ] && echo --enable || echo --disable)
-  fi
-}
+worker_state() {
+  while :; do
+    if [ -z "$READY" ]; then
+      printf mqtt.state >/proc/$(sh -c 'echo $PPID')/comm
+      READY=1
+    fi
 
-set_ota() {
-  service ota $([ "$1" = ON ] && echo enable || echo disable)
-}
-
-set_rtsp() {
-  service rtsp $([ "$1" = ON ] && echo enable || echo disable)
-}
-
-set_streamer() {
-  service streamer $([ "$1" = ON ] && echo enable || echo disable)
-}
-
-update_availability() {
-  mqtt_pub --topic $MQTT_TOPIC_AVAILABILITY --message $1
-}
-
-update_discovery() {
-  mqtt_pub --topic $CEILING_MODE_TOPIC_DISCOVERY --message "$CEILING_MODE_CONFIG"
-  mqtt_pub --topic $CLOUD_TOPIC_DISCOVERY --message "$CLOUD_CONFIG"
-  mqtt_pub --topic $INDICATOR_TOPIC_DISCOVERY --message "$INDICATOR_CONFIG"
-  mqtt_pub --topic $NIGHT_MODE_TOPIC_DISCOVERY --message "$NIGHT_MODE_CONFIG"
-  mqtt_pub --topic $OTA_TOPIC_DISCOVERY --message "$OTA_CONFIG"
-  mqtt_pub --topic $RTSP_TOPIC_DISCOVERY --message "$RTSP_CONFIG"
-  mqtt_pub --topic $STREAMER_TOPIC_DISCOVERY --message "$STREAMER_CONFIG"
-}
-
-update_ceiling_mode() {
-  mqtt_pub --topic $CEILING_MODE_TOPIC --message $(ceiling-mode --status && echo ON || echo OFF)
-}
-
-update_cloud() {
-  mqtt_pub --topic $CLOUD_TOPIC --message $(service cloud state && echo ON || echo OFF)
-}
-
-update_indicator() {
-  mqtt_pub --topic $INDICATOR_TOPIC --message $(indicator --status && echo ON || echo OFF)
-}
-
-update_night_mode() {
-  if service night-mode state; then
-    STATE=AUTO
-  else
-    STATE=$(night-mode --status && echo ON || echo OFF)
-  fi
-
-  mqtt_pub --topic $NIGHT_MODE_TOPIC --message $STATE
-}
-
-update_ota() {
-  mqtt_pub --topic $OTA_TOPIC --message $(service ota state && echo ON || echo OFF)
-}
-
-update_rtsp() {
-  mqtt_pub --topic $RTSP_TOPIC --message $(service rtsp state && echo ON || echo OFF)
-}
-
-update_streamer() {
-  mqtt_pub --topic $STREAMER_TOPIC --message $(service streamer state && echo ON || echo OFF)
+    publish_availability
+    publish_state
+    sleep 60
+  done
 }
 
 stop() {
   for pid in $(pgrep -P $$); do
-    pkill -P $pid
-    kill $pid
+    kill $pid $(pgrep -P $pid)
   done
 
   exit
@@ -232,72 +125,8 @@ stop() {
 printf mqtt >/proc/$$/comm
 trap stop HUP INT QUIT ABRT TERM
 
-update_discovery
-update_ceiling_mode
-update_cloud
-update_indicator
-update_night_mode
-update_ota
-update_rtsp
-update_streamer
+publish_discoverability | logger -t mqtt
+worker_command | logger -t mqtt &
+worker_state | logger -t mqtt &
 
-killall mosquitto_sub 2>/dev/null
-
-while :; do
-  if [ -z "$READY" ]; then
-    printf mqtt.sub >/proc/$(sh -c 'echo $PPID')/comm
-    READY=1
-  fi
-
-  update_availability online
-  mqtt_sub --topic "$MQTT_TOPIC/#" | while read -r LINE; do
-    echo "Incoming MQTT message: $LINE"
-    VALUE=$(get_value "$LINE" | upper)
-    TOPIC=$(get_topic "$LINE")
-
-    case "$TOPIC" in
-      "$MQTT_TOPIC_AVAILABILITY")
-        [ $VALUE = OFFLINE ] && update_availability online
-      ;;
-
-      "$CEILING_MODE_TOPIC_SET")
-        set_ceiling_mode $VALUE
-        update_ceiling_mode
-      ;;
-
-      "$CLOUD_TOPIC_SET")
-        set_cloud $VALUE
-        update_cloud
-      ;;
-
-      "$INDICATOR_TOPIC_SET")
-        set_indicator $VALUE
-        update_indicator
-      ;;
-
-      "$NIGHT_MODE_TOPIC_SET")
-        set_night_mode $VALUE
-        update_night_mode
-      ;;
-
-      "$OTA_TOPIC_SET")
-        set_ota $VALUE
-        update_ota
-      ;;
-
-      "$RTSP_TOPIC_SET")
-        set_rtsp $VALUE
-        update_rtsp
-      ;;
-
-      "$STREAMER_TOPIC_SET")
-        set_streamer $VALUE
-        update_streamer
-      ;;
-    esac
-  done
-done | logger -t mqtt &
-
-while :; do
-  sleep 1
-done
+while :; do sleep 1; done

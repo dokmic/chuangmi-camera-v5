@@ -1,0 +1,13 @@
+#!/bin/sh
+
+NAME=Cloud
+TYPE=switch
+
+get_state() {
+  service cloud state && echo ON || echo OFF
+}
+
+set_state() {
+  service cloud $([ "$1" = ON ] && echo enable || echo disable)
+  config set CLOUD $([ "$1" = ON ] && echo 1 || echo 0)
+}

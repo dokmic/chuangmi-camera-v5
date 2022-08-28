@@ -1,0 +1,13 @@
+#!/bin/sh
+
+NAME=Streamer
+TYPE=switch
+
+get_state() {
+  service streamer state && echo ON || echo OFF
+}
+
+set_state() {
+  service streamer $([ "$1" = ON ] && echo enable || echo disable)
+  config set STREAMER $([ "$1" = ON ] && echo 1 || echo 0)
+}

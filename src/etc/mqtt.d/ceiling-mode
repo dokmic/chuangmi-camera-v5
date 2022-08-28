@@ -1,0 +1,13 @@
+#!/bin/sh
+
+NAME="Ceiling Mode"
+TYPE=switch
+
+get_state() {
+  ceiling-mode --status && echo ON || echo OFF
+}
+
+set_state() {
+  ceiling-mode $([ "$1" = ON ] && echo --enable || echo --disable)
+  config set CEILING_MODE $([ "$1" = ON ] && echo 1 || echo 0)
+}

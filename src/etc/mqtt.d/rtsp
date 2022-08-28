@@ -1,0 +1,13 @@
+#!/bin/sh
+
+NAME=RTSP
+TYPE=switch
+
+get_state() {
+  service rtsp state && echo ON || echo OFF
+}
+
+set_state() {
+  service rtsp $([ "$1" = ON ] && echo enable || echo disable)
+  config set RTSP $([ "$1" = ON ] && echo 1 || echo 0)
+}

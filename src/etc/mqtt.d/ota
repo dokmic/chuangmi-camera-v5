@@ -1,0 +1,13 @@
+#!/bin/sh
+
+NAME=OTA
+TYPE=switch
+
+get_state() {
+  service ota state && echo ON || echo OFF
+}
+
+set_state() {
+  service ota $([ "$1" = ON ] && echo enable || echo disable)
+  config set OTA $([ "$1" = ON ] && echo 1 || echo 0)
+}

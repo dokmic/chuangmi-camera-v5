@@ -1,0 +1,24 @@
+#!/bin/sh
+
+NAME="Night Mode"
+TYPE=select
+CONFIG='"options": ["AUTO", "ON", "OFF"]'
+
+get_state() {
+  if service night-mode state; then
+    echo AUTO
+  else
+    night-mode --status && echo ON || echo OFF
+  fi
+}
+
+set_state() {
+  if [ "$1" = AUTO ]; then
+    service night-mode enable
+    config set NIGHT_MODE AUTO
+  else
+    service night-mode disable
+    night-mode $([ "$1" = ON ] && echo --enable || echo --disable)
+    config set NIGHT_MODE $([ "$1" = ON ] && echo 1 || echo 0)
+  fi
+}
