@@ -8,40 +8,73 @@
 #include "pwm.h"
 
 static struct option options[] = {
-    {"disable", no_argument, 0, 'd'},
-    {"enable", no_argument, 0, 'e'},
-    {"status", no_argument, 0, 's'},
-    {"delay", required_argument, 0, 'h'},
+    {"delay", required_argument, 0, 'd'},
+    {"ev-on", required_argument, 0, 'e'},
+    {"ev-off", required_argument, 0, 'f'},
     {"ir-on", required_argument, 0, 'i'},
     {"ir-off", required_argument, 0, 'j'},
-    {"ev-on", required_argument, 0, 'k'},
-    {"ev-off", required_argument, 0, 'l'},
 };
 
 static struct {
     int delay;
 
-    int ir_on;
-    int ir_off;
-
     int ev_on;
     int ev_off;
-} arguments = {3, 90, 1000, 30, 100};
+
+    int ir_on;
+    int ir_off;
+} arguments = {3, 30, 100, 90, 1000};
 
 static struct {
     int ev;
     int ir;
 } state = {0, 0};
 
-void darkness_mode_set(int state)
+void signal_handler(int signal)
+{
+    exit(0);
+}
+
+void toggle_night_mode(int state)
 {
     set_night_mode(state);
     set_ir_cut(state);
     set_ir_led(state);
 }
 
-void night_mode_auto(void)
+int main(int argc, char *argv[])
 {
+    while (1) {
+        int index;
+        int command = getopt_long(argc, argv, "", options, &index);
+        if (command == -1) {
+            break;
+        }
+
+        switch (command) {
+            case 'd':
+                arguments.delay = atoi(optarg);
+                break;
+            case 'e':
+                arguments.ev_on = atoi(optarg);
+                break;
+            case 'f':
+                arguments.ev_off = atoi(optarg);
+                break;
+            case 'i':
+                arguments.ir_on = atoi(optarg);
+                break;
+            case 'j':
+                arguments.ir_off = atoi(optarg);
+                break;
+            default: return 1;
+        }
+    }
+
+    signal(SIGINT, signal_handler);
+    signal(SIGHUP, signal_handler);
+    signal(SIGTERM, signal_handler);
+
     while (1) {
         unsigned int light_info = get_light_info();
         if (!light_info) {
@@ -64,56 +97,11 @@ void night_mode_auto(void)
         int night_mode = get_night_mode();
 
         if (ev < arguments.ev_on && ir > arguments.ir_on && !night_mode) {
-            darkness_mode_set(1);
+            toggle_night_mode(1);
         } else if (ev > arguments.ev_off && ir < arguments.ir_off && night_mode) {
-            darkness_mode_set(0);
+            toggle_night_mode(0);
         }
 
         sleep(arguments.delay);
     }
-}
-
-void signal_handler(int signal)
-{
-    exit(0);
-}
-
-int main(int argc, char *argv[])
-{
-    while (1) {
-        int index;
-        int command = getopt_long(argc, argv, "", options, &index);
-        if (command == -1) {
-            break;
-        }
-
-        switch (command) {
-            case 'd': return !set_night_mode(0);
-            case 'e': return !set_night_mode(1);
-            case 's': return !get_night_mode();
-            case 'h':
-                arguments.delay = atoi(optarg);
-                break;
-            case 'i':
-                arguments.ir_on = atoi(optarg);
-                break;
-            case 'j':
-                arguments.ir_off = atoi(optarg);
-                break;
-            case 'k':
-                arguments.ev_on = atoi(optarg);
-                break;
-            case 'l':
-                arguments.ev_off = atoi(optarg);
-                break;
-            default: return 1;
-        }
-    }
-
-    signal(SIGINT, signal_handler);
-    signal(SIGHUP, signal_handler);
-    signal(SIGTERM, signal_handler);
-    night_mode_auto();
-
-    return 0;
 }

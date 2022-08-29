@@ -70,8 +70,7 @@ int initialize_pwm(void)
 
     memcpy(&pwm[1], &pwm[0], sizeof(pwm_info_t));
 
-    int i;
-    for (i = 0; i <= 1; i++) {
+    for (int i = 0; i <= 1; i++) {
         pwm[i].id = i;
         ioctl(pwm_fd, PWM_IOCTL_REQUEST, &pwm[i].id);
         ioctl(pwm_fd, PWM_IOCTL_SET_CLKSRC, &pwm[i]);

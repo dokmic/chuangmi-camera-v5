@@ -2,8 +2,10 @@
 #define isp328_h
 
 #include <fcntl.h>
+#include <stdlib.h>
 #include <sys/ioctl.h>
 #include <syslog.h>
+#include <unistd.h>
 
 int get_flip_mode(void);
 int set_flip_mode(int state);

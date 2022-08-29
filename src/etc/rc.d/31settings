@@ -1,5 +1,5 @@
 #!/bin/sh -l
 
-ceiling-mode --$([ "$(config get CEILING_MODE || echo 0)" -eq 1 ] && echo enable || echo disable)
-indicator --$([ "$(config get INDICATOR || echo 1)" -eq 1 ] && echo enable || echo disable)
-night_mode --$([ "$(config get NIGHT_MODE || echo AUTO)" -eq 1 ] && echo enable || echo disable)
+camera led blue $([ "$(config get INDICATOR || echo 1)" -eq 1 ] && echo enable || echo disable)
+camera mode ceiling $([ "$(config get CEILING_MODE || echo 0)" -eq 1 ] && echo enable || echo disable)
+camera mode night $([ "$(config get NIGHT_MODE || echo AUTO)" -eq 1 ] && echo enable || echo disable)

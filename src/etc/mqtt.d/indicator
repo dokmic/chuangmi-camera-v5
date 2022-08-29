@@ -4,10 +4,10 @@ NAME=Indicator
 TYPE=switch
 
 get_state() {
-  indicator --status && echo ON || echo OFF
+  camera led blue status && echo ON || echo OFF
 }
 
 set_state() {
-  indicator $([ "$1" = ON ] && echo --enable || echo --disable)
+  camera led blue $([ "$1" = ON ] && echo enable || echo disable)
   config set INDICATOR $([ "$1" = ON ] && echo 1 || echo 0)
 }

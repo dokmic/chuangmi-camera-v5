@@ -3,8 +3,7 @@ FIRMWARE_DIR := $(CURDIR)/firmware
 SRC_DIR := $(CURDIR)/src
 
 BIN := \
-	$(BUILD_DIR)/bin/ceiling-mode \
-	$(BUILD_DIR)/bin/indicator \
+	$(BUILD_DIR)/bin/camera \
 	$(BUILD_DIR)/bin/night-mode \
 	$(BUILD_DIR)/bin/rtspd
 
@@ -22,6 +21,7 @@ $(BUILD_DIR)/bin/%: $(LIB) $(SRC_DIR)/bin/%.c | $(BUILD_DIR)/bin
 		-L$(BUILD_DIR)/lib \
 		-I$(SRC_DIR)/lib \
 		-Wall \
+		-std=gnu99 \
 		-o $(@) \
 		$(SRC_DIR)/bin/$(@F).c \
 		-l isp328 \
@@ -49,7 +49,7 @@ $(BUILD_DIR)/bin/rtspd: $(SRC_DIR)/bin/rtspd.c | $(BUILD_DIR)/bin
 	rm -rf $(BUILD_DIR)/gm_graph
 
 $(BUILD_DIR)/lib/lib%.so: $(SRC_DIR)/lib/%.* | $(BUILD_DIR)/lib
-	$(LDSHARED) -fPIC -o $(@) $(SRC_DIR)/lib/$(basename $(@F:lib%=%)).c
+	$(LDSHARED) -std=gnu99 -fPIC -o $(@) $(SRC_DIR)/lib/$(basename $(@F:lib%=%)).c
 	$(STRIP) $(@)
 
 $(FIRMWARE_DIR)/openssl/lib: OPENSSL_URL := https://www.openssl.org/source/openssl-1.1.1q.tar.gz

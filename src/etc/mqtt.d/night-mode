@@ -8,7 +8,7 @@ get_state() {
   if service night-mode state; then
     echo AUTO
   else
-    night-mode --status && echo ON || echo OFF
+    camera mode night status && echo ON || echo OFF
   fi
 }
 
@@ -18,7 +18,7 @@ set_state() {
     config set NIGHT_MODE AUTO
   else
     service night-mode disable
-    night-mode $([ "$1" = ON ] && echo --enable || echo --disable)
+    camera mode night $([ "$1" = ON ] && echo enable || echo disable)
     config set NIGHT_MODE $([ "$1" = ON ] && echo 1 || echo 0)
   fi
 }
