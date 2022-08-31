@@ -4,7 +4,6 @@ SRC_DIR := $(CURDIR)/src
 
 BIN := \
 	$(BUILD_DIR)/bin/camera \
-	$(BUILD_DIR)/bin/night-mode \
 	$(BUILD_DIR)/bin/rtspd
 
 LIB := \

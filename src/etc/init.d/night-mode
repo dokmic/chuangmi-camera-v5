@@ -3,7 +3,7 @@
 local pid_file=/var/run/night-mode.pid
 
 enable() {
-  restartctl create night-mode --then="$(which service) night-mode start"
+  restartctl create night-mode --pattern=ir_sample --then="$(which service) night-mode start"
   restartctl reload
 
   echo "Automatic night mode is enabled."
@@ -28,21 +28,14 @@ status() {
 start() {
   echo "Starting automatic night mode."
 
-  eval "$(config | grep ^NIGHT_MODE_)"
   status || start-stop-daemon \
     --background \
-    --exec night-mode \
+    --exec ir_sample \
     --make-pidfile \
     --oknodo \
     --pidfile $pid_file \
     --quiet \
-    --start \
-    -- \
-      ${NIGHT_MODE_DELAY:+--delay=$NIGHT_MODE_DELAY} \
-      ${NIGHT_MODE_EV_ON:+--ev-on=$NIGHT_MODE_EV_ON} \
-      ${NIGHT_MODE_EV_OFF:+--ev-on=$NIGHT_MODE_EV_OFF} \
-      ${NIGHT_MODE_IR_ON:+--ev-on=$NIGHT_MODE_IR_ON} \
-      ${NIGHT_MODE_IR_OFF:+--ev-on=$NIGHT_MODE_IR_OFF}
+    --start
 }
 
 stop() {

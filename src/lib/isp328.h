@@ -16,6 +16,4 @@ int set_mirror_mode(int state);
 int get_night_mode(void);
 int set_night_mode(int state);
 
-unsigned int get_light_info(void);
-
 #endif

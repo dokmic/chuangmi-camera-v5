@@ -127,28 +127,3 @@ int set_night_mode(int state)
 
     return 1;
 }
-
-unsigned int get_light_info(void)
-{
-    if (!initialize_isp328()) {
-        return 0;
-    }
-
-    unsigned int converge = 0, ev = 0, ir = 0, status_ready = 0;
-    unsigned int awb_status[10];
-
-    while (converge < 4) {
-        ioctl(isp328_fd, _IOR(0x65, 0x23, int), &converge);
-        sleep(1);
-    }
-    ioctl(isp328_fd, _IOR(0x65, 0x1f, int), &ev);
-
-    while (status_ready != 0xf) {
-        ioctl(isp328_fd, _IOR(0x63, 0x09, int), &status_ready);
-        usleep(1000);
-    }
-    ioctl(isp328_fd, _IOR(0x68, 0x8a, int), awb_status);
-    ir = awb_status[4] / 230400;
-
-    return (ev << 16) | ir;
-}
