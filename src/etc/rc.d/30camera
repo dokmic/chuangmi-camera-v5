@@ -1,6 +1,5 @@
 #!/bin/sh -l
 
-camera ir cut disable
 camera led yellow disable
 
 [ "$(config get INDICATOR || echo 1)" -eq 1 ] && camera led blue enable

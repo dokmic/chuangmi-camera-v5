@@ -7,13 +7,13 @@
 #include <syslog.h>
 #include <unistd.h>
 
-int get_flip_mode(void);
-int set_flip_mode(int state);
+int get_flip_fliter(void);
+int set_flip_fliter(int state);
 
-int get_mirror_mode(void);
-int set_mirror_mode(int state);
+int get_mirror_fliter(void);
+int set_mirror_fliter(int state);
 
-int get_night_mode(void);
-int set_night_mode(int state);
+int get_night_fliter(void);
+int set_night_fliter(int state);
 
 #endif

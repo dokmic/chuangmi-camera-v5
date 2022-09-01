@@ -6,11 +6,7 @@ BIN := \
 	$(BUILD_DIR)/bin/camera \
 	$(BUILD_DIR)/bin/rtspd
 
-LIB := \
-	$(BUILD_DIR)/lib/libisp328.so \
-	$(BUILD_DIR)/lib/libled.so \
-	$(BUILD_DIR)/lib/libpwm.so \
-	$(BUILD_DIR)/lib/libgpio.so
+LIB := $(BUILD_DIR)/lib/libcamera.so
 
 $(BUILD_DIR) $(BUILD_DIR)/bin $(BUILD_DIR)/lib:
 	@mkdir -p $(@)
@@ -23,10 +19,7 @@ $(BUILD_DIR)/bin/%: $(LIB) $(SRC_DIR)/bin/%.c | $(BUILD_DIR)/bin
 		-std=gnu99 \
 		-o $(@) \
 		$(SRC_DIR)/bin/$(@F).c \
-		-l isp328 \
-		-l led \
-		-l pwm \
-		-l gpio
+		-l camera
 	$(STRIP) $(@)
 
 $(BUILD_DIR)/bin/rtspd: $(SRC_DIR)/bin/rtspd.c | $(BUILD_DIR)/bin
@@ -47,7 +40,8 @@ $(BUILD_DIR)/bin/rtspd: $(SRC_DIR)/bin/rtspd.c | $(BUILD_DIR)/bin
 	$(STRIP) $(@)
 	rm -rf $(BUILD_DIR)/gm_graph
 
-$(BUILD_DIR)/lib/lib%.so: $(SRC_DIR)/lib/%.* | $(BUILD_DIR)/lib
+.SECONDEXPANSION:
+$(BUILD_DIR)/lib/lib%.so: $$(shell $(CC) -MM $(SRC_DIR)/lib/%.c | grep -oE '$(SRC_DIR)/[^ ]+') | $(BUILD_DIR)/lib
 	$(LDSHARED) -std=gnu99 -fPIC -o $(@) $(SRC_DIR)/lib/$(basename $(@F:lib%=%)).c
 	$(STRIP) $(@)
 
