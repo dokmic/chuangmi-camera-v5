@@ -3,22 +3,22 @@
 local pid_file=/var/run/rtspd.pid
 
 enable() {
-  restartctl create rtspd --then="$(which service) rtsp start"
-  restartctl reload
+  restart create rtspd --then="$(which service) rtsp start"
+  restart reload
 
   echo "RTSP is enabled."
 }
 
 disable() {
-  restartctl delete rtspd
-  restartctl reload
+  restart delete rtspd
+  restart reload
   service rtsp stop
 
   echo "RTSP is disabled."
 }
 
 state() {
-  restartctl status rtspd || return $?
+  restart status rtspd || return $?
 }
 
 status() {

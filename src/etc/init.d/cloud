@@ -13,22 +13,22 @@ enable() {
   # cron
   binary enable /mnt/data/miot/logmi.sh
 
-  restartctl update miio_client --then="/mnt/data/ot_wifi_tool/miio_client -D"
-  restartctl enable miio_client
-  restartctl enable miio_client_helper
-  restartctl enable miot_devicekit
-  restartctl enable miio_smb
-  restartctl reload
+  restart update miio_client --then="/mnt/data/ot_wifi_tool/miio_client -D"
+  restart enable miio_client
+  restart enable miio_client_helper
+  restart enable miot_devicekit
+  restart enable miio_smb
+  restart reload
 
   echo "Cloud services are enabled."
 }
 
 disable() {
-  restartctl disable miio_client
-  restartctl disable miio_client_helper
-  restartctl disable miot_devicekit
-  restartctl disable miio_smb
-  restartctl reload
+  restart disable miio_client
+  restart disable miio_client_helper
+  restart disable miot_devicekit
+  restart disable miio_smb
+  restart reload
 
   # /mnt/data/imi/imi_init/S93miio_client
   binary disable /mnt/data/ot_wifi_tool/miio_client
@@ -46,7 +46,7 @@ disable() {
 }
 
 state() {
-  restartctl status miio_client || return $?
+  restart status miio_client || return $?
 }
 
 case "$1" in

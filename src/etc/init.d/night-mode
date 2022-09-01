@@ -3,22 +3,22 @@
 local pid_file=/var/run/night-mode.pid
 
 enable() {
-  restartctl create night-mode --pattern=ir_sample --then="$(which service) night-mode start"
-  restartctl reload
+  restart create night-mode --pattern=ir_sample --then="$(which service) night-mode start"
+  restart reload
 
   echo "Automatic night mode is enabled."
 }
 
 disable() {
-  restartctl delete night-mode
-  restartctl reload
+  restart delete night-mode
+  restart reload
   service night-mode stop
 
   echo "Automatic night mode is disabled."
 }
 
 state() {
-  restartctl status night-mode || return $?
+  restart status night-mode || return $?
 }
 
 status() {

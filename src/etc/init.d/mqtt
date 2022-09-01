@@ -3,22 +3,22 @@
 local pid_file=/var/run/mqtt.pid
 
 enable() {
-  restartctl create mqtt --pattern="$(which mqtt)" --then="$(which service) mqtt start"
-  restartctl reload
+  restart create mqtt --pattern="$(which mqtt)" --then="$(which service) mqtt start"
+  restart reload
 
   echo "MQTT is enabled."
 }
 
 disable() {
-  restartctl delete mqtt
-  restartctl reload
+  restart delete mqtt
+  restart reload
   service mqtt stop
 
   echo "MQTT is disabled."
 }
 
 state() {
-  restartctl status mqtt || return $?
+  restart status mqtt || return $?
 }
 
 status() {

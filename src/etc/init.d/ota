@@ -12,16 +12,16 @@ enable() {
 
   # /mnt/data/imi/imi_init/S95miio_ota
   binary enable /mnt/data/miio_ota/miio_ota
-  restartctl enable miio_ota
-  restartctl reload
+  restart enable miio_ota
+  restart reload
 
   echo "OTA is enabled."
 }
 
 disable() {
   # /mnt/data/imi/imi_init/S95miio_ota
-  restartctl disable miio_ota
-  restartctl reload
+  restart disable miio_ota
+  restart reload
   binary disable /mnt/data/miio_ota/miio_ota
   mount | grep -q $pre_ota && umount $pre_ota
 
@@ -29,7 +29,7 @@ disable() {
 }
 
 state() {
-  restartctl status miio_ota || return $?
+  restart status miio_ota || return $?
 }
 
 case "$1" in

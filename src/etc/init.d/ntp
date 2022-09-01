@@ -3,22 +3,22 @@
 local pid_file=/var/run/ntpd.pid
 
 enable() {
-  restartctl create ntpd --then="$(which service) ntp start"
-  restartctl reload
+  restart create ntpd --then="$(which service) ntp start"
+  restart reload
 
   echo "NTP client is enabled."
 }
 
 disable() {
-  restartctl delete ntpd
-  restartctl reload
+  restart delete ntpd
+  restart reload
   service ntp stop
 
   echo "Automatic night mode is disabled."
 }
 
 state() {
-  restartctl status ntpd || return $?
+  restart status ntpd || return $?
 }
 
 status() {
