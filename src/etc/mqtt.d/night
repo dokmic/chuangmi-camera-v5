@@ -1,11 +1,11 @@
 #!/bin/sh
 
-NAME="Night Mode"
+NAME="Night Vision"
 TYPE=select
 CONFIG='"options": ["AUTO", "ON", "OFF"]'
 
 get_state() {
-  if service night-mode state; then
+  if service night state; then
     echo AUTO
   else
     camera mode night status && echo ON || echo OFF
@@ -14,11 +14,11 @@ get_state() {
 
 set_state() {
   if [ "$1" = AUTO ]; then
-    service night-mode enable
-    config set NIGHT_MODE AUTO
+    service night enable
+    config set NIGHT AUTO
   else
-    service night-mode disable
+    service night disable
     camera mode night $([ "$1" = ON ] && echo enable || echo disable)
-    config set NIGHT_MODE $([ "$1" = ON ] && echo 1 || echo 0)
+    config set NIGHT $([ "$1" = ON ] && echo 1 || echo 0)
   fi
 }

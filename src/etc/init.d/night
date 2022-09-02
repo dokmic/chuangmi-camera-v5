@@ -1,24 +1,24 @@
 #!/bin/sh -l
 
-local pid_file=/var/run/night-mode.pid
+local pid_file=/var/run/night.pid
 
 enable() {
-  restart create night-mode --pattern=ir_sample --then="$(which service) night-mode start"
+  restart create night --pattern=ir_sample --then="$(which service) night start"
   restart reload
 
   echo "Automatic night mode is enabled."
 }
 
 disable() {
-  restart delete night-mode
+  restart delete night
   restart reload
-  service night-mode stop
+  service night stop
 
   echo "Automatic night mode is disabled."
 }
 
 state() {
-  restart status night-mode || return $?
+  restart status night || return $?
 }
 
 status() {

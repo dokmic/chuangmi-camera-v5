@@ -9,4 +9,4 @@ when a certain minimum IR or light value has been reached.
 
 | Configuration            | Options                        | Description |
 | ---                      | ---                            | ---         |
-| `NIGHT_MODE`             | `1` to enable, `0` to disable, or `AUTO` to control automatically. | Enable or disable the auto nightmode service (no auth) |
+| `NIGHT`             | `1` to enable, `0` to disable, or `AUTO` to control automatically. | Enable or disable the auto nightmode service (no auth) |

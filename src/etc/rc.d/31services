@@ -3,7 +3,7 @@
 service ntp enable
 service cloud $([ "$(config get CLOUD || echo 1)" -eq 1 ] && echo enable || echo disable)
 service mqtt $([ "$(config get MQTT || echo 1)" -eq 1 ] && echo enable || echo disable)
-service night-mode $([ "$(config get NIGHT_MODE || echo 0)" = AUTO ] && echo enable || echo disable)
+service night $([ "$(config get NIGHT || echo 0)" = AUTO ] && echo enable || echo disable)
 service ota $([ "$(config get OTA || echo 1)" -eq 1 ] && echo enable || echo disable)
 service rtsp $([ "$(config get RTSP || echo 0)" -eq 1 ] && echo enable || echo disable)
 service streamer $([ "$(config get STREAMER || echo 1)" -eq 1 ] && echo enable || echo disable)

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-NAME="Ceiling Mode"
+NAME="Rotate Image"
 TYPE=switch
 
 get_state() {
@@ -9,5 +9,5 @@ get_state() {
 
 set_state() {
   camera mode ceiling $([ "$1" = ON ] && echo enable || echo disable)
-  config set CEILING_MODE $([ "$1" = ON ] && echo 1 || echo 0)
+  config set CEILING $([ "$1" = ON ] && echo 1 || echo 0)
 }

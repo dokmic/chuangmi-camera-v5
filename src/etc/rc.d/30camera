@@ -3,5 +3,5 @@
 camera led yellow disable
 
 [ "$(config get INDICATOR || echo 1)" -eq 1 ] && camera led blue enable
-[ "$(config get CEILING_MODE || echo 0)" -eq 1 ] && camera mode ceiling enable
-[ "$(config get NIGHT_MODE || echo 0)" -eq 1 ] && camera mode night enable
+[ "$(config get CEILING || echo 0)" -eq 1 ] && camera mode ceiling enable
+[ "$(config get NIGHT || echo 0)" -eq 1 ] && camera mode night enable

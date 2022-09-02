@@ -3,9 +3,9 @@
 ## Ceiling Mode
 
 Ceiling mode is introduced to set the correct rotation to camera's that are mounted on the ceiling.
-If `CEILING_MODE` is enabled, the camera will use `flip` and `mirror_mode` to rotate the camera accordingly.
+If `CEILING` is enabled, the camera will use `flip` and `mirror_mode` to rotate the camera accordingly.
 
-Ceiling mode can be configured in the main `config.cfg` by setting `CEILING_MODE` from `0` to `1`.
+Ceiling mode can be configured in the main `config.cfg` by setting `CEILING` from `0` to `1`.
 
 ## Night mode
 
