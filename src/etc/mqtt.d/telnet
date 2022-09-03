@@ -1,0 +1,13 @@
+#!/bin/sh
+
+NAME=Telnet
+TYPE=switch
+
+get_state() {
+  service telnet state && echo ON || echo OFF
+}
+
+set_state() {
+  service telnet $([ "$1" = ON ] && echo enable || echo disable)
+  config set TELNET $([ "$1" = ON ] && echo 1 || echo 0)
+}
