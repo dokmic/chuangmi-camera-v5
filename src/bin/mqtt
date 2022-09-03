@@ -46,6 +46,8 @@ process_message() {
 
 publish_availability() {
   publish --topic $MQTT_TOPIC_AVAILABILITY --message online
+
+  return $?
 }
 
 publish_discoverability() {
@@ -73,6 +75,8 @@ publish_discoverability() {
 
     publish --topic "$topic" --message "$config"
   done
+
+  return $?
 }
 
 publish_state() {
@@ -85,6 +89,8 @@ publish_state() {
 
     publish --topic "$topic" --message "$state"
   done
+
+  return $?
 }
 
 worker_command() {
@@ -108,9 +114,11 @@ worker_state() {
       READY=1
     fi
 
-    publish_availability
-    publish_state
-    sleep 60
+    publish_availability \
+      && publish_discoverability \
+      && publish_state
+
+    sleep $([ "$?" -eq 0 ] && echo 60 || echo 5)
   done
 }
 
@@ -125,7 +133,6 @@ stop() {
 printf mqtt >/proc/$$/comm
 trap stop HUP INT QUIT ABRT TERM
 
-publish_discoverability | logger -t mqtt
 worker_command | logger -t mqtt &
 worker_state | logger -t mqtt &
 
