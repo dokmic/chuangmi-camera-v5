@@ -1,4 +1,6 @@
 # Chuangmi Camera V5 Extended Firmware
+[![Build](https://github.com/dokmic/chuangmi-camera-v5/actions/workflows/build.yaml/badge.svg?branch=master)](https://github.com/dokmic/chuangmi-camera-v5/actions/workflows/tests.yaml)
+[![Version](https://img.shields.io/github/v/release/dokmic/chuangmi-camera-v5?label=version)](https://github.com/dokmic/chuangmi-camera-v5/releases/latest)
 [![License][license-image]][license]
 
 This is a complimentary firmware for Chuangmi 720p Camera ([chuangmi.camera.v5](https://home.miot-spec.com/s/chuangmi.camera.v5)).

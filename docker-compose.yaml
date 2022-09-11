@@ -1,7 +1,7 @@
 services:
-  miicam:
+  camera:
     build:
       context: .
-    image: miicam:latest
+    image: camera:latest
     volumes:
       - .:/app
